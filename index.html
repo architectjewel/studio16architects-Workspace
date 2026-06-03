@@ -3,193 +3,349 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Studio 16 Tracker — Connection Test</title>
+  <title>Studio 16 — Team Board</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <style> body { font-family: 'Archivo', system-ui, sans-serif; } .mono { font-family: 'Spline Sans Mono', monospace; } </style>
+  <style> body{font-family:'Archivo',system-ui,sans-serif;} .mono{font-family:'Spline Sans Mono',monospace;} </style>
 </head>
 <body class="bg-[#f4f4f2] text-zinc-900">
   <div id="root"></div>
-
   <script type="text/babel">
     const { useState, useEffect } = React;
 
-    /* ============================================================
-       STEP A — paste your two Supabase keys between the quotes.
-       (Supabase → Project Settings → API)
-       The anon/public key is safe to put here — your security
-       rules protect the data, not the key.
-       ============================================================ */
+    /* ===== STEP A: paste your two Supabase keys ===== */
     const SUPABASE_URL      = "https://wznspowrhxpugfphwowl.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6bnNwb3dyaHhwdWdmcGh3b3dsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDk1OTIsImV4cCI6MjA5NjAyNTU5Mn0.KzwU8kaqnKxw0CuG8W1SRp7ghO9eEZ1X6e_Ok8-kXjQ";
-
     const configured = !SUPABASE_URL.includes("__PASTE") && !SUPABASE_ANON_KEY.includes("__PASTE");
     const db = configured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-    function App() {
-      const [session, setSession] = useState(null);
-      const [profile, setProfile] = useState(null);
-      const [data, setData] = useState({ members: [], boards: [], projects: [], tasks: [] });
-      const [loading, setLoading] = useState(false);
-      const [err, setErr] = useState("");
-      const [email, setEmail] = useState("");
-      const [pw, setPw] = useState("");
-      const [busy, setBusy] = useState(false);
-      const [nm, setNm] = useState("");
-      const [nr, setNr] = useState("Architect");
+    /* ===== constants ===== */
+    const PRIORITY = { top:{label:"Top",rank:0,text:"text-red-600",dot:"bg-red-500",soft:"bg-red-50"}, medium:{label:"Medium",rank:1,text:"text-amber-600",dot:"bg-amber-400",soft:"bg-amber-50"}, low:{label:"Low",rank:2,text:"text-zinc-500",dot:"bg-zinc-300",soft:"bg-zinc-100"} };
+    const STATUS = { live:"Live", hold:"On hold", dead:"Dead", complete:"Complete", closed:"Closed" };
+    const TS = { upcoming:"Upcoming", ongoing:"Ongoing", pending:"Pending", done:"Done" };
+    const PRIORITY_OPTS = Object.keys(PRIORITY).map(k=>({value:k,label:PRIORITY[k].label}));
+    const STATUS_OPTS = Object.keys(STATUS).map(k=>({value:k,label:STATUS[k]}));
+    const TS_OPTS = Object.keys(TS).map(k=>({value:k,label:TS[k]}));
+    const ROLES = ["Architect","Lead Architect","Senior Architect","3D Visualizer","Draftsman","Structural Engineer","MEP Engineer","Estimator","Manager","Other"];
+    const ROLE_PALETTE = [
+      {bg:"bg-slate-100",text:"text-slate-600"},{bg:"bg-blue-100",text:"text-blue-600"},{bg:"bg-indigo-100",text:"text-indigo-600"},
+      {bg:"bg-violet-100",text:"text-violet-600"},{bg:"bg-teal-100",text:"text-teal-600"},{bg:"bg-cyan-100",text:"text-cyan-600"},
+      {bg:"bg-emerald-100",text:"text-emerald-600"},{bg:"bg-rose-100",text:"text-rose-500"},{bg:"bg-purple-100",text:"text-purple-600"},{bg:"bg-sky-100",text:"text-sky-600"} ];
+    const ROLE_COLOR = {"Lead Architect":2,"Senior Architect":1,"Architect":9,"3D Visualizer":3,"Draftsman":4,"Structural Engineer":0,"MEP Engineer":5,"Estimator":6,"Manager":8,"Other":0};
+    const roleColor = (r)=>{ if(ROLE_COLOR[r]!=null) return ROLE_PALETTE[ROLE_COLOR[r]]; let h=0; for(let i=0;i<(r||"").length;i++) h=(h*31+r.charCodeAt(i))>>>0; return ROLE_PALETTE[h%ROLE_PALETTE.length]; };
+    const PROD_GROUPS = [
+      {g:"Architectural",items:[["2D Layout Design","ARCH","2200"],["3D Design — Perspective Views","ARCH","2300"],["3D Design — Animation","ARCH","2700"],["Architectural Working Drawing Preparation","ARCH","2400"],["Brochure Plan Preparation","ARCH","2600"],["Master Plan Design","ARCH","2500"]]},
+      {g:"Authority Approval",items:[["RAJUK Approval Drawing","AUTH","3100"],["CDA Approval Drawing","AUTH","3200"],["Jolshiri Approval Drawing","AUTH","3300"],["Upazila / City Corp. Drawing","AUTH","3400"]]},
+      {g:"Interior & Landscape",items:[["Interior Layout Design","INT","6300"],["Interior 3D Space Design","INT","6400"],["Landscape 3D Design","LAND","6200"],["Landscape Working Drawing","LAND","6100"]]},
+      {g:"Other Production",items:[["Tender Documents Preparation","DOC","1800"],["Quotation Preparation","DOC","0001"]]},
+    ];
+    const FOLLOW_GROUPS = [
+      {g:"Pre-design & Approvals",items:[["Client's Requirement","CLIENT","1600"],["Digital Survey","SURVEY","1300"],["Soil Test Report","SOIL","1200"],["Planning Permit","PERMIT","3010"],["Construction Permit","PERMIT","3020"]]},
+      {g:"Engineering Coordination",items:[["Structural Working Drawing","STRUCT","4100"],["Electrical & Plumbing Drawing","MEP","5100 & 5200"],["Fire Working Drawing","FIRE","5500"]]},
+      {g:"Costing & Site",items:[["BOQ — Civil / Finish","BOQ","4200"],["Client Follow-up","CLIENT","0002"],["Site Visit","SITE","7100"],["Site Construction Supervision","SITE","7200"]]},
+    ];
+    const DEFAULT_TASK_DEFS = [["2D Layout Design","production"],["3D Design — Perspective Views","production"],["RAJUK Approval Drawing","production"],["3D Design — Animation","production"],["Architectural Working Drawing Preparation","production"],["Digital Survey","coordination"],["Soil Test Report","coordination"],["Planning Permit","coordination"],["Structural Working Drawing","coordination"],["Electrical & Plumbing Drawing","coordination"],["Construction Permit","coordination"]];
+    const ONGOING_DEFAULTS = ["2D Layout Design","Planning Permit"];
+    const typeCat = (n,wt)=>{ for(const g of (wt==="production"?PROD_GROUPS:FOLLOW_GROUPS)) for(const it of g.items) if(it[0]===n) return it[1]; return "DOC"; };
+    const typeCode = (n,wt)=>{ for(const g of (wt==="production"?PROD_GROUPS:FOLLOW_GROUPS)) for(const it of g.items) if(it[0]===n) return it[2]||""; return ""; };
+    const SIZE_RE = /^\s*[\d.]+\s*(katha|kahta|bigha|decimal|dec|cottah|chatak|sq\.?\s*ft|sqft|sft)\b/i;
+    const parseName = (raw)=>{ const p=(raw||"").split("_").map(s=>s.trim()); const code=p[0]||"",client=p[1]||"",location=p[2]||""; const rest=p.slice(3).filter(x=>x.length); let size="",address=""; if(rest.length){ if(SIZE_RE.test(rest[0])){size=rest[0];address=rest.slice(1).join("_");} else address=rest.join("_"); } return {code,client,location,size,address}; };
+    const initials = (n)=> (n||"").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();
+    const today = ()=> new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short"});
 
-      useEffect(() => {
-        if (!db) return;
-        db.auth.getSession().then(({ data }) => setSession(data.session));
-        const { data: sub } = db.auth.onAuthStateChange((_e, s) => setSession(s));
-        return () => sub.subscription.unsubscribe();
-      }, []);
+    /* ===== small components ===== */
+    function Select({value,onChange,options,className,tone}){
+      return <select value={value} onChange={e=>onChange(e.target.value)} className={`mono rounded-md border px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900 ${tone||"border-zinc-300 text-zinc-700 bg-white"} ${className||""}`}>{options.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}</select>;
+    }
+    function TypeSelect({value,onChange,wt}){ const groups = wt==="production"?PROD_GROUPS:FOLLOW_GROUPS; return <select value={value} onChange={e=>onChange(e.target.value)} className="mono w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900">{groups.map(g=><optgroup key={g.g} label={g.g}>{g.items.map(([n,,code])=><option key={n} value={n}>{n}{code?` (${code})`:""}</option>)}</optgroup>)}</select>; }
+    function Reorder({onUp,onDown,upOk,downOk}){ return <span className="flex flex-col leading-none"><button onClick={e=>{e.stopPropagation();upOk&&onUp();}} disabled={!upOk} className="px-1 text-[9px] text-zinc-400 hover:text-zinc-800 disabled:opacity-20">▲</button><button onClick={e=>{e.stopPropagation();downOk&&onDown();}} disabled={!downOk} className="px-1 text-[9px] text-zinc-400 hover:text-zinc-800 disabled:opacity-20">▼</button></span>; }
+    function RoleField({value,onChange}){ const inList=ROLES.includes(value); const [custom,setCustom]=useState(!inList&&!!value); const showCustom=custom||(!inList&&!!value); return <><Select value={showCustom?"__custom":(inList?value:"")} onChange={v=>{ if(v==="__custom"){setCustom(true);onChange("");} else {setCustom(false);onChange(v);} }} className="w-full" options={[{value:"",label:"Select role…"},...ROLES.map(r=>({value:r,label:r})),{value:"__custom",label:"✏ Custom role…"}]} />{showCustom&&<input autoFocus value={value} onChange={e=>onChange(e.target.value)} placeholder="Type role…" className="mt-1 w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" />}</>; }
+    const Lbl = ({children})=> <label className="mono mb-1 block text-[9px] uppercase tracking-wider text-zinc-400">{children}</label>;
+    const Input = (p)=> <input {...p} className={`w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900 ${p.className||""}`} />;
+    const Dot = ({level})=> <span className={`h-2 w-2 rounded-full ${PRIORITY[level].dot}`} />;
+    const Avatar = ({name})=> <span className="mono flex h-7 w-7 items-center justify-center rounded-full bg-zinc-800 text-[10px] font-semibold text-white">{name?initials(name):"—"}</span>;
+    const Stat = ({n,l,tone})=> <div className="flex flex-col"><span className={`mono text-base font-semibold leading-none ${tone==="red"?"text-red-500":"text-zinc-900"}`}>{n}</span><span className="mono mt-1 text-[9px] uppercase tracking-wider text-zinc-400">{l}</span></div>;
 
-      useEffect(() => { if (session) loadAll(); }, [session]);
+    /* ===== mappers (db row -> app shape) ===== */
+    const mapMember = r=>({id:r.id,name:r.name,role:r.role,teamId:r.team_id,boardId:r.board_id,status:r.status,archivedDate:r.archived_date,sort:r.sort_order});
+    const mapBoard = r=>({id:r.id,name:r.name,desc:r.description||"",leadId:r.lead_member_id,sort:r.sort_order});
+    const mapProject = r=>({id:r.id,code:r.code,nickname:r.nickname,client:r.client,location:r.location,size:r.size,address:r.address,priority:r.priority,status:r.status,lead:r.lead_member_id,sort:r.sort_order,tasks:[]});
+    const mapTask = r=>({id:r.id,projectId:r.project_id,label:r.label,workType:r.work_type,cat:r.cat,code:r.code,status:r.status,assignee:r.assignee_member_id,contact:r.contact||"",doneDate:r.done_date,sort:r.sort_order});
 
-      async function loadAll() {
-        setLoading(true); setErr("");
-        try {
-          const { data: prof, error: pe } = await db.from("profiles").select("*, companies(*)").eq("id", session.user.id).single();
-          if (pe) throw pe;
-          setProfile(prof);
-          const [m, b, p, t] = await Promise.all([
+    function App(){
+      const [session,setSession]=useState(null);
+      const [profile,setProfile]=useState(null);
+      const [members,setMembers]=useState([]);
+      const [boards,setBoards]=useState([]);
+      const [projects,setProjects]=useState([]);
+      const [loading,setLoading]=useState(false);
+      const [err,setErr]=useState("");
+      const [email,setEmail]=useState(""); const [pw,setPw]=useState(""); const [busy,setBusy]=useState(false);
+      const [selId,setSelId]=useState("");
+      const [activeBoard,setActiveBoard]=useState("");
+      const [wt,setWt]=useState("all");
+      const [expanded,setExpanded]=useState(null);
+      const [shareOpen,setShareOpen]=useState(false); const [copied,setCopied]=useState(false);
+      const [showAddM,setShowAddM]=useState(false); const [nm,setNm]=useState({name:"",role:"Architect",teamId:""});
+      const [editM,setEditM]=useState(null);
+      const [removeM,setRemoveM]=useState(false); const [reassign,setReassign]=useState("");
+      const [boardCfg,setBoardCfg]=useState(false); const [addBoardOpen,setAddBoardOpen]=useState(false); const [nb,setNb]=useState({name:"",desc:"",leadId:""});
+      const [showAddP,setShowAddP]=useState(false); const [np,setNp]=useState({raw:"",code:"",nickname:"",client:"",location:"",size:"",address:"",priority:"medium",lead:"__none"});
+      const [addTaskFor,setAddTaskFor]=useState(null); const [td,setTd]=useState({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:"__none"});
+
+      const isAdmin = profile?.role==="admin";
+
+      useEffect(()=>{ if(!db) return; db.auth.getSession().then(({data})=>setSession(data.session)); const {data:sub}=db.auth.onAuthStateChange((_e,s)=>setSession(s)); return ()=>sub.subscription.unsubscribe(); },[]);
+      useEffect(()=>{ if(session) load(true); },[session]);
+
+      async function load(initial){
+        if(initial) setLoading(true); setErr("");
+        try{
+          let prof = profile;
+          if(initial){ const {data:p,error:pe}=await db.from("profiles").select("*, companies(*)").eq("id",session.user.id).single(); if(pe) throw pe; prof=p; setProfile(p); }
+          const [mb,bd,pr,tk]=await Promise.all([
             db.from("members").select("*").order("sort_order"),
             db.from("boards").select("*").order("sort_order"),
             db.from("projects").select("*").order("sort_order"),
             db.from("tasks").select("*").order("sort_order"),
           ]);
-          for (const r of [m, b, p, t]) if (r.error) throw r.error;
-          setData({ members: m.data, boards: b.data, projects: p.data, tasks: t.data });
-        } catch (e) { setErr(e.message || String(e)); }
-        setLoading(false);
+          for(const r of [mb,bd,pr,tk]) if(r.error) throw r.error;
+          let bds = bd.data.map(mapBoard);
+          if(bds.length===0 && prof?.role==="admin"){ const {data:nbd}=await db.from("boards").insert({company_id:prof.company_id,name:"Design Team",description:"",sort_order:0}).select().single(); if(nbd) bds=[mapBoard(nbd)]; }
+          const tasks = tk.data.map(mapTask);
+          const projs = pr.data.map(mapProject).map(p=>({...p,tasks:tasks.filter(t=>t.projectId===p.id).sort((a,b)=>a.sort-b.sort)}));
+          setMembers(mb.data.map(mapMember)); setBoards(bds); setProjects(projs);
+          setActiveBoard(a=> a && bds.some(b=>b.id===a) ? a : (bds[0]?.id||""));
+        }catch(e){ setErr(e.message||String(e)); }
+        if(initial) setLoading(false);
       }
+      const refresh = ()=>load(false);
+      const cid = ()=>profile.company_id;
+      const fail = (e)=>{ if(e){ setErr(e.message||String(e)); return true; } return false; };
 
-      async function signIn(e) {
-        e.preventDefault(); setBusy(true); setErr("");
-        const { error } = await db.auth.signInWithPassword({ email: email.trim(), password: pw });
-        if (error) setErr(error.message);
-        setBusy(false);
-      }
-      async function signOut() { await db.auth.signOut(); setSession(null); setProfile(null); setData({ members: [], boards: [], projects: [], tasks: [] }); }
+      async function signIn(e){ e.preventDefault(); setBusy(true); setErr(""); const {error}=await db.auth.signInWithPassword({email:email.trim(),password:pw}); if(error) setErr(error.message); setBusy(false); }
+      async function signOut(){ await db.auth.signOut(); setSession(null); setProfile(null); setMembers([]); setBoards([]); setProjects([]); }
 
-      async function addMember() {
-        if (!nm.trim() || !profile) return;
-        setErr("");
-        const { error } = await db.from("members").insert({
-          company_id: profile.company_id, name: nm.trim(), role: nr.trim(),
-          status: "active", board_id: data.boards[0]?.id || null, sort_order: data.members.length,
-        });
-        if (error) { setErr(error.message); return; }
-        setNm(""); loadAll();
-      }
+      const byId = id=>members.find(m=>m.id===id);
+      const active = members.filter(m=>m.status==="active");
+      const archived = members.filter(m=>m.status==="archived");
+      const boardOf = m=> m.boardId || boards[0]?.id;
+      const activeLead = boards.find(b=>b.id===activeBoard)?.leadId || null;
+      const boardMembers = active.filter(m=> boardOf(m)===activeBoard || m.id===activeLead);
+      const sel = byId(selId);
+      const mine = projects.filter(p=> p.lead===selId || p.tasks.some(t=>t.assignee===selId));
+      const matchWt = p=> wt==="all" || p.tasks.some(t=>t.workType===wt);
+      const kpis = {
+        live: projects.filter(p=>p.status==="live").length,
+        ongoing: projects.filter(p=>p.status==="live"&&p.tasks.some(t=>t.status==="ongoing")).length,
+        hold: projects.filter(p=>p.status==="hold").length,
+        unassigned: projects.filter(p=>p.status==="live"&&!p.lead).length,
+        pending: projects.filter(p=>p.status==="live").reduce((a,p)=>a+p.tasks.filter(t=>t.workType==="coordination"&&t.status==="pending").length,0),
+      };
 
-      const nameOf = (id) => data.members.find((m) => m.id === id)?.name || "—";
-      const firstName = (id) => (data.members.find((m) => m.id === id)?.name || "").split(" ")[0] || "Unassigned";
+      async function addMember(){ if(!nm.name.trim()) return; if(fail((await db.from("members").insert({company_id:cid(),board_id:activeBoard,name:nm.name.trim(),role:(nm.role||"Team member").trim(),team_id:nm.teamId.trim()||null,status:"active",sort_order:boardMembers.length})).error)) return; setNm({name:"",role:"Architect",teamId:""}); setShowAddM(false); await refresh(); }
+      async function saveMember(){ const e=editM; if(fail((await db.from("members").update({name:e.name.trim()||sel.name,role:e.role.trim()||sel.role,team_id:e.teamId.trim()||null,board_id:e.boardId||boardOf(sel)}).eq("id",selId)).error)) return; setEditM(null); if(e.boardId&&e.boardId!==activeBoard) setSelId(""); await refresh(); }
+      async function moveMember(id,dir){ const i=boardMembers.findIndex(m=>m.id===id); const j=i+dir; if(j<0||j>=boardMembers.length) return; const a=boardMembers[i],b=boardMembers[j]; await db.from("members").update({sort_order:b.sort}).eq("id",a.id); await db.from("members").update({sort_order:a.sort}).eq("id",b.id); await refresh(); }
+      async function doRemoveMember(){ const id=selId; const doneN=projects.reduce((a,p)=>a+p.tasks.filter(t=>t.assignee===id&&t.status==="done").length,0); const to=reassign||null; await db.from("tasks").update({assignee_member_id:to}).eq("assignee_member_id",id).neq("status","done"); await db.from("projects").update({lead_member_id:to}).eq("lead_member_id",id); await db.from("boards").update({lead_member_id:to}).eq("lead_member_id",id); if(doneN>0) await db.from("members").update({status:"archived",archived_date:today()}).eq("id",id); else await db.from("members").delete().eq("id",id); setRemoveM(false); setReassign(""); setSelId(""); await refresh(); }
+      async function restore(id){ await db.from("members").update({status:"active"}).eq("id",id); await refresh(); }
 
-      // ---- not configured ----
-      if (!configured) return (
-        <div className="mx-auto mt-20 max-w-lg rounded-xl border border-amber-300 bg-amber-50 p-6 text-sm text-amber-800">
-          <div className="mb-1 font-semibold">Almost there — add your keys</div>
-          Open this file and paste your Supabase <b>Project URL</b> and <b>anon public key</b> into the two lines near the top (Step A), then re-deploy.
-        </div>
-      );
+      async function addBoard(){ if(!nb.name.trim()) return; const {data,error}=await db.from("boards").insert({company_id:cid(),name:nb.name.trim(),description:nb.desc.trim(),lead_member_id:nb.leadId||null,sort_order:boards.length}).select().single(); if(fail(error)) return; setNb({name:"",desc:"",leadId:""}); setAddBoardOpen(false); await refresh(); setActiveBoard(data.id); setSelId(""); }
+      async function patchBoard(id,f){ if(fail((await db.from("boards").update(f).eq("id",id)).error)) return; await refresh(); }
+      async function removeBoard(id){ if(boards.length<=1) return; const fb=boards.find(b=>b.id!==id).id; await db.from("members").update({board_id:fb}).eq("board_id",id); await db.from("boards").delete().eq("id",id); setBoardCfg(false); setActiveBoard(fb); setSelId(""); await refresh(); }
+      async function moveBoard(id,dir){ const i=boards.findIndex(b=>b.id===id); const j=i+dir; if(j<0||j>=boards.length) return; const a=boards[i],b=boards[j]; await db.from("boards").update({sort_order:b.sort}).eq("id",a.id); await db.from("boards").update({sort_order:a.sort}).eq("id",b.id); await refresh(); }
 
-      // ---- login ----
-      if (!session) return (
+      async function addProject(){ if(!np.code.trim()||!np.client.trim()) return; const lead=np.lead==="__none"?null:np.lead; const {data:proj,error}=await db.from("projects").insert({company_id:cid(),code:np.code.trim(),nickname:np.nickname,client:np.client,location:np.location,size:np.size,address:np.address,priority:np.priority,status:"live",lead_member_id:lead,sort_order:projects.length}).select().single(); if(fail(error)) return; const tasks=DEFAULT_TASK_DEFS.map(([name,w],i)=>({project_id:proj.id,label:name,work_type:w,cat:typeCat(name,w),code:typeCode(name,w),status:ONGOING_DEFAULTS.includes(name)?"ongoing":"upcoming",assignee_member_id:lead,contact:"",sort_order:i})); if(fail((await db.from("tasks").insert(tasks)).error)) return; setNp({raw:"",code:"",nickname:"",client:"",location:"",size:"",address:"",priority:"medium",lead:"__none"}); setShowAddP(false); await refresh(); setExpanded(proj.id); }
+      async function patchProject(id,f){ if(fail((await db.from("projects").update(f).eq("id",id)).error)) return; if(f.lead_member_id) await db.from("tasks").update({assignee_member_id:f.lead_member_id}).eq("project_id",id).is("assignee_member_id",null); await refresh(); }
+
+      async function addTask(pid){ const sort=(projects.find(p=>p.id===pid)?.tasks.length)||0; if(fail((await db.from("tasks").insert({project_id:pid,label:td.label.trim()||td.type,work_type:td.workType,cat:typeCat(td.type,td.workType),code:typeCode(td.type,td.workType),status:"upcoming",assignee_member_id:td.assignee==="__none"?null:td.assignee,contact:td.contact||"",sort_order:sort})).error)) return; setTd({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:selId||"__none"}); setAddTaskFor(null); await refresh(); }
+      async function setTaskStatus(id,status){ if(fail((await db.from("tasks").update({status,done_date:status==="done"?today():null}).eq("id",id)).error)) return; await refresh(); }
+      async function setTaskAssignee(id,mid){ if(fail((await db.from("tasks").update({assignee_member_id:mid==="__none"?null:mid}).eq("id",id)).error)) return; await refresh(); }
+      async function removeTask(id){ await db.from("tasks").delete().eq("id",id); await refresh(); }
+      async function moveTask(list,id,dir){ const i=list.findIndex(t=>t.id===id); const j=i+dir; if(j<0||j>=list.length) return; const a=list[i],b=list[j]; await db.from("tasks").update({sort_order:b.sort}).eq("id",a.id); await db.from("tasks").update({sort_order:a.sort}).eq("id",b.id); await refresh(); }
+
+      function buildShare(m){ if(!m) return ""; const mp=projects.filter(p=>p.tasks.some(t=>t.assignee===m.id&&t.status!=="done")).sort((a,b)=>PRIORITY[a.priority].rank-PRIORITY[b.priority].rank); const out=[m.name]; mp.forEach((p,pi)=>{ out.push((pi+1)+". "+p.code+" "+(p.nickname||p.client||"")); p.tasks.filter(t=>t.assignee===m.id&&t.status!=="done").forEach((t,ti)=>{ const L=String.fromCharCode(65+ti); const c=t.workType==="coordination"&&t.contact?" -> "+t.contact:""; const tag=t.workType==="coordination"?"(follow-up "+t.status+")":"("+t.status+")"; out.push("     "+L+". "+t.label+c+" "+tag); }); }); if(!mp.length) out.push("No open tasks."); return out.join("\n"); }
+      function doCopy(){ const text=buildShare(sel); if(navigator.clipboard) navigator.clipboard.writeText(text).catch(()=>{}); const ta=document.getElementById("shareArea"); if(ta){ta.focus();ta.select();try{document.execCommand("copy");}catch(e){}} setCopied(true); setTimeout(()=>setCopied(false),1500); }
+
+      if(!configured) return <div className="mx-auto mt-20 max-w-lg rounded-xl border border-amber-300 bg-amber-50 p-6 text-sm text-amber-800"><b>Add your keys</b> — paste your Supabase Project URL and anon key into Step A near the top of this file, then re-deploy.</div>;
+      if(!session) return (
         <div className="flex min-h-screen items-center justify-center px-4">
           <form onSubmit={signIn} className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
             <h1 className="text-lg font-semibold">Studio 16 Architects</h1>
-            <p className="mb-4 text-[12px] text-zinc-500">Project &amp; Team Tracker — sign in</p>
-            <label className="mb-1 block text-[11px] uppercase tracking-wider text-zinc-400">Email</label>
-            <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" autoFocus className="mb-3 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-900" placeholder="admin@studio16.app" />
-            <label className="mb-1 block text-[11px] uppercase tracking-wider text-zinc-400">Password</label>
-            <input value={pw} onChange={(e) => setPw(e.target.value)} type="password" className="mb-4 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-900" placeholder="••••••" />
-            <button disabled={busy} className="w-full rounded-md bg-zinc-900 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50">{busy ? "Signing in…" : "Sign in"}</button>
+            <p className="mb-4 text-[12px] text-zinc-500">Team Board — sign in</p>
+            <Lbl>Email</Lbl><input value={email} onChange={e=>setEmail(e.target.value)} type="email" autoFocus className="mb-3 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-900" />
+            <Lbl>Password</Lbl><input value={pw} onChange={e=>setPw(e.target.value)} type="password" className="mb-4 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-900" />
+            <button disabled={busy} className="w-full rounded-md bg-zinc-900 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50">{busy?"Signing in…":"Sign in"}</button>
             {err && <div className="mt-3 rounded-md bg-red-50 px-3 py-2 text-[12px] text-red-600">{err}</div>}
           </form>
         </div>
       );
 
-      // ---- signed in ----
+      const board = boards.find(b=>b.id===activeBoard);
+      const leadMember = board?.leadId ? byId(board.leadId) : null;
+
       return (
         <div className="min-h-screen">
           <header className="border-b border-zinc-200 bg-white">
-            <div className="mx-auto flex max-w-[1000px] items-center justify-between px-4 py-3 sm:px-8">
-              <div>
-                <div className="text-base font-semibold leading-tight">{profile?.companies?.name || "Studio 16 Architects"}</div>
-                <div className="mono text-[10px] uppercase tracking-wider text-zinc-500">Connected · live data</div>
+            <div className="mx-auto max-w-[1100px] px-4 py-3 sm:px-8">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-3">
+                <div className="flex flex-wrap items-stretch gap-x-6 gap-y-2">
+                  <Stat n={kpis.live} l="Live" /><Stat n={kpis.ongoing} l="Ongoing" /><Stat n={kpis.hold} l="On hold" /><Stat n={kpis.unassigned} l="Unassigned" tone="red" /><Stat n={kpis.pending} l="Pending follow-ups" />
+                </div>
+                <div className="flex items-center gap-3 text-[12px]"><span className="text-zinc-500">{profile?.name} · {profile?.role}</span><button onClick={signOut} className="rounded-md border border-zinc-300 px-3 py-1.5 hover:bg-zinc-50">Sign out</button></div>
               </div>
-              <div className="flex items-center gap-3 text-[12px]">
-                <span className="text-zinc-500">{profile ? `${profile.name} · ${profile.role}` : ""}</span>
-                <button onClick={signOut} className="rounded-md border border-zinc-300 px-3 py-1.5 hover:bg-zinc-50">Sign out</button>
-              </div>
+              <div className="flex items-center justify-between pt-3"><div className="text-sm font-semibold">{profile?.companies?.name||"Studio 16 Architects"} <span className="mono ml-2 text-[10px] uppercase tracking-wider text-zinc-400">Team Board</span></div>{isAdmin && <button onClick={()=>{setShowAddP(!showAddP); setNp(s=>({...s,lead:activeLead||"__none"}));}} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add project</button>}</div>
             </div>
           </header>
 
-          <main className="mx-auto max-w-[1000px] px-4 py-6 sm:px-8">
-            {loading && <div className="mono text-sm text-zinc-400">Loading your data…</div>}
+          <main className="mx-auto max-w-[1100px] px-4 py-5 sm:px-8">
+            {loading && <div className="mono mb-4 text-sm text-zinc-400">Loading…</div>}
             {err && <div className="mb-4 rounded-md bg-red-50 px-3 py-2 text-[12px] text-red-600">{err}</div>}
 
-            <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-[13px] text-emerald-800">
-              ✓ You're live and connected to your database. This is your real Supabase data below.
-            </div>
-
-            {profile?.role === "admin" && (
-              <div className="mb-6 flex flex-wrap items-end gap-2 rounded-lg border border-zinc-200 bg-white p-3">
-                <div className="flex-1"><label className="mb-1 block text-[10px] uppercase tracking-wider text-zinc-400">Add a member (saves to the database)</label>
-                  <input value={nm} onChange={(e) => setNm(e.target.value)} placeholder="Name" className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-sm outline-none focus:border-zinc-900" /></div>
-                <input value={nr} onChange={(e) => setNr(e.target.value)} placeholder="Role" className="w-36 rounded-md border border-zinc-300 px-2 py-1.5 text-sm outline-none focus:border-zinc-900" />
-                <button onClick={addMember} className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700">Add</button>
+            {showAddP && isAdmin && (
+              <div className="mb-4 rounded-lg border border-zinc-300 bg-white p-3">
+                <div className="mb-2"><Lbl>Paste full project name</Lbl><Input value={np.raw} onChange={e=>setNp({...np,raw:e.target.value,...parseName(e.target.value)})} placeholder="5102_LT GEN SHAFIQUR RAHMAN_JOLSHIRI_5 Katha_PLOT ID 17" /></div>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <div><Lbl>Code</Lbl><Input value={np.code} onChange={e=>setNp({...np,code:e.target.value})} /></div>
+                  <div><Lbl>Client</Lbl><Input value={np.client} onChange={e=>setNp({...np,client:e.target.value})} /></div>
+                  <div><Lbl>Location</Lbl><Input value={np.location} onChange={e=>setNp({...np,location:e.target.value})} /></div>
+                  <div><Lbl>Nickname</Lbl><Input value={np.nickname} onChange={e=>setNp({...np,nickname:e.target.value})} /></div>
+                  <div><Lbl>Priority</Lbl><Select value={np.priority} onChange={v=>setNp({...np,priority:v})} options={PRIORITY_OPTS} className="w-full" /></div>
+                  <div className="sm:col-span-2"><Lbl>Lead (tasks assign to them)</Lbl><Select value={np.lead} onChange={v=>setNp({...np,lead:v})} options={[...active.map(m=>({value:m.id,label:m.name})),{value:"__none",label:"Unassigned"}]} className="w-full" /></div>
+                </div>
+                <div className="mt-3 flex gap-2"><button onClick={addProject} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-600">Create project</button><button onClick={()=>setShowAddP(false)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600">Cancel</button></div>
               </div>
             )}
 
-            <section className="mb-6">
-              <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Team ({data.members.length})</h2>
-              {data.members.length === 0 && <p className="mono text-[12px] text-zinc-400">No members yet{profile?.role === "admin" ? " — add one above to test saving." : "."}</p>}
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {data.members.map((m) => (
-                  <div key={m.id} className="rounded-lg border border-zinc-200 bg-white p-3">
-                    <div className="text-[13px] font-semibold">{m.name}</div>
-                    <div className="mono text-[10px] text-zinc-500">{m.role}{m.team_id ? ` · ${m.team_id}` : ""}</div>
-                  </div>
-                ))}
-              </div>
-            </section>
+            <div className="mb-3 flex flex-wrap items-center gap-1.5">
+              {boards.map(b=>(
+                <div key={b.id} className={`flex items-center overflow-hidden rounded-md border ${b.id===activeBoard?"border-zinc-400 bg-zinc-100 text-zinc-900":"border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300"}`}>
+                  <button onClick={()=>{setActiveBoard(b.id);setSelId("");setBoardCfg(false);setShareOpen(false);}} className="px-3 py-1.5 text-[12px] font-medium">{b.name}</button>
+                  {isAdmin&&b.id===activeBoard&&boards.length>1&&<><button onClick={()=>moveBoard(b.id,-1)} className="border-l border-zinc-300 px-1 py-1.5 text-zinc-400 hover:text-zinc-800">‹</button><button onClick={()=>moveBoard(b.id,1)} className="border-l border-zinc-300 px-1 py-1.5 text-zinc-400 hover:text-zinc-800">›</button></>}
+                  {isAdmin&&b.id===activeBoard&&<button onClick={()=>{setBoardCfg(!boardCfg);setAddBoardOpen(false);}} className="border-l border-zinc-300 px-1.5 py-1.5 text-zinc-400 hover:text-zinc-800">✎</button>}
+                </div>
+              ))}
+              {isAdmin && <button onClick={()=>{setAddBoardOpen(!addBoardOpen);setBoardCfg(false);setNb({name:"",desc:"",leadId:activeLead||""});}} className="rounded-md border border-dashed border-zinc-300 px-2.5 py-1.5 text-[12px] text-zinc-500 hover:border-zinc-500">+ Team board</button>}
+            </div>
 
-            <section>
-              <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Projects ({data.projects.length})</h2>
-              {data.projects.length === 0 && <p className="mono text-[12px] text-zinc-400">No projects yet — we'll add the project screens in the next stage.</p>}
-              <div className="space-y-2">
-                {data.projects.map((p) => (
-                  <div key={p.id} className="rounded-lg border border-zinc-200 bg-white p-3">
-                    <div className="flex items-center justify-between">
-                      <div className="text-[13px] font-semibold">{p.code} · {p.nickname || p.client}</div>
-                      <span className="mono text-[10px] uppercase text-zinc-400">{p.priority} · {p.status} · lead: {firstName(p.lead_member_id)}</span>
-                    </div>
-                    <div className="mt-1 space-y-0.5">
-                      {data.tasks.filter((t) => t.project_id === p.id).map((t) => (
-                        <div key={t.id} className="flex items-center gap-2 text-[12px]">
-                          <span className="text-zinc-700">{t.label}</span>
-                          {t.code && <span className="mono text-[9px] text-zinc-300">({t.code})</span>}
-                          <span className="mono ml-auto text-[10px] uppercase text-zinc-400">{t.status} · {firstName(t.assignee_member_id)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+            {isAdmin && addBoardOpen && (
+              <div className="mb-3 flex flex-wrap items-end gap-2 rounded-lg border border-zinc-300 bg-white p-3">
+                <div className="min-w-[150px] flex-1"><Lbl>New team board</Lbl><Input value={nb.name} onChange={e=>setNb({...nb,name:e.target.value})} placeholder="e.g. Construction Team" /></div>
+                <div className="min-w-[180px] flex-[2]"><Lbl>Short description (optional)</Lbl><Input value={nb.desc} onChange={e=>setNb({...nb,desc:e.target.value})} /></div>
+                <div className="w-44"><Lbl>Default team leader</Lbl><Select value={nb.leadId||"__none"} onChange={v=>setNb({...nb,leadId:v==="__none"?"":v})} options={[{value:"__none",label:"— none —"},...active.map(m=>({value:m.id,label:m.name}))]} className="w-full" /></div>
+                <button onClick={addBoard} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Create</button>
               </div>
-            </section>
+            )}
+            {isAdmin && boardCfg && board && (
+              <div className="mb-3 flex flex-wrap items-end gap-2 rounded-lg border border-zinc-300 bg-white p-3">
+                <div className="min-w-[150px] flex-1"><Lbl>Board name</Lbl><Input value={board.name} onChange={e=>patchBoard(board.id,{name:e.target.value})} /></div>
+                <div className="min-w-[180px] flex-[2]"><Lbl>Description</Lbl><Input value={board.desc} onChange={e=>patchBoard(board.id,{description:e.target.value})} /></div>
+                <div className="w-44"><Lbl>Team leader</Lbl><Select value={board.leadId||"__none"} onChange={v=>patchBoard(board.id,{lead_member_id:v==="__none"?null:v})} options={[{value:"__none",label:"— none —"},...active.map(m=>({value:m.id,label:m.name}))]} className="w-full" /></div>
+                {boards.length>1 && <button onClick={()=>removeBoard(board.id)} className="rounded-md border border-zinc-300 px-2 py-1.5 text-[11px] text-red-500 hover:bg-red-50">Remove board</button>}
+                <button onClick={()=>setBoardCfg(false)} className="rounded-md border border-zinc-300 px-2 py-1.5 text-[11px] text-zinc-600">Done</button>
+              </div>
+            )}
+            {(board?.desc || leadMember) && <div className="mb-2 flex flex-wrap gap-x-3 text-[12px] text-zinc-500">{board?.desc&&<span>{board.desc}</span>}{leadMember&&<span>Team leader: <span className="font-medium text-zinc-700">{leadMember.name}</span></span>}</div>}
+
+            <div className="mb-2 flex items-center justify-between">
+              <h2 className="mono text-[10px] uppercase tracking-wider text-zinc-500">{board?.name} · {boardMembers.length} active{archived.length?` · ${archived.length} archived`:""}</h2>
+              {isAdmin && <button onClick={()=>{setShowAddM(!showAddM);setRemoveM(false);}} className="text-[11px] font-medium text-zinc-600 hover:text-zinc-900">+ Add member</button>}
+            </div>
+            {showAddM && isAdmin && (
+              <div className="mb-3 flex flex-wrap items-end gap-2 rounded-lg border border-zinc-300 bg-white p-3">
+                <div className="min-w-[150px] flex-1"><Lbl>Name</Lbl><Input value={nm.name} onChange={e=>setNm({...nm,name:e.target.value})} /></div>
+                <div className="w-44"><Lbl>Role</Lbl><RoleField value={nm.role} onChange={v=>setNm({...nm,role:v})} /></div>
+                <div className="w-28"><Lbl>Team ID</Lbl><Input value={nm.teamId} onChange={e=>setNm({...nm,teamId:e.target.value})} placeholder="S16-07" /></div>
+                <button onClick={addMember} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Add</button>
+              </div>
+            )}
+
+            <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {boardMembers.map((m,ai)=>{ const ps=projects.filter(p=>p.lead===m.id||p.tasks.some(t=>t.assignee===m.id)); const liveN=ps.filter(p=>p.status==="live").length; const topN=ps.filter(p=>p.status==="live"&&p.priority==="top").length; const a=m.id===selId; const isLead=board?.leadId===m.id; const pal=roleColor(m.role); return (
+                <div key={m.id} className={`flex items-center gap-1.5 rounded-lg border p-2.5 shadow-sm transition ${a?"border-zinc-900 bg-zinc-900 text-white":"border-zinc-200 bg-zinc-100 hover:bg-zinc-50"}`}>
+                  <button onClick={()=>{setSelId(m.id);setExpanded(null);setRemoveM(false);setEditM(null);setShareOpen(false);}} className="flex min-w-0 flex-1 items-center gap-2.5 text-left">
+                    <span className={`mono flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${a?"bg-white text-zinc-900":`${pal.bg} ${pal.text}`}`}>{initials(m.name)}</span>
+                    <span className="min-w-0 flex-1"><span className="flex items-center gap-1"><span className="truncate text-[12px] font-semibold leading-tight">{m.name}</span>{isLead&&<span className={`mono shrink-0 rounded px-1 py-0.5 text-[8px] font-bold uppercase ${a?"bg-white/20 text-white":"bg-zinc-200 text-zinc-600"}`}>Lead</span>}</span><span className={`mono block truncate text-[9px] ${a?"text-zinc-400":pal.text}`}>{m.role}{m.teamId?` · ${m.teamId}`:""}</span><span className={`mono text-[9px] ${a?"text-zinc-500":"text-zinc-400"}`}>{liveN} live</span></span>
+                  </button>
+                  {topN>0&&<span className="h-2 w-2 shrink-0 rounded-full bg-red-500" />}
+                  <Reorder onUp={()=>moveMember(m.id,-1)} onDown={()=>moveMember(m.id,1)} upOk={ai>0} downOk={ai<boardMembers.length-1} />
+                </div>
+              ); })}
+            </div>
+            {!boardMembers.length && <div className="mb-4 rounded-lg border border-dashed border-zinc-300 bg-white py-8 text-center text-[12px] text-zinc-400">No members in this board yet{isAdmin?" — tap “+ Add member”.":"."}</div>}
+            {archived.length>0 && isAdmin && <div className="mb-4 text-[11px] text-zinc-400">Archived: {archived.map(m=><button key={m.id} onClick={()=>restore(m.id)} className="mr-2 underline hover:text-zinc-700">{m.name} (restore)</button>)}</div>}
+
+            {sel && <>
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-3">
+                <div className="flex items-center gap-3"><Avatar name={sel.name} /><div><div className="text-base font-semibold leading-tight">{sel.name}</div><div className="mono text-[10px] uppercase tracking-wider text-zinc-500">{sel.role}{sel.teamId?` · ID ${sel.teamId}`:""}</div></div></div>
+                <div className="flex gap-1"><button onClick={()=>setShareOpen(!shareOpen)} className="rounded-md border border-zinc-200 px-2.5 py-1.5 text-[11px] text-zinc-500 hover:border-zinc-400">Copy list</button>{isAdmin&&<><button onClick={()=>setEditM({name:sel.name,role:sel.role,teamId:sel.teamId||"",boardId:boardOf(sel)})} className="rounded-md border border-zinc-200 px-2.5 py-1.5 text-[11px] text-zinc-500 hover:border-zinc-400">Edit</button><button onClick={()=>{setRemoveM(!removeM);setReassign("");}} className="rounded-md border border-zinc-200 px-2.5 py-1.5 text-[11px] text-zinc-500 hover:border-red-300 hover:text-red-500">Remove</button></>}</div>
+              </div>
+
+              {shareOpen && <div className="mb-4 rounded-lg border border-zinc-300 bg-white p-3"><div className="mb-2 flex items-center justify-between"><span className="text-[12px] font-semibold text-zinc-700">{sel.name}'s task list — copy &amp; paste</span><button onClick={doCopy} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[11px] font-medium text-white">{copied?"Copied!":"Copy"}</button></div><textarea id="shareArea" readOnly value={buildShare(sel)} className="mono h-48 w-full resize-y rounded-md border border-zinc-200 bg-zinc-50 p-2 text-[12px] text-zinc-700 outline-none" /></div>}
+
+              {editM && <div className="mb-4 flex flex-wrap items-end gap-2 rounded-lg border border-zinc-300 bg-white p-3"><div className="min-w-[140px] flex-1"><Lbl>Name</Lbl><Input value={editM.name} onChange={e=>setEditM({...editM,name:e.target.value})} /></div><div className="w-44"><Lbl>Role</Lbl><RoleField value={editM.role} onChange={v=>setEditM({...editM,role:v})} /></div><div className="w-28"><Lbl>Team ID</Lbl><Input value={editM.teamId} onChange={e=>setEditM({...editM,teamId:e.target.value})} /></div>{boards.length>1&&<div className="w-40"><Lbl>Board</Lbl><Select value={editM.boardId||activeBoard} onChange={v=>setEditM({...editM,boardId:v})} options={boards.map(b=>({value:b.id,label:b.name}))} className="w-full" /></div>}<button onClick={saveMember} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Save</button><button onClick={()=>setEditM(null)} className="rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] text-zinc-600">Cancel</button></div>}
+
+              {removeM && isAdmin && <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-[12px]"><div className="mb-2 text-red-700">Reassign {sel.name}'s active work to:</div><div className="flex flex-wrap items-center gap-2"><Select value={reassign} onChange={setReassign} options={[{value:"",label:"Unassigned"},...active.filter(m=>m.id!==selId).map(m=>({value:m.id,label:m.name}))]} className="w-44" /><button onClick={doRemoveMember} className="rounded-md bg-red-600 px-3 py-1.5 font-medium text-white">Remove / archive</button><button onClick={()=>setRemoveM(false)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-zinc-600">Cancel</button></div></div>}
+
+              <div className="mb-4 flex flex-wrap items-center gap-2"><span className="mono mr-1 text-[10px] uppercase tracking-wider text-zinc-400">Show</span>{[{v:"all",l:"All work"},{v:"production",l:"PC / Production"},{v:"coordination",l:"Coordination / Follow-up"}].map(o=><button key={o.v} onClick={()=>setWt(o.v)} className={`rounded-full border px-3 py-1 text-[11px] font-medium ${wt===o.v?"border-zinc-400 bg-zinc-100 text-zinc-900":"border-zinc-200 bg-white text-zinc-500 hover:bg-zinc-50"}`}>{o.l}</button>)}</div>
+
+              {["top","medium","low"].map(lvl=>{ const rows=mine.filter(p=>p.status==="live"&&p.priority===lvl&&matchWt(p)).sort((a,b)=>a.sort-b.sort); if(!rows.length) return null; return (
+                <section key={lvl} className="mb-4">
+                  <div className="mb-2 flex items-center gap-2"><Dot level={lvl} /><h3 className={`text-[11px] font-semibold uppercase tracking-wider ${PRIORITY[lvl].text}`}>{PRIORITY[lvl].label} Priority</h3><div className="ml-2 h-px flex-1 bg-zinc-200" /></div>
+                  <div className="space-y-2">{rows.map(p=>{ const open=expanded===p.id; const myActive=[...p.tasks.filter(t=>t.status==="ongoing"),...p.tasks.filter(t=>t.status==="pending")].filter(t=>t.assignee===selId); return (
+                    <div key={p.id} className="rounded-lg border border-zinc-200 bg-white">
+                      <button onClick={()=>setExpanded(open?null:p.id)} className="flex w-full items-center gap-2 px-3 py-2 text-left">
+                        <span className="text-[11px] text-zinc-400">{open?"▾":"▸"}</span>
+                        <span className="min-w-0 flex-1 text-[13px] font-semibold">{p.code} · {p.nickname||p.client}</span>
+                        <span className="mono text-[10px] uppercase text-zinc-400">{myActive.length} task{myActive.length!==1?"s":""}</span>
+                      </button>
+                      {!open && myActive.length>0 && <div className="space-y-0.5 px-3 pb-2">{myActive.map((t,i)=>(<div key={t.id} className="flex items-center gap-2 text-[11px]"><span className="mono w-4 text-right text-zinc-300">{i+1}.</span><span className={`h-1.5 w-1.5 rounded-full ${t.workType==="production"?"bg-zinc-700":"bg-amber-500"}`} /><span className={`truncate font-semibold ${t.workType==="production"?"text-zinc-800":"text-amber-700"}`}>{t.label}</span>{t.code&&<span className="mono text-[9px] text-zinc-300">({t.code})</span>}{t.workType==="coordination"&&t.contact&&<span className="text-[10px] text-amber-600">→ {t.contact}</span>}<span className="mono ml-auto text-[9px] uppercase text-zinc-400">{t.status}</span></div>))}</div>}
+                      {open && <div className="border-t border-zinc-100 p-3">
+                        <div className="mb-2 flex flex-wrap items-center gap-2"><span className="mono mr-auto text-[10px] uppercase text-zinc-400">{p.code}</span><Select value={p.priority} onChange={v=>patchProject(p.id,{priority:v})} options={PRIORITY_OPTS} className="w-24" />{isAdmin&&<Select value={p.lead??"__none"} onChange={v=>patchProject(p.id,{lead_member_id:v==="__none"?null:v})} options={[...active.map(m=>({value:m.id,label:m.name})),{value:"__none",label:"No lead"}]} className="w-28" />}{isAdmin&&<Select value={p.status} onChange={v=>patchProject(p.id,{status:v})} options={STATUS_OPTS} className="w-24" />}</div>
+                        <div className="space-y-1">{p.tasks.slice().sort((a,b)=>a.sort-b.sort).map((t,i,arr)=>(
+                          <div key={t.id} className="flex items-center gap-2 rounded-md border border-zinc-100 bg-zinc-50 px-2 py-1.5">
+                            <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${t.workType==="production"?"bg-zinc-700":"bg-amber-500"}`} />
+                            <span className={`truncate text-[12px] ${t.status==="done"?"text-zinc-400 line-through":(t.status==="ongoing"||t.status==="pending")?"font-semibold text-zinc-900":"text-zinc-600"}`}>{t.label}</span>
+                            {t.code&&<span className="mono shrink-0 text-[10px] text-zinc-300">({t.code})</span>}
+                            {t.workType==="coordination"&&t.contact&&<span className="shrink-0 text-[10px] text-amber-600">→ {t.contact}</span>}
+                            <span className="ml-auto" />
+                            <Select value={t.status} onChange={v=>setTaskStatus(t.id,v)} options={TS_OPTS} className="w-24 shrink-0" tone={t.status==="pending"?"bg-amber-50 text-amber-700 border-amber-200":"border-zinc-300 text-zinc-700 bg-white"} />
+                            <Select value={t.assignee||"__none"} onChange={v=>setTaskAssignee(t.id,v)} options={[...active.map(m=>({value:m.id,label:m.name.split(" ")[0]})),{value:"__none",label:"Unassigned"}]} className="w-28 shrink-0" tone={t.assignee?"border-zinc-300 text-zinc-700 bg-white":"bg-red-50 text-red-600 border-red-200"} />
+                            <Reorder onUp={()=>moveTask(arr,t.id,-1)} onDown={()=>moveTask(arr,t.id,1)} upOk={i>0} downOk={i<arr.length-1} />
+                            <button onClick={()=>removeTask(t.id)} className="shrink-0 px-1 text-[11px] text-zinc-300 hover:text-red-500">✕</button>
+                          </div>
+                        ))}</div>
+                        {addTaskFor===p.id ? (
+                          <div className="mt-2 rounded-md border border-zinc-200 bg-white p-2">
+                            <div className="mb-2 flex gap-1">{["production","coordination"].map(w=><button key={w} onClick={()=>setTd({...td,workType:w,type:(w==="production"?PROD_GROUPS:FOLLOW_GROUPS)[0].items[0][0]})} className={`rounded px-2 py-1 text-[11px] ${td.workType===w?"bg-zinc-900 text-white":"bg-zinc-100 text-zinc-600"}`}>{w==="production"?"Production":"Follow-up"}</button>)}</div>
+                            <div className="flex flex-wrap items-end gap-2">
+                              <div className="min-w-[180px] flex-1"><Lbl>Task type</Lbl><TypeSelect value={td.type} onChange={v=>setTd({...td,type:v})} wt={td.workType} /></div>
+                              {td.workType==="coordination"&&<div className="w-36"><Lbl>Contact (who to chase)</Lbl><Input value={td.contact} onChange={e=>setTd({...td,contact:e.target.value})} /></div>}
+                              <div className="w-32"><Lbl>Assign to</Lbl><Select value={td.assignee} onChange={v=>setTd({...td,assignee:v})} options={[...active.map(m=>({value:m.id,label:m.name.split(" ")[0]})),{value:"__none",label:"Unassigned"}]} className="w-full" /></div>
+                              <button onClick={()=>addTask(p.id)} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Add task</button>
+                              <button onClick={()=>setAddTaskFor(null)} className="rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] text-zinc-600">Cancel</button>
+                            </div>
+                          </div>
+                        ) : <button onClick={()=>{setAddTaskFor(p.id);setTd({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:p.lead||selId||"__none"});}} className="mt-2 text-[11px] font-medium text-zinc-500 hover:text-zinc-900">+ Add task</button>}
+                      </div>}
+                    </div>
+                  ); })}</div>
+                </section>
+              ); })}
+              {!mine.some(p=>p.status==="live"&&matchWt(p)) && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-8 text-center text-[12px] text-zinc-400">No live work in this view.</div>}
+            </>}
+
+            {isAdmin && (()=>{ const orphan=projects.filter(p=>p.status==="live"&&!p.lead&&!p.tasks.some(t=>t.assignee)); if(!orphan.length) return null; return (
+              <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-3"><div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-amber-700">Unassigned projects ({orphan.length}) — give each a lead</div>{orphan.map(p=>(<div key={p.id} className="flex items-center gap-2 py-1 text-[12px]"><span className="flex-1 font-medium">{p.code} · {p.nickname||p.client}</span><Select value="__none" onChange={v=>v!=="__none"&&patchProject(p.id,{lead_member_id:v})} options={[{value:"__none",label:"Assign lead…"},...active.map(m=>({value:m.id,label:m.name}))]} className="w-40" /></div>))}</div>
+            ); })()}
           </main>
         </div>
       );
     }
-
-    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
   </script>
 </body>
 </html>
