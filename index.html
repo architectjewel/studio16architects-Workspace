@@ -64,7 +64,7 @@
     function Select({value,onChange,options,className,tone}){
       return <select value={value} onChange={e=>onChange(e.target.value)} className={`mono rounded-md border px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900 ${tone||"border-zinc-300 text-zinc-700 bg-white"} ${className||""}`}>{options.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}</select>;
     }
-    function TypeSelect({value,onChange,wt}){ const groups = wt==="production"?PROD_GROUPS:FOLLOW_GROUPS; return <select value={value} onChange={e=>onChange(e.target.value)} className="mono w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900">{groups.map(g=><optgroup key={g.g} label={g.g}>{g.items.map(([n,,code])=><option key={n} value={n}>{n}{code?` (${code})`:""}</option>)}</optgroup>)}</select>; }
+    function TypeSelect({value,onChange,wt}){ const groups = wt==="production"?PROD_GROUPS:FOLLOW_GROUPS; return <select value={value} onChange={e=>onChange(e.target.value)} className="mono w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900">{groups.map(g=><optgroup key={g.g} label={g.g}>{g.items.map(([n,,code])=><option key={n} value={n}>{n}{code?` (${code})`:""}</option>)}</optgroup>)}<option value="__custom">✏ Custom task…</option></select>; }
     function Reorder({onUp,onDown,upOk,downOk}){ return <span className="flex flex-col leading-none"><button onClick={e=>{e.stopPropagation();upOk&&onUp();}} disabled={!upOk} className="px-1 text-[9px] text-zinc-400 hover:text-zinc-800 disabled:opacity-20">▲</button><button onClick={e=>{e.stopPropagation();downOk&&onDown();}} disabled={!downOk} className="px-1 text-[9px] text-zinc-400 hover:text-zinc-800 disabled:opacity-20">▼</button></span>; }
     function RoleField({value,onChange}){ const inList=ROLES.includes(value); const [custom,setCustom]=useState(!inList&&!!value); const showCustom=custom||(!inList&&!!value); return <><Select value={showCustom?"__custom":(inList?value:"")} onChange={v=>{ if(v==="__custom"){setCustom(true);onChange("");} else {setCustom(false);onChange(v);} }} className="w-full" options={[{value:"",label:"Select role…"},...ROLES.map(r=>({value:r,label:r})),{value:"__custom",label:"✏ Custom role…"}]} />{showCustom&&<input autoFocus value={value} onChange={e=>onChange(e.target.value)} placeholder="Type role…" className="mt-1 w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" />}</>; }
     const Lbl = ({children})=> <label className="mono mb-1 block text-[9px] uppercase tracking-wider text-zinc-400">{children}</label>;
@@ -99,7 +99,7 @@
       const [boardCfg,setBoardCfg]=useState(false); const [addBoardOpen,setAddBoardOpen]=useState(false); const [nb,setNb]=useState({name:"",desc:"",leadId:""});
       const [showAddP,setShowAddP]=useState(false); const [np,setNp]=useState({raw:"",code:"",nickname:"",client:"",location:"",size:"",address:"",priority:"medium",status:"live",lead:"__none"});
       const [addTaskFor,setAddTaskFor]=useState(null); const [td,setTd]=useState({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:"__none"});
-      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false);
+      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({});
 
       const isAdmin = profile?.role==="admin";
 
@@ -138,8 +138,8 @@
       const active = members.filter(m=>m.status==="active");
       const archived = members.filter(m=>m.status==="archived");
       const boardOf = m=> m.boardId || boards[0]?.id;
-      const activeLead = boards.find(b=>b.id===activeBoard)?.leadId || null;
-      const boardMembers = active.filter(m=> boardOf(m)===activeBoard || m.id===activeLead);
+      const boardMembers = active.filter(m=> boardOf(m)===activeBoard).sort((a,b)=>a.sort-b.sort);
+      const activeLead = (()=>{ const lid=boards.find(b=>b.id===activeBoard)?.leadId; return lid && boardMembers.some(m=>m.id===lid) ? lid : null; })();
       const sel = byId(selId);
       const mine = projects.filter(p=> p.lead===selId || p.tasks.some(t=>t.assignee===selId));
       const matchWt = p=> wt==="all" || p.tasks.some(t=>t.workType===wt);
@@ -168,7 +168,7 @@
       async function deleteProject(id){ await db.from("tasks").delete().eq("project_id",id); if(fail((await db.from("projects").delete().eq("id",id)).error)) return; setDelP(null); if(expanded===id) setExpanded(null); await refresh(); }
       async function patchProject(id,f){ if(fail((await db.from("projects").update(f).eq("id",id)).error)) return; if(f.lead_member_id) await db.from("tasks").update({assignee_member_id:f.lead_member_id}).eq("project_id",id).is("assignee_member_id",null); await refresh(); }
 
-      async function addTask(pid){ const sort=(projects.find(p=>p.id===pid)?.tasks.length)||0; if(fail((await db.from("tasks").insert({project_id:pid,label:td.label.trim()||td.type,work_type:td.workType,cat:typeCat(td.type,td.workType),code:typeCode(td.type,td.workType),status:"upcoming",assignee_member_id:td.assignee==="__none"?null:td.assignee,contact:td.contact||"",sort_order:sort})).error)) return; setTd({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:selId||"__none"}); setAddTaskFor(null); await refresh(); }
+      async function addTask(pid){ const sort=(projects.find(p=>p.id===pid)?.tasks.length)||0; const isC=td.type==="__custom"; const label=isC?(td.label.trim()||"Custom task"):td.type; const cat=isC?"CUSTOM":typeCat(td.type,td.workType); const code=isC?"":typeCode(td.type,td.workType); if(fail((await db.from("tasks").insert({project_id:pid,label,work_type:td.workType,cat,code,status:"upcoming",assignee_member_id:td.assignee==="__none"?null:td.assignee,contact:td.contact||"",sort_order:sort})).error)) return; setTd({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:selId||"__none"}); setAddTaskFor(null); await refresh(); }
       async function setTaskStatus(id,status){ if(fail((await db.from("tasks").update({status,done_date:status==="done"?today():null}).eq("id",id)).error)) return; await refresh(); }
       async function setTaskAssignee(id,mid){ if(fail((await db.from("tasks").update({assignee_member_id:mid==="__none"?null:mid}).eq("id",id)).error)) return; await refresh(); }
       async function removeTask(id){ await db.from("tasks").delete().eq("id",id); await refresh(); }
@@ -177,9 +177,56 @@
       function buildShare(m){ if(!m) return ""; const mp=projects.filter(p=>p.tasks.some(t=>t.assignee===m.id&&t.status!=="done")).sort((a,b)=>PRIORITY[a.priority].rank-PRIORITY[b.priority].rank); const out=[m.name]; mp.forEach((p,pi)=>{ out.push((pi+1)+". "+p.code+" "+(p.nickname||p.client||"")); p.tasks.filter(t=>t.assignee===m.id&&t.status!=="done").forEach((t,ti)=>{ const L=String.fromCharCode(65+ti); const c=t.workType==="coordination"&&t.contact?" -> "+t.contact:""; const tag=t.workType==="coordination"?"(follow-up "+t.status+")":"("+t.status+")"; out.push("     "+L+". "+t.label+c+" "+tag); }); }); if(!mp.length) out.push("No open tasks."); return out.join("\n"); }
       function doCopy(){ const text=buildShare(sel); if(navigator.clipboard) navigator.clipboard.writeText(text).catch(()=>{}); const ta=document.getElementById("shareArea"); if(ta){ta.focus();ta.select();try{document.execCommand("copy");}catch(e){}} setCopied(true); setTimeout(()=>setCopied(false),1500); }
       function copyText(t){ if(navigator.clipboard) navigator.clipboard.writeText(t).catch(()=>{}); try{ const ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);}catch(e){} }
-      function buildBoardShare(){ const live=projects.filter(p=>p.status==="live"); const out=[(profile?.companies?.name||"Studio 16")+" — Live Projects ("+today()+")"]; ["top","medium","low"].forEach(lvl=>{ const rows=live.filter(p=>p.priority===lvl).sort((a,b)=>a.sort-b.sort); if(!rows.length) return; out.push(""); out.push("● "+PRIORITY[lvl].label.toUpperCase()+" PRIORITY"); rows.forEach((p,i)=>{ const lead=byId(p.lead); const og=p.tasks.filter(t=>t.status==="ongoing").length; const pend=p.tasks.filter(t=>t.workType==="coordination"&&t.status==="pending").length; out.push((i+1)+". "+p.code+" "+(p.nickname||p.client||"")+(lead?" — "+lead.name:" — (no lead)")+"  ["+og+" ongoing"+(pend?", "+pend+" pending":"")+"]"); }); }); if(out.length===1) out.push("No live projects."); return out.join("\n"); }
+      function buildBoardShare(){ const live=projects.filter(p=>p.status==="live"); const out=[(profile?.companies?.name||"Studio 16")+" — Live Projects ("+today()+")"]; ["top","medium","low"].forEach(lvl=>{ const rows=live.filter(p=>p.priority===lvl).sort((a,b)=>a.sort-b.sort); if(!rows.length) return; out.push(""); out.push("● "+PRIORITY[lvl].label.toUpperCase()+" PRIORITY"); rows.forEach((p,i)=>{ const lead=byId(p.lead); out.push((i+1)+". "+p.code+" "+(p.nickname||p.client||"")+(lead?" — "+lead.name:" — (no lead)")); const ts=p.tasks.filter(t=>t.status!=="done").sort((a,b)=>a.sort-b.sort); if(!ts.length){ out.push("     (no open tasks)"); } else { ts.forEach(t=>{ const who=byId(t.assignee); const c=t.workType==="coordination"&&t.contact?" -> "+t.contact:""; const mark=t.status==="ongoing"?"►":t.status==="pending"?"!":"·"; out.push("     "+mark+" "+t.label+c+" ("+t.status+(who?", "+who.name.split(" ")[0]:"")+")"); }); } }); }); if(out.length===1) out.push("No live projects."); return out.join("\n"); }
       function copyBoard(){ copyText(buildBoardShare()); setBoardCopied(true); setTimeout(()=>setBoardCopied(false),1500); }
-      function printBoard(){ const c=profile?.companies||{}; const live=projects.filter(p=>p.status==="live"); const esc=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); const sec=["top","medium","low"].map(lvl=>{ const rows=live.filter(p=>p.priority===lvl).sort((a,b)=>a.sort-b.sort); if(!rows.length) return ""; const items=rows.map((p,i)=>{ const lead=byId(p.lead); const og=p.tasks.filter(t=>t.status==="ongoing").length; const pend=p.tasks.filter(t=>t.workType==="coordination"&&t.status==="pending").length; return "<tr><td class='n'>"+(i+1)+"</td><td class='c'>"+esc(p.code)+"</td><td>"+esc(p.nickname||p.client||"")+"</td><td>"+(lead?esc(lead.name):"<span class='u'>Unassigned</span>")+"</td><td class='m'>"+og+" ongoing"+(pend?", "+pend+" pending":"")+"</td></tr>"; }).join(""); return "<h2 class='"+lvl+"'>"+PRIORITY[lvl].label+" priority <span>"+rows.length+"</span></h2><table>"+items+"</table>"; }).join(""); const html="<!doctype html><html><head><meta charset='utf-8'><title>Live Projects — "+esc(c.name||"Studio 16")+"</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Archivo,Arial,sans-serif;color:#18181b;padding:38px 44px}.hd{display:flex;align-items:flex-start;justify-content:space-between;border-bottom:2px solid #18181b;padding-bottom:14px}.hd img{height:42px}.hd .co{text-align:right;font-size:10px;color:#52525b;line-height:1.5}.ttl{margin:22px 0 4px;font-size:19px;font-weight:700}.sub{font-size:11px;color:#71717a;margin-bottom:14px}h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;margin:18px 0 6px;color:#18181b}h2 span{color:#a1a1aa;font-weight:500;margin-left:4px}h2.top{color:#dc2626}h2.medium{color:#d97706}table{width:100%;border-collapse:collapse;font-size:12px}td{padding:6px 8px;border-bottom:1px solid #ececec;vertical-align:top}td.n{width:26px;color:#a1a1aa}td.c{width:64px;font-family:'Spline Sans Mono',monospace;font-weight:600}td.m{width:170px;text-align:right;font-family:'Spline Sans Mono',monospace;color:#71717a;font-size:10px}.u{color:#dc2626}.ft{margin-top:30px;border-top:1px solid #d4d4d8;padding-top:8px;font-size:9px;color:#a1a1aa;display:flex;justify-content:space-between}@media print{body{padding:0}}</style></head><body><div class='hd'><img src='data:image/svg+xml;base64,"+LOGO_B64+"' alt='logo'/><div class='co'><b>"+esc(c.name||"Studio 16 Architects")+"</b><br>"+esc(c.address||"")+"<br>"+esc(c.email||"")+(c.website?" · "+esc(c.website):"")+"</div></div><div class='ttl'>Live Projects</div><div class='sub'>"+live.length+" live · generated "+today()+"</div>"+(sec||"<p style='color:#a1a1aa;font-size:12px'>No live projects.</p>")+"<div class='ft'><span>"+esc(c.name||"Studio 16 Architects")+"</span><span>"+esc(c.website||"")+"</span></div></body></html>"; const w=window.open("","_blank"); if(!w){ setErr("Allow pop-ups for this site to print."); return; } w.document.write(html); w.document.close(); w.focus(); setTimeout(()=>{ try{w.print();}catch(e){} },450); }
+      function printBoard(){ const c=profile?.companies||{}; const live=projects.filter(p=>p.status==="live"); const esc=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); const taskLine=t=>{ const who=byId(t.assignee); const c2=t.workType==="coordination"&&t.contact?" → "+esc(t.contact):""; return "<div class='tk "+t.status+"'><span class='dot "+t.workType+"'></span><span class='tl'>"+esc(t.label)+c2+"</span><span class='ts'>"+t.status+(who?" · "+esc(who.name.split(' ')[0]):"")+"</span></div>"; }; const taskBlock=p=>{ const open=p.tasks.filter(t=>t.status!=="done").sort((a,b)=>a.sort-b.sort); const prod=open.filter(t=>t.workType==="production"); const fol=open.filter(t=>t.workType==="coordination"); if(!open.length) return "<div class='none'>No open tasks</div>"; let h=""; if(prod.length) h+="<div class='grp'>Production</div>"+prod.map(taskLine).join(""); if(fol.length) h+="<div class='grp'>Follow-up</div>"+fol.map(taskLine).join(""); return h; }; const sec=["top","medium","low"].map(lvl=>{ const rows=live.filter(p=>p.priority===lvl).sort((a,b)=>a.sort-b.sort); if(!rows.length) return ""; const blocks=rows.map((p,i)=>{ const lead=byId(p.lead); return "<div class='pj'><div class='ph'><span class='pc'>"+esc(p.code)+"</span><span class='pn'>"+esc(p.nickname||p.client||"")+"</span><span class='pl'>"+(lead?esc(lead.name):"<span class=u>Unassigned</span>")+"</span></div>"+taskBlock(p)+"</div>"; }).join(""); return "<h2 class='"+lvl+"'>"+PRIORITY[lvl].label+" priority <span>"+rows.length+"</span></h2>"+blocks; }).join(""); const html="<!doctype html><html><head><meta charset='utf-8'><title>Live Projects — "+esc(c.name||"Studio 16")+"</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Archivo,Arial,sans-serif;color:#18181b;padding:38px 44px}.hd{display:flex;align-items:flex-start;justify-content:space-between;border-bottom:2px solid #18181b;padding-bottom:14px}.hd img{height:42px}.hd .co{text-align:right;font-size:10px;color:#52525b;line-height:1.5}.ttl{margin:22px 0 4px;font-size:19px;font-weight:700}.sub{font-size:11px;color:#71717a;margin-bottom:14px}h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;margin:20px 0 8px;color:#18181b}h2 span{color:#a1a1aa;font-weight:500;margin-left:4px}h2.top{color:#dc2626}h2.medium{color:#d97706}.pj{border:1px solid #e4e4e7;border-radius:7px;padding:9px 11px;margin-bottom:8px;page-break-inside:avoid}.ph{display:flex;align-items:baseline;gap:8px;margin-bottom:5px}.pc{font-family:'Spline Sans Mono',monospace;font-weight:600;font-size:13px}.pn{font-size:13px;flex:1}.pl{font-size:10px;color:#71717a}.grp{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:#a1a1aa;margin:5px 0 2px}.tk{display:flex;align-items:center;gap:6px;font-size:11px;padding:2px 0}.tk .tl{flex:1}.tk .ts{font-family:'Spline Sans Mono',monospace;font-size:9px;color:#a1a1aa;text-transform:uppercase}.tk.ongoing .tl{font-weight:700}.tk.pending .tl{font-weight:600;color:#b45309}.dot{width:6px;height:6px;border-radius:50%;flex:none}.dot.production{background:#3f3f46}.dot.coordination{background:#f59e0b}.none{font-size:10px;color:#a1a1aa;font-style:italic}.u{color:#dc2626}.ft{margin-top:28px;border-top:1px solid #d4d4d8;padding-top:8px;font-size:9px;color:#a1a1aa;display:flex;justify-content:space-between}@media print{body{padding:0}}</style></head><body><div class='hd'><img src='data:image/svg+xml;base64,"+LOGO_B64+"' alt='logo'/><div class='co'><b>"+esc(c.name||"Studio 16 Architects")+"</b><br>"+esc(c.address||"")+"<br>"+esc(c.email||"")+(c.website?" · "+esc(c.website):"")+"</div></div><div class='ttl'>Live Projects</div><div class='sub'>"+live.length+" live · generated "+today()+"</div>"+(sec||"<p style='color:#a1a1aa;font-size:12px'>No live projects.</p>")+"<div class='ft'><span>"+esc(c.name||"Studio 16 Architects")+"</span><span>"+esc(c.website||"")+"</span></div></body></html>"; const w=window.open("","_blank"); if(!w){ setErr("Allow pop-ups for this site to print."); return; } w.document.write(html); w.document.close(); w.focus(); setTimeout(()=>{ try{w.print();}catch(e){} },450); }
+
+      const sub=k=>!!subOpen[k];
+      const toggleSub=k=>setSubOpen(s=>({...s,[k]:!s[k]}));
+      function taskRow(t,arr){ const i=arr.indexOf(t); return (
+        <div key={t.id} className={`flex items-center gap-2 rounded-md border px-2 py-1.5 ${t.status==="ongoing"?"border-zinc-300 bg-white shadow-sm":t.status==="pending"?"border-amber-200 bg-amber-50/40":"border-zinc-100 bg-zinc-50"}`}>
+          <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${t.workType==="production"?"bg-zinc-700":"bg-amber-500"}`} />
+          <span className={`truncate text-[12px] ${t.status==="done"?"text-zinc-400 line-through":t.status==="ongoing"?"font-bold text-zinc-900":t.status==="pending"?"font-semibold text-amber-700":"text-zinc-500"}`}>{t.label}</span>
+          {t.code&&<span className="mono shrink-0 text-[10px] text-zinc-300">({t.code})</span>}
+          {t.workType==="coordination"&&t.contact&&<span className="shrink-0 text-[10px] text-amber-600">→ {t.contact}</span>}
+          <span className="ml-auto" />
+          <Select value={t.status} onChange={v=>setTaskStatus(t.id,v)} options={TS_OPTS} className="w-[86px] shrink-0" tone={t.status==="pending"?"bg-amber-50 text-amber-700 border-amber-200":t.status==="ongoing"?"border-zinc-400 text-zinc-900 bg-white font-semibold":"border-zinc-300 text-zinc-600 bg-white"} />
+          <Select value={t.assignee||"__none"} onChange={v=>setTaskAssignee(t.id,v)} options={[...active.map(m=>({value:m.id,label:m.name.split(" ")[0]})),{value:"__none",label:"Unassigned"}]} className="w-[100px] shrink-0" tone={t.assignee?"border-zinc-300 text-zinc-700 bg-white":"bg-red-50 text-red-600 border-red-200"} />
+          <Reorder onUp={()=>moveTask(arr,t.id,-1)} onDown={()=>moveTask(arr,t.id,1)} upOk={i>0} downOk={i<arr.length-1} />
+          <button onClick={()=>removeTask(t.id)} className="shrink-0 px-1 text-[11px] text-zinc-300 hover:text-red-500">✕</button>
+        </div>
+      ); }
+      function taskSection(p,w,label){ const arr=p.tasks.filter(t=>t.workType===w).sort((a,b)=>a.sort-b.sort); const ongoing=arr.filter(t=>t.status==="ongoing"); const pending=arr.filter(t=>t.status==="pending"); const upcoming=arr.filter(t=>t.status==="upcoming"); const done=arr.filter(t=>t.status==="done"); const act=[...ongoing,...pending]; const upK=p.id+":"+w+":up", dnK=p.id+":"+w+":dn"; return (
+        <div className="rounded-lg border border-zinc-100 bg-white p-2">
+          <div className="mb-1.5 flex items-center gap-2"><span className={`h-2 w-2 rounded-full ${w==="production"?"bg-zinc-700":"bg-amber-500"}`} /><span className="mono text-[10px] font-semibold uppercase tracking-wider text-zinc-600">{label}</span><span className="mono text-[9px] text-zinc-300">{arr.length}</span></div>
+          <div className="space-y-1">
+            {act.length>0 ? act.map(t=>taskRow(t,arr)) : <div className="px-2 py-1 text-[11px] italic text-zinc-300">nothing active</div>}
+            {upcoming.length>0 && <><button onClick={()=>toggleSub(upK)} className="mono mt-1 block px-1 py-0.5 text-[10px] uppercase tracking-wider text-zinc-400 hover:text-zinc-700">{sub(upK)?"▾":"▸"} Upcoming ({upcoming.length})</button>{sub(upK)&&<div className="space-y-1">{upcoming.map(t=>taskRow(t,arr))}</div>}</>}
+            {done.length>0 && <><button onClick={()=>toggleSub(dnK)} className="mono mt-1 block px-1 py-0.5 text-[10px] uppercase tracking-wider text-zinc-400 hover:text-zinc-700">{sub(dnK)?"▾":"▸"} Done ({done.length})</button>{sub(dnK)&&<div className="space-y-1">{done.map(t=>taskRow(t,arr))}</div>}</>}
+          </div>
+        </div>
+      ); }
+      function addTaskUI(p){ return addTaskFor===p.id ? (
+        <div className="rounded-md border border-zinc-200 bg-white p-2">
+          <div className="mb-2 flex gap-1">{["production","coordination"].map(w=><button key={w} onClick={()=>setTd({...td,workType:w,type:(w==="production"?PROD_GROUPS:FOLLOW_GROUPS)[0].items[0][0]})} className={`rounded px-2 py-1 text-[11px] ${td.workType===w?"bg-zinc-900 text-white":"bg-zinc-100 text-zinc-600"}`}>{w==="production"?"Production":"Follow-up"}</button>)}</div>
+          <div className="flex flex-wrap items-end gap-2">
+            <div className="min-w-[170px] flex-1"><Lbl>Task type</Lbl><TypeSelect value={td.type} onChange={v=>setTd({...td,type:v})} wt={td.workType} /></div>
+            {td.type==="__custom"&&<div className="min-w-[150px] flex-1"><Lbl>Custom task name</Lbl><Input value={td.label} onChange={e=>setTd({...td,label:e.target.value})} placeholder="Type the task…" /></div>}
+            {td.workType==="coordination"&&<div className="w-36"><Lbl>Contact (who to chase)</Lbl><Input value={td.contact} onChange={e=>setTd({...td,contact:e.target.value})} /></div>}
+            <div className="w-32"><Lbl>Assign to</Lbl><Select value={td.assignee} onChange={v=>setTd({...td,assignee:v})} options={[...active.map(m=>({value:m.id,label:m.name.split(" ")[0]})),{value:"__none",label:"Unassigned"}]} className="w-full" /></div>
+            <button onClick={()=>addTask(p.id)} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Add task</button>
+            <button onClick={()=>setAddTaskFor(null)} className="rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] text-zinc-600">Cancel</button>
+          </div>
+        </div>
+      ) : <button onClick={()=>{setAddTaskFor(p.id);setTd({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:p.lead||selId||"__none"});}} className="text-[11px] font-medium text-zinc-500 hover:text-zinc-900">+ Add task</button>;
+      }
+      function renderTasks(p){ return <div className="space-y-2">{taskSection(p,"production","Production / PC")}{taskSection(p,"coordination","Follow-up")}{addTaskUI(p)}</div>; }
+      function projectControls(p){ return (
+        <div className="mb-2 flex flex-wrap items-center gap-2"><span className="mono mr-auto text-[10px] uppercase text-zinc-400">{p.code}{p.client?" · "+p.client:""}</span><Select value={p.priority} onChange={v=>patchProject(p.id,{priority:v})} options={PRIORITY_OPTS} className="w-24" />{isAdmin&&<Select value={p.lead??"__none"} onChange={v=>patchProject(p.id,{lead_member_id:v==="__none"?null:v})} options={[...active.map(m=>({value:m.id,label:m.name})),{value:"__none",label:"No lead"}]} className="w-28" />}{isAdmin&&<Select value={p.status} onChange={v=>patchProject(p.id,{status:v})} options={STATUS_OPTS} className="w-24" />}</div>
+      ); }
+      function previewTasks(p,memberId){ let act=[...p.tasks.filter(t=>t.status==="ongoing"),...p.tasks.filter(t=>t.status==="pending")]; if(memberId) act=act.filter(t=>t.assignee===memberId); if(!act.length) return null; return (
+        <div className="space-y-0.5 px-3 pb-2">{act.map((t,i)=>(<div key={t.id} className="flex items-center gap-2 text-[11px]"><span className="mono w-4 text-right text-zinc-300">{i+1}.</span><span className={`h-1.5 w-1.5 shrink-0 rounded-full ${t.workType==="production"?"bg-zinc-700":"bg-amber-500"}`} /><span className={`truncate ${t.status==="ongoing"?"font-bold":"font-semibold"} ${t.workType==="production"?"text-zinc-800":"text-amber-700"}`}>{t.label}</span>{t.code&&<span className="mono text-[9px] text-zinc-300">({t.code})</span>}{t.workType==="coordination"&&t.contact&&<span className="text-[10px] text-amber-600">→ {t.contact}</span>}<span className="mono ml-auto text-[9px] uppercase text-zinc-400">{t.status}</span></div>))}</div>
+      ); }
 
       if(!configured) return <div className="mx-auto mt-20 max-w-lg rounded-xl border border-amber-300 bg-amber-50 p-6 text-sm text-amber-800"><b>Add your keys</b> — paste your Supabase Project URL and anon key into Step A near the top of this file, then re-deploy.</div>;
       if(!session) return (
@@ -196,7 +243,7 @@
       );
 
       const board = boards.find(b=>b.id===activeBoard);
-      const leadMember = board?.leadId ? byId(board.leadId) : null;
+      const leadMember = activeLead ? byId(activeLead) : null;
 
       return (
         <div className="min-h-screen">
@@ -212,7 +259,7 @@
                 <div className="flex items-center gap-3">
                   <div className="text-sm font-semibold">{profile?.companies?.name||"Studio 16 Architects"}</div>
                   {isAdmin ? (
-                    <div className="flex gap-1">{[["team","Team Board"],["board","Project Board"],["registry","Registry"]].map(([k,l])=><button key={k} onClick={()=>{setTab(k);setShowAddP(false);setShowRegAdd(false);setEditP(null);setDelP(null);}} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${tab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
+                    <div className="flex gap-1">{[["team","Team Board"],["board","Project Board"],["registry","Registry"]].map(([k,l])=><button key={k} onClick={()=>{setTab(k);setShowAddP(false);setShowRegAdd(false);setEditP(null);setDelP(null);setExpanded(null);setAddTaskFor(null);}} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${tab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
                   ) : <span className="mono text-[10px] uppercase tracking-wider text-zinc-400">Team Board</span>}
                 </div>
                 {isAdmin && tab==="team" && <button onClick={()=>{setShowAddP(!showAddP); setNp(s=>({...s,lead:activeLead||"__none"}));}} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add project</button>}
@@ -248,22 +295,22 @@
                   {isAdmin&&b.id===activeBoard&&<button onClick={()=>{setBoardCfg(!boardCfg);setAddBoardOpen(false);}} className="border-l border-zinc-300 px-1.5 py-1.5 text-zinc-400 hover:text-zinc-800">✎</button>}
                 </div>
               ))}
-              {isAdmin && <button onClick={()=>{setAddBoardOpen(!addBoardOpen);setBoardCfg(false);setNb({name:"",desc:"",leadId:activeLead||""});}} className="rounded-md border border-dashed border-zinc-300 px-2.5 py-1.5 text-[12px] text-zinc-500 hover:border-zinc-500">+ Team board</button>}
+              {isAdmin && <button onClick={()=>{setAddBoardOpen(!addBoardOpen);setBoardCfg(false);setNb({name:"",desc:"",leadId:""});}} className="rounded-md border border-dashed border-zinc-300 px-2.5 py-1.5 text-[12px] text-zinc-500 hover:border-zinc-500">+ Team board</button>}
             </div>
 
             {isAdmin && addBoardOpen && (
               <div className="mb-3 flex flex-wrap items-end gap-2 rounded-lg border border-zinc-300 bg-white p-3">
                 <div className="min-w-[150px] flex-1"><Lbl>New team board</Lbl><Input value={nb.name} onChange={e=>setNb({...nb,name:e.target.value})} placeholder="e.g. Construction Team" /></div>
                 <div className="min-w-[180px] flex-[2]"><Lbl>Short description (optional)</Lbl><Input value={nb.desc} onChange={e=>setNb({...nb,desc:e.target.value})} /></div>
-                <div className="w-44"><Lbl>Default team leader</Lbl><Select value={nb.leadId||"__none"} onChange={v=>setNb({...nb,leadId:v==="__none"?"":v})} options={[{value:"__none",label:"— none —"},...active.map(m=>({value:m.id,label:m.name}))]} className="w-full" /></div>
                 <button onClick={addBoard} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Create</button>
+                <div className="mono w-full text-[10px] text-zinc-400">Add this board's members first, then pick a team leader from them with the ✎ button.</div>
               </div>
             )}
             {isAdmin && boardCfg && board && (
               <div className="mb-3 flex flex-wrap items-end gap-2 rounded-lg border border-zinc-300 bg-white p-3">
                 <div className="min-w-[150px] flex-1"><Lbl>Board name</Lbl><Input value={board.name} onChange={e=>patchBoard(board.id,{name:e.target.value})} /></div>
                 <div className="min-w-[180px] flex-[2]"><Lbl>Description</Lbl><Input value={board.desc} onChange={e=>patchBoard(board.id,{description:e.target.value})} /></div>
-                <div className="w-44"><Lbl>Team leader</Lbl><Select value={board.leadId||"__none"} onChange={v=>patchBoard(board.id,{lead_member_id:v==="__none"?null:v})} options={[{value:"__none",label:"— none —"},...active.map(m=>({value:m.id,label:m.name}))]} className="w-full" /></div>
+                <div className="w-44"><Lbl>Team leader</Lbl><Select value={board.leadId||"__none"} onChange={v=>patchBoard(board.id,{lead_member_id:v==="__none"?null:v})} options={[{value:"__none",label:"— none —"},...boardMembers.map(m=>({value:m.id,label:m.name}))]} className="w-full" /></div>
                 {boards.length>1 && <button onClick={()=>removeBoard(board.id)} className="rounded-md border border-zinc-300 px-2 py-1.5 text-[11px] text-red-500 hover:bg-red-50">Remove board</button>}
                 <button onClick={()=>setBoardCfg(false)} className="rounded-md border border-zinc-300 px-2 py-1.5 text-[11px] text-zinc-600">Done</button>
               </div>
@@ -315,42 +362,15 @@
               {["top","medium","low"].map(lvl=>{ const rows=mine.filter(p=>p.status==="live"&&p.priority===lvl&&matchWt(p)).sort((a,b)=>a.sort-b.sort); if(!rows.length) return null; return (
                 <section key={lvl} className="mb-4">
                   <div className="mb-2 flex items-center gap-2"><Dot level={lvl} /><h3 className={`text-[11px] font-semibold uppercase tracking-wider ${PRIORITY[lvl].text}`}>{PRIORITY[lvl].label} Priority</h3><div className="ml-2 h-px flex-1 bg-zinc-200" /></div>
-                  <div className="space-y-2">{rows.map(p=>{ const open=expanded===p.id; const myActive=[...p.tasks.filter(t=>t.status==="ongoing"),...p.tasks.filter(t=>t.status==="pending")].filter(t=>t.assignee===selId); return (
+                  <div className="space-y-2">{rows.map(p=>{ const open=expanded===p.id; const openN=p.tasks.filter(t=>t.assignee===selId&&t.status!=="done").length; return (
                     <div key={p.id} className="rounded-lg border border-zinc-200 bg-white">
                       <button onClick={()=>setExpanded(open?null:p.id)} className="flex w-full items-center gap-2 px-3 py-2 text-left">
                         <span className="text-[11px] text-zinc-400">{open?"▾":"▸"}</span>
                         <span className="min-w-0 flex-1 text-[13px] font-semibold">{p.code} · {p.nickname||p.client}</span>
-                        <span className="mono text-[10px] uppercase text-zinc-400">{myActive.length} task{myActive.length!==1?"s":""}</span>
+                        <span className="mono text-[10px] uppercase text-zinc-400">{openN} open</span>
                       </button>
-                      {!open && myActive.length>0 && <div className="space-y-0.5 px-3 pb-2">{myActive.map((t,i)=>(<div key={t.id} className="flex items-center gap-2 text-[11px]"><span className="mono w-4 text-right text-zinc-300">{i+1}.</span><span className={`h-1.5 w-1.5 rounded-full ${t.workType==="production"?"bg-zinc-700":"bg-amber-500"}`} /><span className={`truncate font-semibold ${t.workType==="production"?"text-zinc-800":"text-amber-700"}`}>{t.label}</span>{t.code&&<span className="mono text-[9px] text-zinc-300">({t.code})</span>}{t.workType==="coordination"&&t.contact&&<span className="text-[10px] text-amber-600">→ {t.contact}</span>}<span className="mono ml-auto text-[9px] uppercase text-zinc-400">{t.status}</span></div>))}</div>}
-                      {open && <div className="border-t border-zinc-100 p-3">
-                        <div className="mb-2 flex flex-wrap items-center gap-2"><span className="mono mr-auto text-[10px] uppercase text-zinc-400">{p.code}</span><Select value={p.priority} onChange={v=>patchProject(p.id,{priority:v})} options={PRIORITY_OPTS} className="w-24" />{isAdmin&&<Select value={p.lead??"__none"} onChange={v=>patchProject(p.id,{lead_member_id:v==="__none"?null:v})} options={[...active.map(m=>({value:m.id,label:m.name})),{value:"__none",label:"No lead"}]} className="w-28" />}{isAdmin&&<Select value={p.status} onChange={v=>patchProject(p.id,{status:v})} options={STATUS_OPTS} className="w-24" />}</div>
-                        <div className="space-y-1">{p.tasks.slice().sort((a,b)=>a.sort-b.sort).map((t,i,arr)=>(
-                          <div key={t.id} className="flex items-center gap-2 rounded-md border border-zinc-100 bg-zinc-50 px-2 py-1.5">
-                            <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${t.workType==="production"?"bg-zinc-700":"bg-amber-500"}`} />
-                            <span className={`truncate text-[12px] ${t.status==="done"?"text-zinc-400 line-through":(t.status==="ongoing"||t.status==="pending")?"font-semibold text-zinc-900":"text-zinc-600"}`}>{t.label}</span>
-                            {t.code&&<span className="mono shrink-0 text-[10px] text-zinc-300">({t.code})</span>}
-                            {t.workType==="coordination"&&t.contact&&<span className="shrink-0 text-[10px] text-amber-600">→ {t.contact}</span>}
-                            <span className="ml-auto" />
-                            <Select value={t.status} onChange={v=>setTaskStatus(t.id,v)} options={TS_OPTS} className="w-24 shrink-0" tone={t.status==="pending"?"bg-amber-50 text-amber-700 border-amber-200":"border-zinc-300 text-zinc-700 bg-white"} />
-                            <Select value={t.assignee||"__none"} onChange={v=>setTaskAssignee(t.id,v)} options={[...active.map(m=>({value:m.id,label:m.name.split(" ")[0]})),{value:"__none",label:"Unassigned"}]} className="w-28 shrink-0" tone={t.assignee?"border-zinc-300 text-zinc-700 bg-white":"bg-red-50 text-red-600 border-red-200"} />
-                            <Reorder onUp={()=>moveTask(arr,t.id,-1)} onDown={()=>moveTask(arr,t.id,1)} upOk={i>0} downOk={i<arr.length-1} />
-                            <button onClick={()=>removeTask(t.id)} className="shrink-0 px-1 text-[11px] text-zinc-300 hover:text-red-500">✕</button>
-                          </div>
-                        ))}</div>
-                        {addTaskFor===p.id ? (
-                          <div className="mt-2 rounded-md border border-zinc-200 bg-white p-2">
-                            <div className="mb-2 flex gap-1">{["production","coordination"].map(w=><button key={w} onClick={()=>setTd({...td,workType:w,type:(w==="production"?PROD_GROUPS:FOLLOW_GROUPS)[0].items[0][0]})} className={`rounded px-2 py-1 text-[11px] ${td.workType===w?"bg-zinc-900 text-white":"bg-zinc-100 text-zinc-600"}`}>{w==="production"?"Production":"Follow-up"}</button>)}</div>
-                            <div className="flex flex-wrap items-end gap-2">
-                              <div className="min-w-[180px] flex-1"><Lbl>Task type</Lbl><TypeSelect value={td.type} onChange={v=>setTd({...td,type:v})} wt={td.workType} /></div>
-                              {td.workType==="coordination"&&<div className="w-36"><Lbl>Contact (who to chase)</Lbl><Input value={td.contact} onChange={e=>setTd({...td,contact:e.target.value})} /></div>}
-                              <div className="w-32"><Lbl>Assign to</Lbl><Select value={td.assignee} onChange={v=>setTd({...td,assignee:v})} options={[...active.map(m=>({value:m.id,label:m.name.split(" ")[0]})),{value:"__none",label:"Unassigned"}]} className="w-full" /></div>
-                              <button onClick={()=>addTask(p.id)} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Add task</button>
-                              <button onClick={()=>setAddTaskFor(null)} className="rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] text-zinc-600">Cancel</button>
-                            </div>
-                          </div>
-                        ) : <button onClick={()=>{setAddTaskFor(p.id);setTd({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:p.lead||selId||"__none"});}} className="mt-2 text-[11px] font-medium text-zinc-500 hover:text-zinc-900">+ Add task</button>}
-                      </div>}
+                      {!open && previewTasks(p,selId)}
+                      {open && <div className="border-t border-zinc-100 p-3">{projectControls(p)}{renderTasks(p)}</div>}
                     </div>
                   ); })}</div>
                 </section>
@@ -372,12 +392,16 @@
               {["top","medium","low"].map(lvl=>{ const rows=projects.filter(p=>p.status==="live"&&p.priority===lvl).sort((a,b)=>a.sort-b.sort); if(!rows.length) return null; return (
                 <section key={lvl} className="mb-4">
                   <div className="mb-2 flex items-center gap-2"><Dot level={lvl} /><h3 className={`text-[11px] font-semibold uppercase tracking-wider ${PRIORITY[lvl].text}`}>{PRIORITY[lvl].label} Priority</h3><span className="mono text-[10px] text-zinc-400">{rows.length}</span><div className="ml-2 h-px flex-1 bg-zinc-200" /></div>
-                  <div className="space-y-1.5">{rows.map((p,i)=>{ const lead=byId(p.lead); const pal=lead?roleColor(lead.role):null; const og=p.tasks.filter(t=>t.status==="ongoing").length; const pend=p.tasks.filter(t=>t.workType==="coordination"&&t.status==="pending").length; const un=p.tasks.filter(t=>!t.assignee).length; return (
-                    <div key={p.id} className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2">
-                      <span className="min-w-0 flex-1"><span className="mono text-[12px] font-semibold">{p.code}</span> <span className="text-[12px] text-zinc-600">{p.nickname||p.client}</span></span>
-                      <span className="hidden items-center gap-1.5 text-[11px] text-zinc-500 sm:flex">{lead?<><span className={`mono flex h-5 w-5 items-center justify-center rounded-full text-[8px] font-semibold ${pal.bg} ${pal.text}`}>{initials(lead.name)}</span>{lead.name}</>:<span className="font-medium text-red-500">No lead</span>}</span>
-                      <span className="mono shrink-0 text-[10px] uppercase text-zinc-400">{og} ong{pend?` · ${pend} pend`:""}{un?` · `:""}{un>0&&<span className="text-red-500">{un} unassigned</span>}</span>
-                      <Reorder onUp={()=>moveProject(rows,p.id,-1)} onDown={()=>moveProject(rows,p.id,1)} upOk={i>0} downOk={i<rows.length-1} />
+                  <div className="space-y-1.5">{rows.map((p,i)=>{ const lead=byId(p.lead); const pal=lead?roleColor(lead.role):null; const og=p.tasks.filter(t=>t.status==="ongoing").length; const pend=p.tasks.filter(t=>t.workType==="coordination"&&t.status==="pending").length; const un=p.tasks.filter(t=>!t.assignee).length; const open=expanded===p.id; return (
+                    <div key={p.id} className="rounded-lg border border-zinc-200 bg-white">
+                      <div className="flex items-center gap-2 px-3 py-2">
+                        <button onClick={()=>setExpanded(open?null:p.id)} className="flex min-w-0 flex-1 items-center gap-2 text-left"><span className="text-[11px] text-zinc-400">{open?"▾":"▸"}</span><span className="min-w-0"><span className="mono text-[12px] font-semibold">{p.code}</span> <span className="text-[12px] text-zinc-600">{p.nickname||p.client}</span></span></button>
+                        <span className="hidden items-center gap-1.5 text-[11px] text-zinc-500 sm:flex">{lead?<><span className={`mono flex h-5 w-5 items-center justify-center rounded-full text-[8px] font-semibold ${pal.bg} ${pal.text}`}>{initials(lead.name)}</span>{lead.name}</>:<span className="font-medium text-red-500">No lead</span>}</span>
+                        <span className="mono shrink-0 text-[10px] uppercase text-zinc-400">{og} ong{pend?` · ${pend} pend`:""}{un>0&&<span className="text-red-500"> · {un} unassigned</span>}</span>
+                        <Reorder onUp={()=>moveProject(rows,p.id,-1)} onDown={()=>moveProject(rows,p.id,1)} upOk={i>0} downOk={i<rows.length-1} />
+                      </div>
+                      {!open && previewTasks(p,null)}
+                      {open && <div className="border-t border-zinc-100 p-3">{projectControls(p)}{renderTasks(p)}</div>}
                     </div>
                   ); })}</div>
                 </section>
@@ -443,6 +467,7 @@
                           <span className="ml-auto" />
                           {delP===p.id ? <span className="flex items-center gap-2 text-[11px] text-red-600">Delete this project &amp; its tasks?<button onClick={()=>deleteProject(p.id)} className="rounded-md bg-red-600 px-2 py-1 font-medium text-white">Yes, delete</button><button onClick={()=>setDelP(null)} className="rounded-md border border-zinc-300 px-2 py-1 text-zinc-600">No</button></span> : <button onClick={()=>setDelP(p.id)} className="rounded-md border border-zinc-200 px-3 py-1.5 text-[11px] text-zinc-400 hover:border-red-300 hover:text-red-500">Delete</button>}
                         </div>
+                        <div className="mt-3 border-t border-zinc-100 pt-3"><div className="mb-2 mono text-[10px] uppercase tracking-wider text-zinc-400">Tasks</div>{renderTasks(p)}</div>
                       </div>}
                     </div>
                   ); })}</div>
