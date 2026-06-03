@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Studio 16 Tracker — Connection Test</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style> body { font-family: 'Archivo', system-ui, sans-serif; } .mono { font-family: 'Spline Sans Mono', monospace; } </style>
+</head>
+<body class="bg-[#f4f4f2] text-zinc-900">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    /* ============================================================
+       STEP A — paste your two Supabase keys between the quotes.
+       (Supabase → Project Settings → API)
+       The anon/public key is safe to put here — your security
+       rules protect the data, not the key.
+       ============================================================ */
+    const SUPABASE_URL      = "https://wznspowrhxpugfphwowl.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6bnNwb3dyaHhwdWdmcGh3b3dsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NDk1OTIsImV4cCI6MjA5NjAyNTU5Mn0.KzwU8kaqnKxw0CuG8W1SRp7ghO9eEZ1X6e_Ok8-kXjQ";
+
+    const configured = !SUPABASE_URL.includes("__PASTE") && !SUPABASE_ANON_KEY.includes("__PASTE");
+    const db = configured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    function App() {
+      const [session, setSession] = useState(null);
+      const [profile, setProfile] = useState(null);
+      const [data, setData] = useState({ members: [], boards: [], projects: [], tasks: [] });
+      const [loading, setLoading] = useState(false);
+      const [err, setErr] = useState("");
+      const [email, setEmail] = useState("");
+      const [pw, setPw] = useState("");
+      const [busy, setBusy] = useState(false);
+      const [nm, setNm] = useState("");
+      const [nr, setNr] = useState("Architect");
+
+      useEffect(() => {
+        if (!db) return;
+        db.auth.getSession().then(({ data }) => setSession(data.session));
+        const { data: sub } = db.auth.onAuthStateChange((_e, s) => setSession(s));
+        return () => sub.subscription.unsubscribe();
+      }, []);
+
+      useEffect(() => { if (session) loadAll(); }, [session]);
+
+      async function loadAll() {
+        setLoading(true); setErr("");
+        try {
+          const { data: prof, error: pe } = await db.from("profiles").select("*, companies(*)").eq("id", session.user.id).single();
+          if (pe) throw pe;
+          setProfile(prof);
+          const [m, b, p, t] = await Promise.all([
+            db.from("members").select("*").order("sort_order"),
+            db.from("boards").select("*").order("sort_order"),
+            db.from("projects").select("*").order("sort_order"),
+            db.from("tasks").select("*").order("sort_order"),
+          ]);
+          for (const r of [m, b, p, t]) if (r.error) throw r.error;
+          setData({ members: m.data, boards: b.data, projects: p.data, tasks: t.data });
+        } catch (e) { setErr(e.message || String(e)); }
+        setLoading(false);
+      }
+
+      async function signIn(e) {
+        e.preventDefault(); setBusy(true); setErr("");
+        const { error } = await db.auth.signInWithPassword({ email: email.trim(), password: pw });
+        if (error) setErr(error.message);
+        setBusy(false);
+      }
+      async function signOut() { await db.auth.signOut(); setSession(null); setProfile(null); setData({ members: [], boards: [], projects: [], tasks: [] }); }
+
+      async function addMember() {
+        if (!nm.trim() || !profile) return;
+        setErr("");
+        const { error } = await db.from("members").insert({
+          company_id: profile.company_id, name: nm.trim(), role: nr.trim(),
+          status: "active", board_id: data.boards[0]?.id || null, sort_order: data.members.length,
+        });
+        if (error) { setErr(error.message); return; }
+        setNm(""); loadAll();
+      }
+
+      const nameOf = (id) => data.members.find((m) => m.id === id)?.name || "—";
+      const firstName = (id) => (data.members.find((m) => m.id === id)?.name || "").split(" ")[0] || "Unassigned";
+
+      // ---- not configured ----
+      if (!configured) return (
+        <div className="mx-auto mt-20 max-w-lg rounded-xl border border-amber-300 bg-amber-50 p-6 text-sm text-amber-800">
+          <div className="mb-1 font-semibold">Almost there — add your keys</div>
+          Open this file and paste your Supabase <b>Project URL</b> and <b>anon public key</b> into the two lines near the top (Step A), then re-deploy.
+        </div>
+      );
+
+      // ---- login ----
+      if (!session) return (
+        <div className="flex min-h-screen items-center justify-center px-4">
+          <form onSubmit={signIn} className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+            <h1 className="text-lg font-semibold">Studio 16 Architects</h1>
+            <p className="mb-4 text-[12px] text-zinc-500">Project &amp; Team Tracker — sign in</p>
+            <label className="mb-1 block text-[11px] uppercase tracking-wider text-zinc-400">Email</label>
+            <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" autoFocus className="mb-3 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-900" placeholder="admin@studio16.app" />
+            <label className="mb-1 block text-[11px] uppercase tracking-wider text-zinc-400">Password</label>
+            <input value={pw} onChange={(e) => setPw(e.target.value)} type="password" className="mb-4 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-900" placeholder="••••••" />
+            <button disabled={busy} className="w-full rounded-md bg-zinc-900 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50">{busy ? "Signing in…" : "Sign in"}</button>
+            {err && <div className="mt-3 rounded-md bg-red-50 px-3 py-2 text-[12px] text-red-600">{err}</div>}
+          </form>
+        </div>
+      );
+
+      // ---- signed in ----
+      return (
+        <div className="min-h-screen">
+          <header className="border-b border-zinc-200 bg-white">
+            <div className="mx-auto flex max-w-[1000px] items-center justify-between px-4 py-3 sm:px-8">
+              <div>
+                <div className="text-base font-semibold leading-tight">{profile?.companies?.name || "Studio 16 Architects"}</div>
+                <div className="mono text-[10px] uppercase tracking-wider text-zinc-500">Connected · live data</div>
+              </div>
+              <div className="flex items-center gap-3 text-[12px]">
+                <span className="text-zinc-500">{profile ? `${profile.name} · ${profile.role}` : ""}</span>
+                <button onClick={signOut} className="rounded-md border border-zinc-300 px-3 py-1.5 hover:bg-zinc-50">Sign out</button>
+              </div>
+            </div>
+          </header>
+
+          <main className="mx-auto max-w-[1000px] px-4 py-6 sm:px-8">
+            {loading && <div className="mono text-sm text-zinc-400">Loading your data…</div>}
+            {err && <div className="mb-4 rounded-md bg-red-50 px-3 py-2 text-[12px] text-red-600">{err}</div>}
+
+            <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-[13px] text-emerald-800">
+              ✓ You're live and connected to your database. This is your real Supabase data below.
+            </div>
+
+            {profile?.role === "admin" && (
+              <div className="mb-6 flex flex-wrap items-end gap-2 rounded-lg border border-zinc-200 bg-white p-3">
+                <div className="flex-1"><label className="mb-1 block text-[10px] uppercase tracking-wider text-zinc-400">Add a member (saves to the database)</label>
+                  <input value={nm} onChange={(e) => setNm(e.target.value)} placeholder="Name" className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-sm outline-none focus:border-zinc-900" /></div>
+                <input value={nr} onChange={(e) => setNr(e.target.value)} placeholder="Role" className="w-36 rounded-md border border-zinc-300 px-2 py-1.5 text-sm outline-none focus:border-zinc-900" />
+                <button onClick={addMember} className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700">Add</button>
+              </div>
+            )}
+
+            <section className="mb-6">
+              <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Team ({data.members.length})</h2>
+              {data.members.length === 0 && <p className="mono text-[12px] text-zinc-400">No members yet{profile?.role === "admin" ? " — add one above to test saving." : "."}</p>}
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {data.members.map((m) => (
+                  <div key={m.id} className="rounded-lg border border-zinc-200 bg-white p-3">
+                    <div className="text-[13px] font-semibold">{m.name}</div>
+                    <div className="mono text-[10px] text-zinc-500">{m.role}{m.team_id ? ` · ${m.team_id}` : ""}</div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section>
+              <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Projects ({data.projects.length})</h2>
+              {data.projects.length === 0 && <p className="mono text-[12px] text-zinc-400">No projects yet — we'll add the project screens in the next stage.</p>}
+              <div className="space-y-2">
+                {data.projects.map((p) => (
+                  <div key={p.id} className="rounded-lg border border-zinc-200 bg-white p-3">
+                    <div className="flex items-center justify-between">
+                      <div className="text-[13px] font-semibold">{p.code} · {p.nickname || p.client}</div>
+                      <span className="mono text-[10px] uppercase text-zinc-400">{p.priority} · {p.status} · lead: {firstName(p.lead_member_id)}</span>
+                    </div>
+                    <div className="mt-1 space-y-0.5">
+                      {data.tasks.filter((t) => t.project_id === p.id).map((t) => (
+                        <div key={t.id} className="flex items-center gap-2 text-[12px]">
+                          <span className="text-zinc-700">{t.label}</span>
+                          {t.code && <span className="mono text-[9px] text-zinc-300">({t.code})</span>}
+                          <span className="mono ml-auto text-[10px] uppercase text-zinc-400">{t.status} · {firstName(t.assignee_member_id)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </main>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
