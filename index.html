@@ -100,7 +100,7 @@
       const [boardCfg,setBoardCfg]=useState(false); const [addBoardOpen,setAddBoardOpen]=useState(false); const [nb,setNb]=useState({name:"",desc:"",leadId:""});
       const [showAddP,setShowAddP]=useState(false); const [np,setNp]=useState({raw:"",code:"",nickname:"",client:"",location:"",size:"",address:"",priority:"medium",status:"live",lead:"__none"});
       const [addTaskFor,setAddTaskFor]=useState(null); const [td,setTd]=useState({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:"__none"});
-      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]);
+      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null);
 
       const realAdmin = profile?.role==="admin";
       const isAdmin = realAdmin && viewAs==="admin";
@@ -118,7 +118,7 @@
             db.from("boards").select("*").order("sort_order"),
             db.from("projects").select("*").order("sort_order"),
             db.from("tasks").select("*").order("sort_order"),
-            db.from("profiles").select("id,name,role,employee_id").order("employee_id"),
+            db.from("profiles").select("id,name,role,employee_id,phone").order("employee_id"),
           ]);
           for(const r of [mb,bd,pr,tk]) if(r.error) throw r.error;
           if(!pf.error) setAllProfiles(pf.data||[]);
@@ -174,6 +174,7 @@
       async function saveEditP(){ const e=editP; const f={code:e.code.trim(),nickname:e.nickname,client:e.client,location:e.location,size:e.size,address:e.address,priority:e.priority,status:e.status,lead_member_id:e.lead==="__none"?null:e.lead}; if(fail((await db.from("projects").update(f).eq("id",e.id)).error)) return; if(f.lead_member_id) await db.from("tasks").update({assignee_member_id:f.lead_member_id}).eq("project_id",e.id).is("assignee_member_id",null); setEditP(null); await refresh(); }
       async function deleteProject(id){ await db.from("tasks").delete().eq("project_id",id); if(fail((await db.from("projects").delete().eq("id",id)).error)) return; setDelP(null); if(expanded===id) setExpanded(null); await refresh(); }
       async function setProfileRole(id,role){ if(id===profile.id) return; if(fail((await db.from("profiles").update({role}).eq("id",id)).error)) return; await refresh(); }
+      async function saveProfile(){ const e=pEdit; if(fail((await db.from("profiles").update({name:e.name.trim(),phone:e.phone.trim()||null}).eq("id",e.id)).error)) return; if(e.id===profile.id) setProfile(p=>({...p,name:e.name.trim()})); setPEdit(null); await refresh(); }
       async function patchCompany(f){ if(fail((await db.from("companies").update(f).eq("id",cid())).error)) return; setProfile(p=>({...p,companies:{...p.companies,...f}})); }
       async function patchProject(id,f){ if(fail((await db.from("projects").update(f).eq("id",id)).error)) return; if(f.lead_member_id) await db.from("tasks").update({assignee_member_id:f.lead_member_id}).eq("project_id",id).is("assignee_member_id",null); await refresh(); }
 
@@ -493,12 +494,16 @@
 
               <div className="mb-5 rounded-lg border border-zinc-200 bg-white p-3">
                 <div className="mb-2 flex items-center justify-between"><h3 className="text-[13px] font-semibold">Logins &amp; roles</h3><span className="mono text-[10px] text-zinc-400">{allProfiles.length} {allProfiles.length===1?"login":"logins"}</span></div>
-                <div className="space-y-1">{allProfiles.slice().sort((a,b)=>String(a.employee_id||"").localeCompare(String(b.employee_id||""))).map(pr=>(
-                  <div key={pr.id} className="flex items-center gap-2 rounded-md border border-zinc-100 bg-zinc-50 px-3 py-2">
-                    <span className="min-w-0 flex-1"><span className="text-[12px] font-semibold">{pr.name||"—"}</span> <span className="mono text-[10px] text-zinc-400">{pr.employee_id||""}</span>{pr.id===profile.id&&<span className="mono ml-1 text-[9px] uppercase text-zinc-400">(you)</span>}</span>
-                    {pr.id===profile.id ? <span className={`mono rounded px-2 py-1 text-[10px] font-semibold uppercase ${pr.role==="admin"?"bg-zinc-900 text-white":"bg-zinc-200 text-zinc-600"}`}>{pr.role}</span> : <Select value={pr.role} onChange={v=>setProfileRole(pr.id,v)} options={[{value:"member",label:"Member"},{value:"admin",label:"Admin"}]} className="w-28" />}
+                <div className="space-y-1">{allProfiles.slice().sort((a,b)=>String(a.employee_id||"").localeCompare(String(b.employee_id||""))).map(pr=>{ const ed=pEdit&&pEdit.id===pr.id; return (
+                  <div key={pr.id} className="rounded-md border border-zinc-100 bg-zinc-50">
+                    <div className="flex items-center gap-2 px-3 py-2">
+                      <button onClick={()=>setPEdit(ed?null:{id:pr.id,name:pr.name||"",phone:pr.phone||""})} className="min-w-0 flex-1 text-left"><span className="text-[12px] font-semibold">{pr.name||"—"}</span> <span className="mono text-[10px] text-zinc-400">{pr.employee_id||""}</span>{pr.phone&&<span className="mono text-[10px] text-zinc-400"> · {pr.phone}</span>}{pr.id===profile.id&&<span className="mono ml-1 text-[9px] uppercase text-zinc-400">(you)</span>}</button>
+                      {pr.id===profile.id ? <span className={`mono rounded px-2 py-1 text-[10px] font-semibold uppercase ${pr.role==="admin"?"bg-zinc-900 text-white":"bg-zinc-200 text-zinc-600"}`}>{pr.role}</span> : <Select value={pr.role} onChange={v=>setProfileRole(pr.id,v)} options={[{value:"member",label:"Member"},{value:"admin",label:"Admin"}]} className="w-28" />}
+                      <button onClick={()=>setPEdit(ed?null:{id:pr.id,name:pr.name||"",phone:pr.phone||""})} className="shrink-0 px-1 text-[11px] text-zinc-400 hover:text-zinc-800">{ed?"▾":"✎"}</button>
+                    </div>
+                    {ed && <div className="border-t border-zinc-100 p-3"><div className="flex flex-wrap items-end gap-2"><div className="min-w-[140px] flex-1"><Lbl>Display name</Lbl><Input value={pEdit.name} onChange={e=>setPEdit({...pEdit,name:e.target.value})} /></div><div className="w-44"><Lbl>Mobile</Lbl><Input value={pEdit.phone} onChange={e=>setPEdit({...pEdit,phone:e.target.value})} placeholder="+8801…" /></div><button onClick={saveProfile} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Save</button><button onClick={()=>setPEdit(null)} className="rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] text-zinc-600">Cancel</button></div><div className="mono mt-2 text-[10px] text-zinc-400">Team ID ({pr.employee_id||"—"}) and password are managed in Supabase; name &amp; mobile are managed here.</div></div>}
                   </div>
-                ))}</div>
+                ); })}</div>
                 {!allProfiles.length && <div className="py-4 text-center text-[12px] text-zinc-400">No logins loaded.</div>}
                 <div className="mono mt-3 rounded-md bg-zinc-50 p-2 text-[10px] leading-relaxed text-zinc-500">To add a new login: Supabase → Authentication → Users → Add user, with email <b>teamid@{LOGIN_DOMAIN}</b> and your common password. They appear here automatically as a Member; switch them to Admin above if needed.</div>
               </div>
