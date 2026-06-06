@@ -149,7 +149,7 @@
       const activeLead = leadId0 && active.some(m=>m.id===leadId0) ? leadId0 : null;
       const boardMembers = (activeLead && !homeMembers.some(m=>m.id===activeLead)) ? [byId(activeLead), ...homeMembers] : homeMembers;
       const sel = byId(selId);
-      const mine = projects.filter(p=> p.lead===selId || p.tasks.some(t=>t.assignee===selId));
+      const mine = projects.filter(p=> p.tasks.some(t=>t.assignee===selId && (t.status==="ongoing"||t.status==="pending")));
       const matchWt = p=> wt==="all" || p.tasks.some(t=>t.workType===wt);
       const kpis = {
         live: projects.filter(p=>p.status==="live").length,
@@ -270,9 +270,7 @@
               <div className="flex flex-wrap items-center justify-between gap-2 pt-3">
                 <div className="flex items-center gap-3">
                   <div className="text-sm font-semibold">{profile?.companies?.name||"Studio 16 Architects"}</div>
-                  {isAdmin ? (
-                    <div className="flex gap-1">{[["team","Team Board"],["board","Project Board"],["registry","Registry"],["admin","Admin"]].map(([k,l])=><button key={k} onClick={()=>{setTab(k);setShowAddP(false);setShowRegAdd(false);setEditP(null);setDelP(null);setExpanded(null);setAddTaskFor(null);}} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${tab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
-                  ) : <span className="mono text-[10px] uppercase tracking-wider text-zinc-400">Team Board</span>}
+                  <div className="flex gap-1">{(isAdmin?[["team","Team Board"],["board","Project Board"],["registry","Registry"],["admin","Admin"]]:[["team","Team Board"],["board","Project Board"]]).map(([k,l])=><button key={k} onClick={()=>{setTab(k);setShowAddP(false);setShowRegAdd(false);setEditP(null);setDelP(null);setExpanded(null);setAddTaskFor(null);}} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${tab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
                 </div>
                 {false}
               </div>
@@ -344,11 +342,11 @@
             )}
 
             <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {boardMembers.map((m)=>{ const ps=projects.filter(p=>p.lead===m.id||p.tasks.some(t=>t.assignee===m.id)); const liveN=ps.filter(p=>p.status==="live").length; const topN=ps.filter(p=>p.status==="live"&&p.priority==="top").length; const a=m.id===selId; const isLead=m.id===activeLead; const hi=homeMembers.findIndex(x=>x.id===m.id); const pal=roleColor(m.role); return (
+              {boardMembers.map((m)=>{ const ps=projects.filter(p=>p.status==="live"&&p.tasks.some(t=>t.assignee===m.id&&(t.status==="ongoing"||t.status==="pending"))); const liveN=ps.length; const topN=ps.filter(p=>p.priority==="top").length; const a=m.id===selId; const isLead=m.id===activeLead; const hi=homeMembers.findIndex(x=>x.id===m.id); const pal=roleColor(m.role); return (
                 <div key={m.id} className={`flex items-center gap-1.5 rounded-lg border p-2.5 shadow-sm transition ${a?"border-zinc-900 bg-zinc-900 text-white":"border-zinc-200 bg-zinc-100 hover:bg-zinc-50"}`}>
                   <button onClick={()=>{setSelId(m.id);setExpanded(null);setRemoveM(false);setEditM(null);setShareOpen(false);}} className="flex min-w-0 flex-1 items-center gap-2.5 text-left">
                     <span className={`mono flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${a?"bg-white text-zinc-900":`${pal.bg} ${pal.text}`}`}>{initials(m.name)}</span>
-                    <span className="min-w-0 flex-1"><span className="flex items-center gap-1"><span className="truncate text-[12px] font-semibold leading-tight">{m.name}</span>{isLead&&<span className={`mono shrink-0 rounded px-1 py-0.5 text-[8px] font-bold uppercase ${a?"bg-white/20 text-white":"bg-zinc-200 text-zinc-600"}`}>Lead</span>}</span><span className={`mono block truncate text-[9px] ${a?"text-zinc-400":pal.text}`}>{m.role}{m.teamId?` · ${m.teamId}`:""}</span><span className={`mono text-[9px] ${a?"text-zinc-500":"text-zinc-400"}`}>{liveN} live</span></span>
+                    <span className="min-w-0 flex-1"><span className="flex items-center gap-1"><span className="truncate text-[12px] font-semibold leading-tight">{m.name}</span>{isLead&&<span className={`mono shrink-0 rounded px-1 py-0.5 text-[8px] font-bold uppercase ${a?"bg-white/20 text-white":"bg-zinc-200 text-zinc-600"}`}>Lead</span>}</span><span className={`mono block truncate text-[9px] ${a?"text-zinc-400":pal.text}`}>{m.role}{m.teamId?` · ${m.teamId}`:""}</span><span className={`mono text-[9px] ${a?"text-zinc-500":"text-zinc-400"}`}>{liveN} active</span></span>
                   </button>
                   {topN>0&&<span className="h-2 w-2 shrink-0 rounded-full bg-red-500" />}
                   {hi>=0 ? <Reorder onUp={()=>moveMember(m.id,-1)} onDown={()=>moveMember(m.id,1)} upOk={hi>0} downOk={hi<homeMembers.length-1} /> : <span className="mono px-1 text-[7px] uppercase text-zinc-300">visiting</span>}
@@ -375,13 +373,14 @@
               {["top","medium","low"].map(lvl=>{ const ord=sel.projOrder||[]; const rnk=p=>{ const i=ord.indexOf(p.id); return i<0?1000000+(p.sort||0):i; }; const rows=mine.filter(p=>p.status==="live"&&p.priority===lvl&&matchWt(p)).sort((a,b)=>rnk(a)-rnk(b)); if(!rows.length) return null; return (
                 <section key={lvl} className="mb-4">
                   <div className="mb-2 flex items-center gap-2"><Dot level={lvl} /><h3 className={`text-[11px] font-semibold uppercase tracking-wider ${PRIORITY[lvl].text}`}>{PRIORITY[lvl].label} Priority</h3><div className="ml-2 h-px flex-1 bg-zinc-200" /></div>
-                  <div className="space-y-2">{rows.map((p,ri)=>{ const open=expanded===p.id; const openN=p.tasks.filter(t=>t.assignee===selId&&t.status!=="done").length; return (
+                  <div className="space-y-2">{rows.map((p,ri)=>{ const open=expanded===p.id; const openN=p.tasks.filter(t=>t.assignee===selId&&t.status!=="done").length; const lead=byId(p.lead); const pal=lead?roleColor(lead.role):null; return (
                     <div key={p.id} className="flex items-stretch gap-1.5 rounded-lg border border-zinc-200 bg-white">
                       <div className="min-w-0 flex-1">
                         <button onClick={()=>setExpanded(open?null:p.id)} className="flex w-full items-center gap-2 px-3 py-2 text-left">
                           <span className="text-[11px] text-zinc-400">{open?"▾":"▸"}</span>
                           <span className="min-w-0 flex-1"><ProjTitle p={p} /></span>
-                          <span className="mono text-[10px] uppercase text-zinc-400">{openN} open</span>
+                          <span className="flex shrink-0 items-center gap-1 text-[10px] text-zinc-500">{lead?<><span className={`mono flex h-5 w-5 items-center justify-center rounded-full text-[8px] font-semibold ${pal.bg} ${pal.text}`}>{initials(lead.name)}</span><span className="hidden sm:inline">{lead.name}</span></>:<span className="font-medium text-red-500">No lead</span>}</span>
+                          <span className="mono shrink-0 text-[10px] uppercase text-zinc-400">{openN} open</span>
                         </button>
                         {!open && previewTasks(p,selId)}
                         {open && <div className="border-t border-zinc-100 p-3">{projectControls(p)}{renderTasks(p)}</div>}
@@ -399,7 +398,7 @@
             ); })()}
             </>)}
 
-            {tab==="board" && isAdmin && (<>
+            {tab==="board" && (<>
               <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-base font-semibold">Live Projects <span className="mono text-[11px] text-zinc-400">{projects.filter(p=>p.status==="live").length} live</span></h2>
                 <div className="flex flex-wrap items-center gap-2"><label className="mono flex cursor-pointer items-center gap-1 text-[11px] text-zinc-500"><input type="checkbox" checked={printUpcoming} onChange={e=>setPrintUpcoming(e.target.checked)} /> include upcoming in print</label><button onClick={()=>setShowBoardShare(s=>!s)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600 hover:bg-zinc-50">Copy list</button><button onClick={printBoard} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600 hover:bg-zinc-50">Print / PDF</button></div>
@@ -414,7 +413,7 @@
                         <button onClick={()=>setExpanded(open?null:p.id)} className="flex min-w-0 flex-1 items-center gap-2 text-left"><span className="text-[11px] text-zinc-400">{open?"▾":"▸"}</span><span className="min-w-0"><ProjTitle p={p} /></span></button>
                         <span className="hidden items-center gap-1.5 text-[11px] text-zinc-500 sm:flex">{lead?<><span className={`mono flex h-5 w-5 items-center justify-center rounded-full text-[8px] font-semibold ${pal.bg} ${pal.text}`}>{initials(lead.name)}</span>{lead.name}</>:<span className="font-medium text-red-500">No lead</span>}</span>
                         <span className="mono shrink-0 text-[10px] uppercase text-zinc-400">{og} ong{pend?` · ${pend} pend`:""}{un>0&&<span className="text-red-500"> · {un} unassigned</span>}</span>
-                        <Reorder onUp={()=>moveProject(rows,p.id,-1)} onDown={()=>moveProject(rows,p.id,1)} upOk={i>0} downOk={i<rows.length-1} />
+                        {isAdmin && <Reorder onUp={()=>moveProject(rows,p.id,-1)} onDown={()=>moveProject(rows,p.id,1)} upOk={i>0} downOk={i<rows.length-1} />}
                       </div>
                       {!open && previewTasks(p,null)}
                       {open && <div className="border-t border-zinc-100 p-3">{projectControls(p)}{renderTasks(p)}</div>}
