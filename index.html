@@ -60,6 +60,8 @@
     const projText = p => [p.code, (p.nickname||p.client||""), p.location||""].filter(Boolean).join(" ");
     const today = ()=> new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short"});
     const relTime = (iso)=>{ if(!iso) return ""; const d=new Date(iso); const s=Math.floor((Date.now()-d.getTime())/1000); if(s<60) return "just now"; const m=Math.floor(s/60); if(m<60) return m+"m ago"; const h=Math.floor(m/60); if(h<24) return h+"h ago"; const dd=Math.floor(h/24); if(dd<7) return dd+"d ago"; return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"}); };
+    const ALL_KEYS = [["design","Design"],["finance","Finance"],["construction","Construction"],["sales","Sales"],["hr","HR"],["marketing","Marketing"]];
+    const dayStr = ()=> new Date().toLocaleDateString("en-CA");
     const yearOf = (code)=>{ const d=String(code||"").replace(/\D/g,""); if(d.length>=5) return 2000+parseInt(d.slice(0,2),10); if(d.length===4) return 2020+parseInt(d.slice(0,1),10); return null; };
     const STATUS_TONE = { live:"bg-emerald-50 text-emerald-600", hold:"bg-amber-50 text-amber-600", dead:"bg-zinc-100 text-zinc-400", complete:"bg-blue-50 text-blue-600", closed:"bg-zinc-100 text-zinc-500" };
 
@@ -103,10 +105,13 @@
       const [boardCfg,setBoardCfg]=useState(false); const [addBoardOpen,setAddBoardOpen]=useState(false); const [nb,setNb]=useState({name:"",desc:"",leadId:""});
       const [showAddP,setShowAddP]=useState(false); const [np,setNp]=useState({raw:"",code:"",nickname:"",client:"",location:"",size:"",address:"",priority:"medium",status:"live",lead:"__none"});
       const [addTaskFor,setAddTaskFor]=useState(null); const [td,setTd]=useState({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:"__none"});
-      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false);
+      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("design"); const [myCheckin,setMyCheckin]=useState(null);
 
       const realAdmin = profile?.role==="admin";
       const isAdmin = realAdmin && viewAs==="admin";
+      const memberMode = realAdmin && viewAs==="member";
+      const has = k => memberMode ? k==="design" : (realAdmin || (profile?.keys||["design"]).includes(k));
+      const areas = ALL_KEYS.filter(([k])=>has(k));
 
       useEffect(()=>{ if(!db) return; db.auth.getSession().then(({data})=>setSession(data.session)); const {data:sub}=db.auth.onAuthStateChange((_e,s)=>setSession(s)); return ()=>sub.subscription.unsubscribe(); },[]);
       useEffect(()=>{ if(session) load(true); },[session]);
@@ -121,7 +126,7 @@
             db.from("boards").select("*").order("sort_order"),
             db.from("projects").select("*").order("sort_order"),
             db.from("tasks").select("*").order("sort_order"),
-            db.from("profiles").select("id,name,role,employee_id,phone,last_seen").order("employee_id"),
+            db.from("profiles").select("id,name,role,employee_id,phone,last_seen,keys").order("employee_id"),
           ]);
           for(const r of [mb,bd,pr,tk]) if(r.error) throw r.error;
           if(!pf.error) setAllProfiles(pf.data||[]);
@@ -131,6 +136,7 @@
           const projs = pr.data.map(mapProject).map(p=>({...p,tasks:tasks.filter(t=>t.projectId===p.id).sort((a,b)=>a.sort-b.sort)}));
           setMembers(mb.data.map(mapMember)); setBoards(bds); setProjects(projs);
           setActiveBoard(a=> a && bds.some(b=>b.id===a) ? a : (bds[0]?.id||""));
+          try{ const {data:ci}=await db.from("attendance").select("*").eq("profile_id",session.user.id).eq("day",dayStr()).limit(1); setMyCheckin(ci&&ci[0]?ci[0]:null); }catch(e){}
         }catch(e){ setErr(e.message||String(e)); }
         if(initial) setLoading(false);
       }
@@ -177,8 +183,9 @@
       async function saveEditP(){ const e=editP; const f={code:e.code.trim(),nickname:e.nickname,client:e.client,location:e.location,size:e.size,address:e.address,priority:e.priority,status:e.status,lead_member_id:e.lead==="__none"?null:e.lead}; if(fail((await db.from("projects").update(f).eq("id",e.id)).error)) return; if(f.lead_member_id) await db.from("tasks").update({assignee_member_id:f.lead_member_id}).eq("project_id",e.id).is("assignee_member_id",null); setEditP(null); await refresh(); }
       async function deleteProject(id){ await db.from("tasks").delete().eq("project_id",id); if(fail((await db.from("projects").delete().eq("id",id)).error)) return; setDelP(null); if(expanded===id) setExpanded(null); await refresh(); }
       async function setProfileRole(id,role){ if(id===profile.id) return; if(fail((await db.from("profiles").update({role}).eq("id",id)).error)) return; await refresh(); }
-      async function saveProfile(){ const e=pEdit; if(fail((await db.from("profiles").update({name:e.name.trim(),phone:e.phone.trim()||null}).eq("id",e.id)).error)) return; if(e.id===profile.id) setProfile(p=>({...p,name:e.name.trim()})); setPEdit(null); await refresh(); }
+      async function saveProfile(){ const e=pEdit; if(fail((await db.from("profiles").update({name:e.name.trim(),phone:e.phone.trim()||null,keys:e.keys||["design"]}).eq("id",e.id)).error)) return; if(e.id===profile.id) setProfile(p=>({...p,name:e.name.trim()})); setPEdit(null); await refresh(); }
       async function patchCompany(f){ if(fail((await db.from("companies").update(f).eq("id",cid())).error)) return; setProfile(p=>({...p,companies:{...p.companies,...f}})); }
+      async function checkIn(){ if(myCheckin) return; const {data,error}=await db.from("attendance").insert({profile_id:session.user.id,company_id:cid(),day:dayStr()}).select().single(); if(fail(error)) return; setMyCheckin(data); }
       async function patchProject(id,f){ if(fail((await db.from("projects").update(f).eq("id",id)).error)) return; if(f.lead_member_id) await db.from("tasks").update({assignee_member_id:f.lead_member_id}).eq("project_id",id).is("assignee_member_id",null); await refresh(); }
 
       async function addTask(pid){ const sort=(projects.find(p=>p.id===pid)?.tasks.length)||0; const isC=td.type==="__custom"; const label=isC?(td.label.trim()||"Custom task"):td.type; const cat=isC?"CUSTOM":typeCat(td.type,td.workType); const code=isC?"":typeCode(td.type,td.workType); if(fail((await db.from("tasks").insert({project_id:pid,label,work_type:td.workType,cat,code,status:"upcoming",assignee_member_id:td.assignee==="__none"?null:td.assignee,contact:td.contact||"",sort_order:sort})).error)) return; setTd({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:selId||"__none"}); setAddTaskFor(null); await refresh(); }
@@ -275,18 +282,23 @@
           <header className="border-b border-zinc-200 bg-white">
             <div className="mx-auto max-w-[1100px] px-4 py-3 sm:px-8">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-3">
-                <div className="flex flex-wrap items-stretch gap-x-6 gap-y-2">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="text-sm font-semibold">{profile?.companies?.name||"Studio 16 Architects"}</div>
+                  <div className="flex flex-wrap gap-1">{[...areas, ...(isAdmin?[["admin","Admin"]]:[])].map(([k,l])=><button key={k} onClick={()=>setArea(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${area===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
+                </div>
+                <div className="flex items-center gap-2 text-[12px]">
+                  <button onClick={checkIn} disabled={!!myCheckin} className={`rounded-md px-2.5 py-1.5 text-[11px] font-medium ${myCheckin?"border border-emerald-300 bg-emerald-50 text-emerald-700":"bg-zinc-900 text-white hover:bg-zinc-700"}`}>{myCheckin?`✓ In · ${new Date(myCheckin.ts).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`:"Check in"}</button>
+                  <span className="hidden text-zinc-500 sm:inline">{profile?.name} · {profile?.role}</span>
+                  {realAdmin && (viewAs==="admin" ? <button onClick={()=>{setViewAs("member");setArea("design");setTab("team");setShowAddP(false);setShowRegAdd(false);setEditP(null);setDelP(null);}} className="rounded-md border border-zinc-300 px-2.5 py-1.5 text-[11px] text-zinc-500 hover:bg-zinc-50">View as member</button> : <button onClick={()=>setViewAs("admin")} className="rounded-md border border-amber-300 bg-amber-50 px-2.5 py-1.5 text-[11px] font-medium text-amber-700 hover:bg-amber-100">Exit member view</button>)}
+                  <button onClick={signOut} className="rounded-md border border-zinc-300 px-3 py-1.5 hover:bg-zinc-50">Sign out</button>
+                </div>
+              </div>
+              {area==="design" && (<>
+                <div className="flex flex-wrap items-stretch gap-x-6 gap-y-2 pt-3">
                   <Stat n={kpis.live} l="Live" /><Stat n={kpis.ongoing} l="Ongoing" /><Stat n={kpis.hold} l="On hold" /><Stat n={kpis.unassigned} l="Unassigned" tone="red" /><Stat n={kpis.pending} l="Pending follow-ups" />
                 </div>
-                <div className="flex items-center gap-2 text-[12px]"><span className="text-zinc-500">{profile?.name} · {profile?.role}</span>{realAdmin && (viewAs==="admin" ? <button onClick={()=>{setViewAs("member");setTab("team");setShowAddP(false);setShowRegAdd(false);setEditP(null);setDelP(null);}} className="rounded-md border border-zinc-300 px-2.5 py-1.5 text-[11px] text-zinc-500 hover:bg-zinc-50">View as member</button> : <button onClick={()=>setViewAs("admin")} className="rounded-md border border-amber-300 bg-amber-50 px-2.5 py-1.5 text-[11px] font-medium text-amber-700 hover:bg-amber-100">Exit member view</button>)}<button onClick={signOut} className="rounded-md border border-zinc-300 px-3 py-1.5 hover:bg-zinc-50">Sign out</button></div>
-              </div>
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-3">
-                <div className="flex items-center gap-3">
-                  <div className="text-sm font-semibold">{profile?.companies?.name||"Studio 16 Architects"}</div>
-                  <div className="flex gap-1">{(isAdmin?[["team","Team Board"],["board","Project Board"],["registry","Registry"],["admin","Admin"]]:[["team","Team Board"],["board","Project Board"]]).map(([k,l])=><button key={k} onClick={()=>{setTab(k);setShowAddP(false);setShowRegAdd(false);setEditP(null);setDelP(null);setExpanded(null);setAddTaskFor(null);}} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${tab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
-                </div>
-                {false}
-              </div>
+                <div className="flex flex-wrap items-center gap-1 pt-3">{(isAdmin?[["team","Team Board"],["board","Project Board"],["registry","Registry"]]:[["team","Team Board"],["board","Project Board"]]).map(([k,l])=><button key={k} onClick={()=>{setTab(k);setShowAddP(false);setShowRegAdd(false);setEditP(null);setDelP(null);setExpanded(null);setAddTaskFor(null);}} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${tab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
+              </>)}
             </div>
           </header>
 
@@ -295,7 +307,7 @@
             {err && <div className="mb-4 rounded-md bg-red-50 px-3 py-2 text-[12px] text-red-600">{err}</div>}
             {realAdmin && viewAs==="member" && <div className="mb-4 flex items-center justify-between rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-[12px] text-amber-800"><span>Previewing the app as a regular member sees it.</span><button onClick={()=>setViewAs("admin")} className="rounded-md bg-amber-600 px-2.5 py-1 text-[11px] font-medium text-white">Back to admin</button></div>}
 
-            {tab==="team" && (<>
+            {area==="design" && tab==="team" && (<>
             {showAddP && isAdmin && (
               <div className="mb-4 rounded-lg border border-zinc-300 bg-white p-3">
                 <div className="mb-2"><Lbl>Paste full project name</Lbl><Input value={np.raw} onChange={e=>setNp({...np,raw:e.target.value,...parseName(e.target.value)})} placeholder="5102_LT GEN SHAFIQUR RAHMAN_JOLSHIRI_5 Katha_PLOT ID 17" /></div>
@@ -424,7 +436,7 @@
             ); })()}
             </>)}
 
-            {tab==="board" && (<>
+            {area==="design" && tab==="board" && (<>
               <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-base font-semibold">Live Projects <span className="mono text-[11px] text-zinc-400">{projects.filter(p=>p.status==="live").length} live</span></h2>
                 <div className="flex flex-wrap items-center gap-2"><label className="mono flex cursor-pointer items-center gap-1 text-[11px] text-zinc-500"><input type="checkbox" checked={printUpcoming} onChange={e=>setPrintUpcoming(e.target.checked)} /> include upcoming in print</label><button onClick={()=>setShowBoardShare(s=>!s)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600 hover:bg-zinc-50">Copy list</button><button onClick={printBoard} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600 hover:bg-zinc-50">Print / PDF</button></div>
@@ -451,7 +463,7 @@
               {!projects.some(p=>p.status==="live") && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No live projects yet — add one from the Registry.</div>}
             </>)}
 
-            {tab==="registry" && isAdmin && (<>
+            {area==="design" && tab==="registry" && isAdmin && (<>
               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-base font-semibold">Project Registry <span className="mono text-[11px] text-zinc-400">{projects.length} total</span></h2>
                 <button onClick={()=>{setShowRegAdd(s=>!s); setNp(s=>({...s,lead:"__none",status:"live"}));}} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add project</button>
@@ -516,7 +528,7 @@
                 </section>
               )); })()}
             </>)}
-            {tab==="admin" && isAdmin && (<>
+            {area==="admin" && isAdmin && (<>
               <h2 className="mb-1 text-base font-semibold">Admin</h2>
               <p className="mb-4 text-[12px] text-zinc-500">Manage who can sign in and what they can do.</p>
 
@@ -525,11 +537,13 @@
                 <div className="space-y-1">{allProfiles.slice().sort((a,b)=>String(a.employee_id||"").localeCompare(String(b.employee_id||""))).map(pr=>{ const ed=pEdit&&pEdit.id===pr.id; return (
                   <div key={pr.id} className="rounded-md border border-zinc-100 bg-zinc-50">
                     <div className="flex items-center gap-2 px-3 py-2">
-                      <button onClick={()=>setPEdit(ed?null:{id:pr.id,name:pr.name||"",phone:pr.phone||""})} className="min-w-0 flex-1 text-left"><span className="text-[12px] font-semibold">{pr.name||"—"}</span> <span className="mono text-[10px] text-zinc-400">{pr.employee_id||""}</span>{pr.phone&&<span className="mono text-[10px] text-zinc-400"> · {pr.phone}</span>}{pr.id===profile.id&&<span className="mono ml-1 text-[9px] uppercase text-zinc-400">(you)</span>}</button>
+                      <button onClick={()=>setPEdit(ed?null:{id:pr.id,name:pr.name||"",phone:pr.phone||"",keys:pr.keys||["design"]})} className="min-w-0 flex-1 text-left"><span className="text-[12px] font-semibold">{pr.name||"—"}</span> <span className="mono text-[10px] text-zinc-400">{pr.employee_id||""}</span>{pr.phone&&<span className="mono text-[10px] text-zinc-400"> · {pr.phone}</span>}{pr.id===profile.id&&<span className="mono ml-1 text-[9px] uppercase text-zinc-400">(you)</span>}</button>
                       {pr.id===profile.id ? <span className={`mono rounded px-2 py-1 text-[10px] font-semibold uppercase ${pr.role==="admin"?"bg-zinc-900 text-white":"bg-zinc-200 text-zinc-600"}`}>{pr.role}</span> : <Select value={pr.role} onChange={v=>setProfileRole(pr.id,v)} options={[{value:"member",label:"Member"},{value:"admin",label:"Admin"}]} className="w-28" />}
-                      <button onClick={()=>setPEdit(ed?null:{id:pr.id,name:pr.name||"",phone:pr.phone||""})} className="shrink-0 px-1 text-[11px] text-zinc-400 hover:text-zinc-800">{ed?"▾":"✎"}</button>
+                      <button onClick={()=>setPEdit(ed?null:{id:pr.id,name:pr.name||"",phone:pr.phone||"",keys:pr.keys||["design"]})} className="shrink-0 px-1 text-[11px] text-zinc-400 hover:text-zinc-800">{ed?"▾":"✎"}</button>
                     </div>
-                    {ed && <div className="border-t border-zinc-100 p-3"><div className="flex flex-wrap items-end gap-2"><div className="min-w-[140px] flex-1"><Lbl>Display name</Lbl><Input value={pEdit.name} onChange={e=>setPEdit({...pEdit,name:e.target.value})} /></div><div className="w-44"><Lbl>Mobile</Lbl><Input value={pEdit.phone} onChange={e=>setPEdit({...pEdit,phone:e.target.value})} placeholder="+8801…" /></div><button onClick={saveProfile} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Save</button><button onClick={()=>setPEdit(null)} className="rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] text-zinc-600">Cancel</button></div><div className="mono mt-2 text-[10px] text-zinc-400">Team ID ({pr.employee_id||"—"}) and password are managed in Supabase; name &amp; mobile are managed here.</div></div>}
+                    {ed && <div className="border-t border-zinc-100 p-3"><div className="flex flex-wrap items-end gap-2"><div className="min-w-[140px] flex-1"><Lbl>Display name</Lbl><Input value={pEdit.name} onChange={e=>setPEdit({...pEdit,name:e.target.value})} /></div><div className="w-44"><Lbl>Mobile</Lbl><Input value={pEdit.phone} onChange={e=>setPEdit({...pEdit,phone:e.target.value})} placeholder="+8801…" /></div><button onClick={saveProfile} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Save</button><button onClick={()=>setPEdit(null)} className="rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] text-zinc-600">Cancel</button></div>
+                      <div className="mt-3"><Lbl>Area access (keys)</Lbl>{pr.role==="admin"?<div className="text-[11px] text-zinc-500">Admin — full access to every area.</div>:<div className="flex flex-wrap gap-1.5">{ALL_KEYS.map(([k,l])=>{ const on=(pEdit.keys||[]).includes(k); return <button key={k} onClick={()=>setPEdit({...pEdit,keys:on?(pEdit.keys||[]).filter(x=>x!==k):[...(pEdit.keys||[]),k]})} className={`rounded-md border px-2.5 py-1 text-[11px] font-medium ${on?"border-zinc-900 bg-zinc-900 text-white":"border-zinc-300 text-zinc-500 hover:border-zinc-500"}`}>{l}</button>; })}</div>}</div>
+                      <div className="mono mt-2 text-[10px] text-zinc-400">Team ID ({pr.employee_id||"—"}) &amp; password are managed in Supabase; name, mobile &amp; area access here.</div></div>}
                   </div>
                 ); })}</div>
                 {!allProfiles.length && <div className="py-4 text-center text-[12px] text-zinc-400">No logins loaded.</div>}
@@ -547,6 +561,12 @@
                 <div className="mono mt-2 text-[10px] text-zinc-400">Changes save as you type.</div>
               </div>
             </>)}
+            {["finance","construction","sales","hr","marketing"].includes(area) && (()=>{ const lbl=(ALL_KEYS.find(([k])=>k===area)||[])[1]||area; return (
+              <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-10 text-center">
+                <div className="text-base font-semibold text-zinc-700">{lbl} — coming soon</div>
+                <p className="mx-auto mt-2 max-w-md text-[12px] leading-relaxed text-zinc-400">This area exists and is access-controlled — only people you give the <b>{lbl}</b> key can open it, and its data will be invisible to everyone else. We'll build its tools in an upcoming step.</p>
+              </div>
+            ); })()}
           </main>
           <footer className="mx-auto max-w-[1100px] px-4 pb-8 pt-2 sm:px-8">
             {showSeen && <div className="mb-3 rounded-lg border border-zinc-200 bg-white p-3"><div className="mb-1.5 mono text-[10px] uppercase tracking-wider text-zinc-400">Team — last seen</div><div className="space-y-0.5">{allProfiles.slice().sort((a,b)=>(b.last_seen?new Date(b.last_seen).getTime():0)-(a.last_seen?new Date(a.last_seen).getTime():0)).map(pr=>(<div key={pr.id} className="flex items-center gap-2 text-[11px]"><span className="min-w-0 flex-1 truncate text-zinc-600">{pr.name||pr.employee_id}{pr.id===profile?.id&&<span className="text-zinc-400"> (you)</span>}</span><span className="mono shrink-0 text-zinc-400">{pr.last_seen?relTime(pr.last_seen):"never"}</span></div>))}</div></div>}
