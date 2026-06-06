@@ -81,7 +81,7 @@
     const mapMember = r=>({id:r.id,name:r.name,role:r.role,teamId:r.team_id,boardId:r.board_id,status:r.status,archivedDate:r.archived_date,sort:r.sort_order,projOrder:r.project_order||[]});
     const mapBoard = r=>({id:r.id,name:r.name,desc:r.description||"",leadId:r.lead_member_id,sort:r.sort_order});
     const mapProject = r=>({id:r.id,code:r.code,nickname:r.nickname,client:r.client,location:r.location,size:r.size,address:r.address,priority:r.priority,status:r.status,lead:r.lead_member_id,sort:r.sort_order,tasks:[]});
-    const mapTask = r=>({id:r.id,projectId:r.project_id,label:r.label,workType:r.work_type,cat:r.cat,code:r.code,status:r.status,assignee:r.assignee_member_id,contact:r.contact||"",doneDate:r.done_date,sort:r.sort_order});
+    const mapTask = r=>({id:r.id,projectId:r.project_id,label:r.label,workType:r.work_type,cat:r.cat,code:r.code,status:r.status,assignee:r.assignee_member_id,contact:r.contact||"",doneDate:r.done_date,sort:r.sort_order,working:!!r.working});
 
     function App(){
       const [session,setSession]=useState(null);
@@ -182,7 +182,8 @@
       async function patchProject(id,f){ if(fail((await db.from("projects").update(f).eq("id",id)).error)) return; if(f.lead_member_id) await db.from("tasks").update({assignee_member_id:f.lead_member_id}).eq("project_id",id).is("assignee_member_id",null); await refresh(); }
 
       async function addTask(pid){ const sort=(projects.find(p=>p.id===pid)?.tasks.length)||0; const isC=td.type==="__custom"; const label=isC?(td.label.trim()||"Custom task"):td.type; const cat=isC?"CUSTOM":typeCat(td.type,td.workType); const code=isC?"":typeCode(td.type,td.workType); if(fail((await db.from("tasks").insert({project_id:pid,label,work_type:td.workType,cat,code,status:"upcoming",assignee_member_id:td.assignee==="__none"?null:td.assignee,contact:td.contact||"",sort_order:sort})).error)) return; setTd({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:selId||"__none"}); setAddTaskFor(null); await refresh(); }
-      async function setTaskStatus(id,status){ if(fail((await db.from("tasks").update({status,done_date:status==="done"?today():null}).eq("id",id)).error)) return; await refresh(); }
+      async function setTaskStatus(id,status){ if(fail((await db.from("tasks").update({status,done_date:status==="done"?today():null,...(status==="done"?{working:false}:{})}).eq("id",id)).error)) return; await refresh(); }
+      async function toggleWorking(t){ const on=!t.working; if(on&&t.assignee){ await db.from("tasks").update({working:false}).eq("assignee_member_id",t.assignee).neq("id",t.id); } if(fail((await db.from("tasks").update({working:on}).eq("id",t.id)).error)) return; await refresh(); }
       async function setTaskAssignee(id,mid){ if(fail((await db.from("tasks").update({assignee_member_id:mid==="__none"?null:mid}).eq("id",id)).error)) return; await refresh(); }
       async function removeTask(id){ await db.from("tasks").delete().eq("id",id); await refresh(); }
       async function moveTask(list,id,dir){ const i=list.findIndex(t=>t.id===id); const j=i+dir; if(j<0||j>=list.length) return; const a=list[i],b=list[j]; await db.from("tasks").update({sort_order:b.sort}).eq("id",a.id); await db.from("tasks").update({sort_order:a.sort}).eq("id",b.id); await refresh(); }
@@ -196,8 +197,9 @@
 
       const sub=k=>!!subOpen[k];
       const toggleSub=k=>setSubOpen(s=>({...s,[k]:!s[k]}));
-      function taskRow(t,arr){ const i=arr.indexOf(t); return (
-        <div key={t.id} className={`flex items-center gap-2 rounded-md border px-2 py-1.5 ${t.status==="ongoing"?"border-zinc-300 bg-white shadow-sm":t.status==="pending"?"border-amber-200 bg-amber-50/40":"border-zinc-100 bg-zinc-50"}`}>
+      function taskRow(t,arr){ const i=arr.indexOf(t); const cls=t.working?"border-emerald-400 bg-emerald-50 ring-1 ring-emerald-300":(t.status==="ongoing"?"border-zinc-300 bg-white shadow-sm":t.status==="pending"?"border-amber-200 bg-amber-50/40":"border-zinc-100 bg-zinc-50"); return (
+        <div key={t.id} className={`flex items-center gap-2 rounded-md border px-2 py-1.5 ${cls}`}>
+          <button onClick={()=>toggleWorking(t)} title="Mark what you're working on right now" className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border text-[8px] ${t.working?"border-emerald-500 bg-emerald-500 text-white":"border-zinc-300 text-transparent hover:border-emerald-400"}`}>✓</button>
           <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${t.workType==="production"?"bg-zinc-700":"bg-amber-500"}`} />
           <span className={`truncate text-[12px] ${t.status==="done"?"text-zinc-400 line-through":t.status==="ongoing"?"font-bold text-zinc-900":t.status==="pending"?"font-semibold text-amber-700":"text-zinc-500"}`}>{t.label}</span>
           {t.code&&<span className="mono shrink-0 text-[10px] text-zinc-300">({t.code})</span>}
@@ -248,7 +250,7 @@
         <div className="mb-2 flex flex-wrap items-center gap-2"><span className="mono mr-auto text-[10px] uppercase text-zinc-400">{p.code}{p.client?" · "+p.client:""}</span><Select value={p.priority} onChange={v=>patchProject(p.id,{priority:v})} options={PRIORITY_OPTS} className="w-24" />{isAdmin&&<Select value={p.lead??"__none"} onChange={v=>patchProject(p.id,{lead_member_id:v==="__none"?null:v})} options={[...active.map(m=>({value:m.id,label:m.name})),{value:"__none",label:"No lead"}]} className="w-28" />}{isAdmin&&<Select value={p.status} onChange={v=>patchProject(p.id,{status:v})} options={STATUS_OPTS} className="w-24" />}</div>
       ); }
       function previewTasks(p,memberId){ let act=[...p.tasks.filter(t=>t.status==="ongoing"),...p.tasks.filter(t=>t.status==="pending")]; if(memberId) act=act.filter(t=>t.assignee===memberId); if(!act.length) return null; return (
-        <div className="space-y-0.5 px-3 pb-2">{act.map((t,i)=>(<div key={t.id} className="flex items-center gap-2 text-[11px]"><span className="mono w-4 text-right text-zinc-300">{i+1}.</span><span className={`h-1.5 w-1.5 shrink-0 rounded-full ${t.workType==="production"?"bg-zinc-700":"bg-amber-500"}`} /><span className={`truncate ${t.status==="ongoing"?"font-bold":"font-semibold"} ${t.workType==="production"?"text-zinc-800":"text-amber-700"}`}>{t.label}</span>{t.code&&<span className="mono text-[9px] text-zinc-300">({t.code})</span>}{t.workType==="coordination"&&t.contact&&<span className="text-[10px] text-amber-600">→ {t.contact}</span>}<span className="mono ml-auto text-[9px] uppercase text-zinc-400">{t.status}</span></div>))}</div>
+        <div className="space-y-0.5 px-3 pb-2">{act.map((t,i)=>(<div key={t.id} className="flex items-center gap-2 text-[11px]"><span className="mono w-4 text-right text-zinc-300">{i+1}.</span><span className={`h-1.5 w-1.5 shrink-0 rounded-full ${t.working?"bg-emerald-500":t.workType==="production"?"bg-zinc-700":"bg-amber-500"}`} /><span className={`truncate ${t.working?"font-bold text-emerald-700":(t.status==="ongoing"?"font-bold":"font-semibold")+" "+(t.workType==="production"?"text-zinc-800":"text-amber-700")}`}>{t.label}</span>{t.code&&<span className="mono text-[9px] text-zinc-300">({t.code})</span>}{t.workType==="coordination"&&t.contact&&<span className="text-[10px] text-amber-600">→ {t.contact}</span>}<span className="mono ml-auto text-[9px] uppercase text-zinc-400">{t.working?"now":t.status}</span></div>))}</div>
       ); }
 
       if(!configured) return <div className="mx-auto mt-20 max-w-lg rounded-xl border border-amber-300 bg-amber-50 p-6 text-sm text-amber-800"><b>Add your keys</b> — paste your Supabase Project URL and anon key into Step A near the top of this file, then re-deploy.</div>;
@@ -353,12 +355,13 @@
             )}
 
             <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {boardMembers.map((m)=>{ const ps=projects.filter(p=>p.status==="live"&&p.tasks.some(t=>t.assignee===m.id&&(t.status==="ongoing"||t.status==="pending"))); const liveN=ps.length; const topN=ps.filter(p=>p.priority==="top").length; const a=m.id===selId; const isLead=m.id===activeLead; const hi=homeMembers.findIndex(x=>x.id===m.id); const pal=roleColor(m.role); return (
+              {boardMembers.map((m)=>{ const ps=projects.filter(p=>p.status==="live"&&p.tasks.some(t=>t.assignee===m.id&&(t.status==="ongoing"||t.status==="pending"))); const liveN=ps.length; const topN=ps.filter(p=>p.priority==="top").length; const workNow=projects.some(p=>p.tasks.some(t=>t.assignee===m.id&&t.working)); const a=m.id===selId; const isLead=m.id===activeLead; const hi=homeMembers.findIndex(x=>x.id===m.id); const pal=roleColor(m.role); return (
                 <div key={m.id} className={`flex items-center gap-1.5 rounded-lg border p-2.5 shadow-sm transition ${a?"border-zinc-900 bg-zinc-900 text-white":"border-zinc-200 bg-zinc-100 hover:bg-zinc-50"}`}>
                   <button onClick={()=>{setSelId(m.id);setExpanded(null);setRemoveM(false);setEditM(null);setShareOpen(false);}} className="flex min-w-0 flex-1 items-center gap-2.5 text-left">
                     <span className={`mono flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${a?"bg-white text-zinc-900":`${pal.bg} ${pal.text}`}`}>{initials(m.name)}</span>
                     <span className="min-w-0 flex-1"><span className="flex items-center gap-1"><span className="truncate text-[12px] font-semibold leading-tight">{m.name}</span>{isLead&&<span className={`mono shrink-0 rounded px-1 py-0.5 text-[8px] font-bold uppercase ${a?"bg-white/20 text-white":"bg-zinc-200 text-zinc-600"}`}>Lead</span>}</span><span className={`mono block truncate text-[9px] ${a?"text-zinc-400":pal.text}`}>{m.role}{m.teamId?` · ${m.teamId}`:""}</span><span className={`mono text-[9px] ${a?"text-zinc-500":"text-zinc-400"}`}>{liveN} active</span></span>
                   </button>
+                  {workNow&&<span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" title="Working on something now" />}
                   {topN>0&&<span className="h-2 w-2 shrink-0 rounded-full bg-red-500" />}
                   {hi>=0 ? <Reorder onUp={()=>moveMember(m.id,-1)} onDown={()=>moveMember(m.id,1)} upOk={hi>0} downOk={hi<homeMembers.length-1} /> : <span className="mono px-1 text-[7px] uppercase text-zinc-300">visiting</span>}
                 </div>
@@ -384,12 +387,13 @@
               {["top","medium","low"].map(lvl=>{ const ord=sel.projOrder||[]; const rnk=p=>{ const i=ord.indexOf(p.id); return i<0?1000000+(p.sort||0):i; }; const rows=mine.filter(p=>p.status==="live"&&p.priority===lvl&&matchWt(p)).sort((a,b)=>rnk(a)-rnk(b)); if(!rows.length) return null; return (
                 <section key={lvl} className="mb-4">
                   <div className="mb-2 flex items-center gap-2"><Dot level={lvl} /><h3 className={`text-[11px] font-semibold uppercase tracking-wider ${PRIORITY[lvl].text}`}>{PRIORITY[lvl].label} Priority</h3><div className="ml-2 h-px flex-1 bg-zinc-200" /></div>
-                  <div className="space-y-2">{rows.map((p,ri)=>{ const open=expanded===p.id; const openN=p.tasks.filter(t=>t.assignee===selId&&t.status!=="done").length; const lead=byId(p.lead); const pal=lead?roleColor(lead.role):null; return (
-                    <div key={p.id} className="flex items-stretch gap-1.5 rounded-lg border border-zinc-200 bg-white">
+                  <div className="space-y-2">{rows.map((p,ri)=>{ const open=expanded===p.id; const openN=p.tasks.filter(t=>t.assignee===selId&&t.status!=="done").length; const lead=byId(p.lead); const pal=lead?roleColor(lead.role):null; const workNow=p.tasks.some(t=>t.assignee===selId&&t.working); return (
+                    <div key={p.id} className={`flex items-stretch gap-1.5 rounded-lg border bg-white ${workNow?"border-emerald-400 ring-1 ring-emerald-300":"border-zinc-200"}`}>
                       <div className="min-w-0 flex-1">
                         <button onClick={()=>setExpanded(open?null:p.id)} className="flex w-full items-center gap-2 px-3 py-2 text-left">
                           <span className="text-[11px] text-zinc-400">{open?"▾":"▸"}</span>
                           <span className="min-w-0 flex-1"><ProjTitle p={p} /></span>
+                          {workNow&&<span className="mono shrink-0 rounded bg-emerald-100 px-1.5 py-0.5 text-[8px] font-bold uppercase text-emerald-700">● now</span>}
                           <span className="flex shrink-0 items-center gap-1 text-[10px] text-zinc-500">{lead?<><span className={`mono flex h-5 w-5 items-center justify-center rounded-full text-[8px] font-semibold ${pal.bg} ${pal.text}`}>{initials(lead.name)}</span><span className="hidden sm:inline">{lead.name}</span></>:<span className="font-medium text-red-500">No lead</span>}</span>
                           <span className="mono shrink-0 text-[10px] uppercase text-zinc-400">{openN} open</span>
                         </button>
@@ -429,10 +433,11 @@
               {["top","medium","low"].map(lvl=>{ const rows=projects.filter(p=>p.status==="live"&&p.priority===lvl).sort((a,b)=>a.sort-b.sort); if(!rows.length) return null; return (
                 <section key={lvl} className="mb-4">
                   <div className="mb-2 flex items-center gap-2"><Dot level={lvl} /><h3 className={`text-[11px] font-semibold uppercase tracking-wider ${PRIORITY[lvl].text}`}>{PRIORITY[lvl].label} Priority</h3><span className="mono text-[10px] text-zinc-400">{rows.length}</span><div className="ml-2 h-px flex-1 bg-zinc-200" /></div>
-                  <div className="space-y-1.5">{rows.map((p,i)=>{ const lead=byId(p.lead); const pal=lead?roleColor(lead.role):null; const og=p.tasks.filter(t=>t.status==="ongoing").length; const pend=p.tasks.filter(t=>t.workType==="coordination"&&t.status==="pending").length; const un=p.tasks.filter(t=>!t.assignee).length; const open=expanded===p.id; return (
-                    <div key={p.id} className="rounded-lg border border-zinc-200 bg-white">
+                  <div className="space-y-1.5">{rows.map((p,i)=>{ const lead=byId(p.lead); const pal=lead?roleColor(lead.role):null; const og=p.tasks.filter(t=>t.status==="ongoing").length; const pend=p.tasks.filter(t=>t.workType==="coordination"&&t.status==="pending").length; const un=p.tasks.filter(t=>!t.assignee).length; const open=expanded===p.id; const wkr=p.tasks.find(t=>t.working); const wkm=wkr?byId(wkr.assignee):null; return (
+                    <div key={p.id} className={`rounded-lg border bg-white ${wkr?"border-emerald-400 ring-1 ring-emerald-300":"border-zinc-200"}`}>
                       <div className="flex items-center gap-2 px-3 py-2">
                         <button onClick={()=>setExpanded(open?null:p.id)} className="flex min-w-0 flex-1 items-center gap-2 text-left"><span className="text-[11px] text-zinc-400">{open?"▾":"▸"}</span><span className="min-w-0"><ProjTitle p={p} /></span></button>
+                        {wkr&&<span className="mono shrink-0 rounded bg-emerald-100 px-1.5 py-0.5 text-[8px] font-bold uppercase text-emerald-700" title={wkm?wkm.name+" working now":"working now"}>● now</span>}
                         <span className="hidden items-center gap-1.5 text-[11px] text-zinc-500 sm:flex">{lead?<><span className={`mono flex h-5 w-5 items-center justify-center rounded-full text-[8px] font-semibold ${pal.bg} ${pal.text}`}>{initials(lead.name)}</span>{lead.name}</>:<span className="font-medium text-red-500">No lead</span>}</span>
                         <span className="mono shrink-0 text-[10px] uppercase text-zinc-400">{og} ong{pend?` · ${pend} pend`:""}{un>0&&<span className="text-red-500"> · {un} unassigned</span>}</span>
                         {isAdmin && <Reorder onUp={()=>moveProject(rows,p.id,-1)} onDown={()=>moveProject(rows,p.id,1)} upOk={i>0} downOk={i<rows.length-1} />}
