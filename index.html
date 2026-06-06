@@ -59,6 +59,7 @@
     const initials = (n)=> (n||"").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();
     const projText = p => [p.code, (p.nickname||p.client||""), p.location||""].filter(Boolean).join(" ");
     const today = ()=> new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+    const relTime = (iso)=>{ if(!iso) return ""; const d=new Date(iso); const s=Math.floor((Date.now()-d.getTime())/1000); if(s<60) return "just now"; const m=Math.floor(s/60); if(m<60) return m+"m ago"; const h=Math.floor(m/60); if(h<24) return h+"h ago"; const dd=Math.floor(h/24); if(dd<7) return dd+"d ago"; return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"}); };
     const yearOf = (code)=>{ const d=String(code||"").replace(/\D/g,""); if(d.length>=5) return 2000+parseInt(d.slice(0,2),10); if(d.length===4) return 2020+parseInt(d.slice(0,1),10); return null; };
     const STATUS_TONE = { live:"bg-emerald-50 text-emerald-600", hold:"bg-amber-50 text-amber-600", dead:"bg-zinc-100 text-zinc-400", complete:"bg-blue-50 text-blue-600", closed:"bg-zinc-100 text-zinc-500" };
 
@@ -102,7 +103,7 @@
       const [boardCfg,setBoardCfg]=useState(false); const [addBoardOpen,setAddBoardOpen]=useState(false); const [nb,setNb]=useState({name:"",desc:"",leadId:""});
       const [showAddP,setShowAddP]=useState(false); const [np,setNp]=useState({raw:"",code:"",nickname:"",client:"",location:"",size:"",address:"",priority:"medium",status:"live",lead:"__none"});
       const [addTaskFor,setAddTaskFor]=useState(null); const [td,setTd]=useState({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:"__none"});
-      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null);
+      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false);
 
       const realAdmin = profile?.role==="admin";
       const isAdmin = realAdmin && viewAs==="admin";
@@ -114,13 +115,13 @@
         if(initial) setLoading(true); setErr("");
         try{
           let prof = profile;
-          if(initial){ const {data:p,error:pe}=await db.from("profiles").select("*, companies(*)").eq("id",session.user.id).single(); if(pe) throw pe; prof=p; setProfile(p); }
+          if(initial){ const {data:p,error:pe}=await db.from("profiles").select("*, companies(*)").eq("id",session.user.id).single(); if(pe) throw pe; prof=p; setProfile(p); try{ await db.rpc("touch_last_seen"); }catch(e){} }
           const [mb,bd,pr,tk,pf]=await Promise.all([
             db.from("members").select("*").order("sort_order"),
             db.from("boards").select("*").order("sort_order"),
             db.from("projects").select("*").order("sort_order"),
             db.from("tasks").select("*").order("sort_order"),
-            db.from("profiles").select("id,name,role,employee_id,phone").order("employee_id"),
+            db.from("profiles").select("id,name,role,employee_id,phone,last_seen").order("employee_id"),
           ]);
           for(const r of [mb,bd,pr,tk]) if(r.error) throw r.error;
           if(!pf.error) setAllProfiles(pf.data||[]);
@@ -233,6 +234,16 @@
       ) : <button onClick={()=>{setAddTaskFor(p.id);setTd({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:p.lead||selId||"__none"});}} className="text-[11px] font-medium text-zinc-500 hover:text-zinc-900">+ Add task</button>;
       }
       function renderTasks(p){ return <div className="space-y-2">{taskSection(p,"production","Production / PC")}{taskSection(p,"coordination","Follow-up")}{addTaskUI(p)}</div>; }
+      function sectionRows(list){ return <div className="space-y-2">{list.map(p=>{ const open=expanded===p.id; const lead=byId(p.lead); const pal=lead?roleColor(lead.role):null; return (
+        <div key={p.id} className="rounded-lg border border-zinc-200 bg-white">
+          <button onClick={()=>setExpanded(open?null:p.id)} className="flex w-full items-center gap-2 px-3 py-2 text-left">
+            <span className="text-[11px] text-zinc-400">{open?"▾":"▸"}</span>
+            <span className="min-w-0 flex-1"><ProjTitle p={p} /></span>
+            <span className="flex shrink-0 items-center gap-1 text-[10px] text-zinc-500">{lead?<><span className={`mono flex h-5 w-5 items-center justify-center rounded-full text-[8px] font-semibold ${pal.bg} ${pal.text}`}>{initials(lead.name)}</span><span className="hidden sm:inline">{lead.name}</span></>:null}</span>
+          </button>
+          {open && <div className="border-t border-zinc-100 p-3">{projectControls(p)}{renderTasks(p)}</div>}
+        </div>
+      ); })}</div>; }
       function projectControls(p){ return (
         <div className="mb-2 flex flex-wrap items-center gap-2"><span className="mono mr-auto text-[10px] uppercase text-zinc-400">{p.code}{p.client?" · "+p.client:""}</span><Select value={p.priority} onChange={v=>patchProject(p.id,{priority:v})} options={PRIORITY_OPTS} className="w-24" />{isAdmin&&<Select value={p.lead??"__none"} onChange={v=>patchProject(p.id,{lead_member_id:v==="__none"?null:v})} options={[...active.map(m=>({value:m.id,label:m.name})),{value:"__none",label:"No lead"}]} className="w-28" />}{isAdmin&&<Select value={p.status} onChange={v=>patchProject(p.id,{status:v})} options={STATUS_OPTS} className="w-24" />}</div>
       ); }
@@ -391,6 +402,17 @@
                 </section>
               ); })}
               {!mine.some(p=>p.status==="live"&&matchWt(p)) && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-8 text-center text-[12px] text-zinc-400">No live work in this view.</div>}
+
+              {(()=>{ const mt=p=>p.tasks.filter(t=>t.assignee===selId); const involved=projects.filter(p=>mt(p).length>0); const hasS=(p,s)=>mt(p).some(t=>t.status===s); const activeSet=new Set(involved.filter(p=>hasS(p,"ongoing")||hasS(p,"pending")).map(p=>p.id)); const upcomingList=involved.filter(p=>!activeSet.has(p.id)&&hasS(p,"upcoming")); const upSet=new Set(upcomingList.map(p=>p.id)); const doneList=involved.filter(p=>!activeSet.has(p.id)&&!upSet.has(p.id)&&hasS(p,"done")); const upK=selId+":secUp", dnK=selId+":secDn"; return (<>
+                {upcomingList.length>0 && <section className="mb-3 mt-5">
+                  <button onClick={()=>toggleSub(upK)} className="mb-2 flex w-full items-center gap-2 text-left"><span className="text-[11px] text-zinc-400">{sub(upK)?"▾":"▸"}</span><h3 className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Upcoming — what's next</h3><span className="mono text-[10px] text-zinc-400">{upcomingList.length}</span><div className="ml-2 h-px flex-1 bg-zinc-200" /></button>
+                  {sub(upK) && sectionRows(upcomingList)}
+                </section>}
+                {doneList.length>0 && <section className="mb-3">
+                  <button onClick={()=>toggleSub(dnK)} className="mb-2 flex w-full items-center gap-2 text-left"><span className="text-[11px] text-zinc-400">{sub(dnK)?"▾":"▸"}</span><h3 className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Completed</h3><span className="mono text-[10px] text-zinc-400">{doneList.length}</span><div className="ml-2 h-px flex-1 bg-zinc-200" /></button>
+                  {sub(dnK) && sectionRows(doneList)}
+                </section>}
+              </>); })()}
             </>}
 
             {isAdmin && (()=>{ const orphan=projects.filter(p=>p.status==="live"&&!p.lead&&!p.tasks.some(t=>t.assignee)); if(!orphan.length) return null; return (
@@ -521,7 +543,14 @@
               </div>
             </>)}
           </main>
-          <footer className="mx-auto max-w-[1100px] px-4 pb-8 pt-2 sm:px-8"><div className="flex flex-wrap items-center justify-between gap-2 border-t border-zinc-200 pt-4 text-[11px] text-zinc-400"><span>{profile?.companies?.name||"Studio 16 Architects"}{profile?.companies?.website?" · "+profile.companies.website:""}</span><span className="mono">{new Date().toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",year:"numeric"})}</span></div></footer>
+          <footer className="mx-auto max-w-[1100px] px-4 pb-8 pt-2 sm:px-8">
+            {showSeen && <div className="mb-3 rounded-lg border border-zinc-200 bg-white p-3"><div className="mb-1.5 mono text-[10px] uppercase tracking-wider text-zinc-400">Team — last seen</div><div className="space-y-0.5">{allProfiles.slice().sort((a,b)=>(b.last_seen?new Date(b.last_seen).getTime():0)-(a.last_seen?new Date(a.last_seen).getTime():0)).map(pr=>(<div key={pr.id} className="flex items-center gap-2 text-[11px]"><span className="min-w-0 flex-1 truncate text-zinc-600">{pr.name||pr.employee_id}{pr.id===profile?.id&&<span className="text-zinc-400"> (you)</span>}</span><span className="mono shrink-0 text-zinc-400">{pr.last_seen?relTime(pr.last_seen):"never"}</span></div>))}</div></div>}
+            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-zinc-200 pt-4 text-[11px] text-zinc-400">
+              <span>{profile?.companies?.name||"Studio 16 Architects"}{profile?.companies?.website?" · "+profile.companies.website:""}</span>
+              {(()=>{ const others=allProfiles.filter(p=>p.id!==profile?.id&&p.last_seen).sort((a,b)=>new Date(b.last_seen)-new Date(a.last_seen)); const last=others[0]; return <button onClick={()=>setShowSeen(s=>!s)} className="mono hover:text-zinc-700">{last?`Last opened by ${last.name||last.employee_id} · ${relTime(last.last_seen)}`:"Team activity"} {showSeen?"▾":"▸"}</button>; })()}
+              <span className="mono">{new Date().toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",year:"numeric"})}</span>
+            </div>
+          </footer>
         </div>
       );
     }
