@@ -64,6 +64,10 @@
     const dayStr = ()=> new Date().toLocaleDateString("en-CA");
     const yearOf = (code)=>{ const d=String(code||"").replace(/\D/g,""); if(d.length>=5) return 2000+parseInt(d.slice(0,2),10); if(d.length===4) return 2020+parseInt(d.slice(0,1),10); return null; };
     const STATUS_TONE = { live:"bg-emerald-50 text-emerald-600", hold:"bg-amber-50 text-amber-600", dead:"bg-zinc-100 text-zinc-400", complete:"bg-blue-50 text-blue-600", closed:"bg-zinc-100 text-zinc-500" };
+    const LEAD_STATUS = [["new","New"],["reviewing","Reviewing"],["proposal","Proposal sent"],["won","Won"],["lost","Lost"]];
+    const LEAD_LABEL = Object.fromEntries(LEAD_STATUS);
+    const LEAD_TONE = { new:"bg-amber-50 text-amber-700 border-amber-200", reviewing:"bg-zinc-100 text-zinc-600 border-zinc-300", proposal:"bg-blue-50 text-blue-600 border-blue-200", won:"bg-emerald-50 text-emerald-700 border-emerald-200", lost:"bg-zinc-100 text-zinc-400 border-zinc-200" };
+    const mapLead = r=>({id:r.id,name:r.name||"",email:r.email||"",phone:r.phone||"",projectType:r.project_type||"",location:r.location||"",budget:r.budget||"",message:r.message||"",presentAddress:r.present_address||"",who:r.who||"",plotSize:r.plot_size||"",roadWidth:r.road_width||"",services:r.services||"",source:r.source||"manual",status:r.status||"new",proposalAmount:r.proposal_amount,proposalDate:r.proposal_date,notes:r.notes||"",ownerId:r.owner_member_id,convertedProjectId:r.converted_project_id,createdAt:r.created_at});
 
     /* ===== small components ===== */
     function Select({value,onChange,options,className,tone}){
@@ -105,7 +109,7 @@
       const [boardCfg,setBoardCfg]=useState(false); const [addBoardOpen,setAddBoardOpen]=useState(false); const [nb,setNb]=useState({name:"",desc:"",leadId:""});
       const [showAddP,setShowAddP]=useState(false); const [np,setNp]=useState({raw:"",code:"",nickname:"",client:"",location:"",size:"",address:"",priority:"medium",status:"live",lead:"__none"});
       const [addTaskFor,setAddTaskFor]=useState(null); const [td,setTd]=useState({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:"__none"});
-      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("design"); const [myCheckin,setMyCheckin]=useState(null);
+      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("design"); const [myCheckin,setMyCheckin]=useState(null); const [leads,setLeads]=useState([]); const [showAddLead,setShowAddLead]=useState(false); const [nl,setNl]=useState({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); const [leadEdit,setLeadEdit]=useState(null); const [convFor,setConvFor]=useState(null); const [convDraft,setConvDraft]=useState({code:"",priority:"medium"});
 
       const realAdmin = profile?.role==="admin";
       const isAdmin = realAdmin && viewAs==="admin";
@@ -121,15 +125,17 @@
         try{
           let prof = profile;
           if(initial){ const {data:p,error:pe}=await db.from("profiles").select("*, companies(*)").eq("id",session.user.id).single(); if(pe) throw pe; prof=p; setProfile(p); try{ await db.rpc("touch_last_seen"); }catch(e){} }
-          const [mb,bd,pr,tk,pf]=await Promise.all([
+          const [mb,bd,pr,tk,pf,ld]=await Promise.all([
             db.from("members").select("*").order("sort_order"),
             db.from("boards").select("*").order("sort_order"),
             db.from("projects").select("*").order("sort_order"),
             db.from("tasks").select("*").order("sort_order"),
             db.from("profiles").select("id,name,role,employee_id,phone,last_seen,keys").order("employee_id"),
+            db.from("leads").select("*").order("created_at",{ascending:false}),
           ]);
           for(const r of [mb,bd,pr,tk]) if(r.error) throw r.error;
           if(!pf.error) setAllProfiles(pf.data||[]);
+          if(!ld.error) setLeads((ld.data||[]).map(mapLead));
           let bds = bd.data.map(mapBoard);
           if(bds.length===0 && prof?.role==="admin"){ const {data:nbd}=await db.from("boards").insert({company_id:prof.company_id,name:"Design Team",description:"",sort_order:0}).select().single(); if(nbd) bds=[mapBoard(nbd)]; }
           const tasks = tk.data.map(mapTask);
@@ -186,6 +192,11 @@
       async function saveProfile(){ const e=pEdit; if(fail((await db.from("profiles").update({name:e.name.trim(),phone:e.phone.trim()||null,keys:e.keys||["design"]}).eq("id",e.id)).error)) return; if(e.id===profile.id) setProfile(p=>({...p,name:e.name.trim()})); setPEdit(null); await refresh(); }
       async function patchCompany(f){ if(fail((await db.from("companies").update(f).eq("id",cid())).error)) return; setProfile(p=>({...p,companies:{...p.companies,...f}})); }
       async function checkIn(){ if(myCheckin) return; const {data,error}=await db.from("attendance").insert({profile_id:session.user.id,company_id:cid(),day:dayStr()}).select().single(); if(fail(error)) return; setMyCheckin(data); }
+      async function addLead(){ if(!nl.name.trim()&&!nl.phone.trim()) return; if(fail((await db.from("leads").insert({company_id:cid(),name:nl.name.trim(),phone:nl.phone.trim(),email:nl.email.trim(),who:nl.who.trim(),project_type:nl.projectType.trim(),location:nl.location.trim(),present_address:nl.presentAddress.trim(),plot_size:nl.plotSize.trim(),road_width:nl.roadWidth.trim(),services:nl.services.trim(),message:nl.message.trim(),source:"manual",status:"new"})).error)) return; setNl({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); setShowAddLead(false); await refresh(); }
+      async function setLeadStatus(id,status){ if(fail((await db.from("leads").update({status}).eq("id",id)).error)) return; await refresh(); }
+      async function saveLead(){ const e=leadEdit; if(fail((await db.from("leads").update({name:e.name.trim(),phone:e.phone.trim(),email:e.email.trim(),who:(e.who||"").trim(),project_type:e.projectType.trim(),location:e.location.trim(),present_address:(e.presentAddress||"").trim(),plot_size:(e.plotSize||"").trim(),road_width:(e.roadWidth||"").trim(),services:(e.services||"").trim(),message:e.message.trim(),notes:e.notes.trim(),proposal_amount:e.proposalAmount===""||e.proposalAmount==null?null:Number(e.proposalAmount),proposal_date:e.proposalDate||null,owner_member_id:e.ownerId==="__none"||!e.ownerId?null:e.ownerId,status:e.status}).eq("id",e.id)).error)) return; setLeadEdit(null); await refresh(); }
+      async function deleteLead(id){ if(fail((await db.from("leads").delete().eq("id",id)).error)) return; setLeadEdit(null); await refresh(); }
+      async function convertLead(l){ if(!convDraft.code.trim()) return; const {data:proj,error}=await db.from("projects").insert({company_id:cid(),code:convDraft.code.trim(),nickname:l.projectType||"",client:l.name||"",location:l.location||"",size:"",address:"",priority:convDraft.priority,status:"live",lead_member_id:null,sort_order:projects.length}).select().single(); if(fail(error)) return; const tasks=DEFAULT_TASK_DEFS.map(([name,w],i)=>({project_id:proj.id,label:name,work_type:w,cat:typeCat(name,w),code:typeCode(name,w),status:ONGOING_DEFAULTS.includes(name)?"ongoing":"upcoming",assignee_member_id:null,contact:"",sort_order:i})); if(fail((await db.from("tasks").insert(tasks)).error)) return; await db.from("leads").update({status:"won",converted_project_id:proj.id}).eq("id",l.id); setConvFor(null); setConvDraft({code:"",priority:"medium"}); setLeadEdit(null); await refresh(); }
       async function patchProject(id,f){ if(fail((await db.from("projects").update(f).eq("id",id)).error)) return; if(f.lead_member_id) await db.from("tasks").update({assignee_member_id:f.lead_member_id}).eq("project_id",id).is("assignee_member_id",null); await refresh(); }
 
       async function addTask(pid){ const sort=(projects.find(p=>p.id===pid)?.tasks.length)||0; const isC=td.type==="__custom"; const label=isC?(td.label.trim()||"Custom task"):td.type; const cat=isC?"CUSTOM":typeCat(td.type,td.workType); const code=isC?"":typeCode(td.type,td.workType); if(fail((await db.from("tasks").insert({project_id:pid,label,work_type:td.workType,cat,code,status:"upcoming",assignee_member_id:td.assignee==="__none"?null:td.assignee,contact:td.contact||"",sort_order:sort})).error)) return; setTd({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:selId||"__none"}); setAddTaskFor(null); await refresh(); }
@@ -561,7 +572,83 @@
                 <div className="mono mt-2 text-[10px] text-zinc-400">Changes save as you type.</div>
               </div>
             </>)}
-            {["finance","construction","sales","hr","marketing"].includes(area) && (()=>{ const lbl=(ALL_KEYS.find(([k])=>k===area)||[])[1]||area; return (
+            {area==="sales" && has("sales") && (<>
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-base font-semibold">Leads &amp; Proposals <span className="mono text-[11px] text-zinc-400">{leads.length} total</span></h2>
+                <button onClick={()=>setShowAddLead(s=>!s)} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add lead</button>
+              </div>
+              <div className="mb-3 flex flex-wrap gap-x-5 gap-y-2">{LEAD_STATUS.map(([k,l])=><Stat key={k} n={leads.filter(x=>x.status===k).length} l={l} tone={k==="new"?"red":undefined} />)}</div>
+              {showAddLead && (
+                <div className="mb-4 rounded-lg border border-zinc-300 bg-white p-3">
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    <div><Lbl>Full name</Lbl><Input value={nl.name} onChange={e=>setNl({...nl,name:e.target.value})} /></div>
+                    <div><Lbl>Phone</Lbl><Input value={nl.phone} onChange={e=>setNl({...nl,phone:e.target.value})} /></div>
+                    <div><Lbl>Email</Lbl><Input value={nl.email} onChange={e=>setNl({...nl,email:e.target.value})} /></div>
+                    <div><Lbl>Who they are</Lbl><Input value={nl.who} onChange={e=>setNl({...nl,who:e.target.value})} placeholder="Land owner, shareholder…" /></div>
+                    <div><Lbl>Occupancy / type</Lbl><Input value={nl.projectType} onChange={e=>setNl({...nl,projectType:e.target.value})} placeholder="Residential Duplex…" /></div>
+                    <div><Lbl>Project address</Lbl><Input value={nl.location} onChange={e=>setNl({...nl,location:e.target.value})} placeholder="Jolshiri…" /></div>
+                    <div><Lbl>Present address</Lbl><Input value={nl.presentAddress} onChange={e=>setNl({...nl,presentAddress:e.target.value})} /></div>
+                    <div><Lbl>Plot / land size</Lbl><Input value={nl.plotSize} onChange={e=>setNl({...nl,plotSize:e.target.value})} placeholder="2850 sqft…" /></div>
+                    <div><Lbl>Access road width</Lbl><Input value={nl.roadWidth} onChange={e=>setNl({...nl,roadWidth:e.target.value})} /></div>
+                    <div className="col-span-2 sm:col-span-3"><Lbl>Services wanted</Lbl><Input value={nl.services} onChange={e=>setNl({...nl,services:e.target.value})} placeholder="Architectural, Structural, Interior…" /></div>
+                    <div className="col-span-2 sm:col-span-3"><Lbl>Requirement / details</Lbl><Input value={nl.message} onChange={e=>setNl({...nl,message:e.target.value})} /></div>
+                  </div>
+                  <div className="mt-3 flex gap-2"><button onClick={addLead} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Add lead</button><button onClick={()=>setShowAddLead(false)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600">Cancel</button></div>
+                </div>
+              )}
+              {LEAD_STATUS.map(([k,l])=>{ const rows=leads.filter(x=>x.status===k); if(!rows.length) return null; return (
+                <section key={k} className="mb-4">
+                  <div className="mb-2 flex items-center gap-2"><span className={`mono rounded px-1.5 py-0.5 text-[9px] font-bold uppercase ${LEAD_TONE[k]}`}>{l}</span><span className="mono text-[10px] text-zinc-400">{rows.length}</span><div className="ml-1 h-px flex-1 bg-zinc-200" /></div>
+                  <div className="space-y-1.5">{rows.map(ld=>{ const ed=leadEdit&&leadEdit.id===ld.id; const owner=ld.ownerId?byId(ld.ownerId):null; return (
+                    <div key={ld.id} className="rounded-lg border border-zinc-200 bg-white">
+                      <div className="flex items-center gap-2 px-3 py-2">
+                        <button onClick={()=>setLeadEdit(ed?null:{...ld,proposalAmount:ld.proposalAmount??"",proposalDate:ld.proposalDate||"",ownerId:ld.ownerId||"__none"})} className="flex min-w-0 flex-1 items-center gap-2 text-left">
+                          <span className="text-[11px] text-zinc-400">{ed?"▾":"▸"}</span>
+                          <span className="min-w-0"><span className="text-[13px] font-semibold">{ld.name||"(no name)"}</span>{ld.projectType&&<span className="text-[12px] text-zinc-500"> · {ld.projectType}</span>}{ld.location&&<span className="text-[11px] text-zinc-400"> · {ld.location}</span>}{ld.plotSize&&<span className="text-[11px] text-zinc-400"> · {ld.plotSize}</span>}</span>
+                        </button>
+                        {ld.convertedProjectId&&<span className="mono shrink-0 rounded bg-emerald-100 px-1.5 py-0.5 text-[8px] font-bold uppercase text-emerald-700">project</span>}
+                        <span className="mono hidden shrink-0 text-[10px] text-zinc-400 sm:inline">{ld.source}</span>
+                        <span className="mono hidden shrink-0 text-[10px] text-zinc-400 sm:inline">{relTime(ld.createdAt)}</span>
+                        <Select value={ld.status} onChange={v=>setLeadStatus(ld.id,v)} options={LEAD_STATUS.map(([v,t])=>({value:v,label:t}))} className="w-32 shrink-0" tone={LEAD_TONE[ld.status]} />
+                      </div>
+                      {ed && <div className="border-t border-zinc-100 p-3">
+                        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                          <div><Lbl>Full name</Lbl><Input value={leadEdit.name} onChange={e=>setLeadEdit({...leadEdit,name:e.target.value})} /></div>
+                          <div><Lbl>Phone</Lbl><Input value={leadEdit.phone} onChange={e=>setLeadEdit({...leadEdit,phone:e.target.value})} /></div>
+                          <div><Lbl>Email</Lbl><Input value={leadEdit.email} onChange={e=>setLeadEdit({...leadEdit,email:e.target.value})} /></div>
+                          <div><Lbl>Who they are</Lbl><Input value={leadEdit.who||""} onChange={e=>setLeadEdit({...leadEdit,who:e.target.value})} /></div>
+                          <div><Lbl>Occupancy / type</Lbl><Input value={leadEdit.projectType} onChange={e=>setLeadEdit({...leadEdit,projectType:e.target.value})} /></div>
+                          <div><Lbl>Project address</Lbl><Input value={leadEdit.location} onChange={e=>setLeadEdit({...leadEdit,location:e.target.value})} /></div>
+                          <div><Lbl>Present address</Lbl><Input value={leadEdit.presentAddress||""} onChange={e=>setLeadEdit({...leadEdit,presentAddress:e.target.value})} /></div>
+                          <div><Lbl>Plot / land size</Lbl><Input value={leadEdit.plotSize||""} onChange={e=>setLeadEdit({...leadEdit,plotSize:e.target.value})} /></div>
+                          <div><Lbl>Access road width</Lbl><Input value={leadEdit.roadWidth||""} onChange={e=>setLeadEdit({...leadEdit,roadWidth:e.target.value})} /></div>
+                          <div className="col-span-2 sm:col-span-3"><Lbl>Services wanted</Lbl><Input value={leadEdit.services||""} onChange={e=>setLeadEdit({...leadEdit,services:e.target.value})} /></div>
+                          <div className="col-span-2 sm:col-span-3"><Lbl>Requirement / details</Lbl><textarea value={leadEdit.message} onChange={e=>setLeadEdit({...leadEdit,message:e.target.value})} rows={3} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
+                          <div><Lbl>Proposal amount</Lbl><Input value={leadEdit.proposalAmount} onChange={e=>setLeadEdit({...leadEdit,proposalAmount:e.target.value})} placeholder="BDT" /></div>
+                          <div><Lbl>Proposal date</Lbl><input type="date" value={leadEdit.proposalDate} onChange={e=>setLeadEdit({...leadEdit,proposalDate:e.target.value})} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
+                          <div><Lbl>Handled by</Lbl><Select value={leadEdit.ownerId} onChange={v=>setLeadEdit({...leadEdit,ownerId:v})} options={[{value:"__none",label:"—"},...active.map(m=>({value:m.id,label:m.name}))]} className="w-full" /></div>
+                          <div className="col-span-2 sm:col-span-3"><Lbl>Internal notes</Lbl><Input value={leadEdit.notes} onChange={e=>setLeadEdit({...leadEdit,notes:e.target.value})} /></div>
+                        </div>
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <button onClick={saveLead} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Save</button>
+                          <button onClick={()=>setLeadEdit(null)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600">Cancel</button>
+                          {ld.phone&&<a href={`tel:${ld.phone}`} className="rounded-md border border-zinc-200 px-3 py-1.5 text-[11px] text-zinc-500 hover:border-zinc-400">Call</a>}
+                          {ld.email&&<a href={`mailto:${ld.email}`} className="rounded-md border border-zinc-200 px-3 py-1.5 text-[11px] text-zinc-500 hover:border-zinc-400">Email</a>}
+                          <span className="ml-auto" />
+                          {isAdmin && !ld.convertedProjectId && (convFor===ld.id
+                            ? <span className="flex items-center gap-1.5"><Input value={convDraft.code} onChange={e=>setConvDraft({...convDraft,code:e.target.value})} placeholder="Project code" className="w-28" /><Select value={convDraft.priority} onChange={v=>setConvDraft({...convDraft,priority:v})} options={PRIORITY_OPTS} className="w-24" /><button onClick={()=>convertLead(ld)} className="rounded-md bg-emerald-600 px-2.5 py-1.5 text-[11px] font-medium text-white">Create</button><button onClick={()=>setConvFor(null)} className="rounded-md border border-zinc-300 px-2 py-1.5 text-[11px] text-zinc-600">✕</button></span>
+                            : <button onClick={()=>{setConvFor(ld.id);setConvDraft({code:"",priority:"medium"});}} className="rounded-md border border-emerald-300 px-3 py-1.5 text-[11px] font-medium text-emerald-700 hover:bg-emerald-50">Convert to project →</button>)}
+                          {isAdmin&&<button onClick={()=>deleteLead(ld.id)} className="rounded-md border border-zinc-200 px-3 py-1.5 text-[11px] text-zinc-400 hover:border-red-300 hover:text-red-500">Delete</button>}
+                        </div>
+                      </div>}
+                    </div>
+                  ); })}</div>
+                </section>
+              ); })}
+              {!leads.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No leads yet. They'll appear here from your website form, or add one manually.</div>}
+            </>)}
+
+            {["finance","construction","hr","marketing"].includes(area) && (()=>{ const lbl=(ALL_KEYS.find(([k])=>k===area)||[])[1]||area; return (
               <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-10 text-center">
                 <div className="text-base font-semibold text-zinc-700">{lbl} — coming soon</div>
                 <p className="mx-auto mt-2 max-w-md text-[12px] leading-relaxed text-zinc-400">This area exists and is access-controlled — only people you give the <b>{lbl}</b> key can open it, and its data will be invisible to everyone else. We'll build its tools in an upcoming step.</p>
