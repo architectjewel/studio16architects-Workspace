@@ -71,6 +71,11 @@
     const money = n=>"৳ "+Number(n||0).toLocaleString("en-IN");
     const mapRcv = r=>({id:r.id,projectId:r.project_id,title:r.title||"",amount:Number(r.amount||0),paidAmount:Number(r.paid_amount||0),dueDate:r.due_date,paidDate:r.paid_date,note:r.note||"",sortOrder:r.sort_order});
     const rcvStatus = it=>{ if(it.amount>0 && it.paidAmount>=it.amount) return ["paid","Paid","bg-emerald-50 text-emerald-700 border-emerald-200"]; if(it.paidAmount>0) return ["partial","Part-paid","bg-amber-50 text-amber-700 border-amber-200"]; if(it.dueDate && it.dueDate<dayStr()) return ["overdue","Overdue","bg-red-50 text-red-600 border-red-200"]; return ["pending","Pending","bg-zinc-100 text-zinc-500 border-zinc-300"]; };
+    const EXP_CATS = ["Rent","Salaries","Utilities","Internet & phone","Software & subscriptions","Office supplies","Printing","Transport","Marketing","Professional fees","Maintenance","Other"];
+    const EXP_METHODS = ["Cash","Bank transfer","bKash","Nagad","Card","Cheque"];
+    const mapExp = r=>({id:r.id,date:r.date,category:r.category||"Other",payee:r.payee||"",amount:Number(r.amount||0),method:r.method||"",note:r.note||"",recordedBy:r.recorded_by,sortOrder:r.sort_order});
+    const shiftMonth = (ym,d)=>{ const [y,m]=ym.split("-").map(Number); const dt=new Date(y,(m-1)+d,1); return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0"); };
+    const monthName = ym=>{ const [y,m]=ym.split("-").map(Number); return new Date(y,m-1,1).toLocaleDateString("en-GB",{month:"long",year:"numeric"}); };
 
     /* ===== small components ===== */
     function Select({value,onChange,options,className,tone}){
@@ -112,7 +117,7 @@
       const [boardCfg,setBoardCfg]=useState(false); const [addBoardOpen,setAddBoardOpen]=useState(false); const [nb,setNb]=useState({name:"",desc:"",leadId:""});
       const [showAddP,setShowAddP]=useState(false); const [np,setNp]=useState({raw:"",code:"",nickname:"",client:"",location:"",size:"",address:"",priority:"medium",status:"live",lead:"__none"});
       const [addTaskFor,setAddTaskFor]=useState(null); const [td,setTd]=useState({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:"__none"});
-      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("design"); const [myCheckin,setMyCheckin]=useState(null); const [leads,setLeads]=useState([]); const [showAddLead,setShowAddLead]=useState(false); const [nl,setNl]=useState({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); const [leadEdit,setLeadEdit]=useState(null); const [convFor,setConvFor]=useState(null); const [convDraft,setConvDraft]=useState({code:"",priority:"medium"}); const [receivables,setReceivables]=useState([]); const [showAddRcv,setShowAddRcv]=useState(false); const [nr,setNr]=useState({projectId:"",title:"",amount:"",dueDate:""}); const [rcvEdit,setRcvEdit]=useState(null);
+      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("design"); const [myCheckin,setMyCheckin]=useState(null); const [leads,setLeads]=useState([]); const [showAddLead,setShowAddLead]=useState(false); const [nl,setNl]=useState({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); const [leadEdit,setLeadEdit]=useState(null); const [convFor,setConvFor]=useState(null); const [convDraft,setConvDraft]=useState({code:"",priority:"medium"}); const [receivables,setReceivables]=useState([]); const [showAddRcv,setShowAddRcv]=useState(false); const [nr,setNr]=useState({projectId:"",title:"",amount:"",dueDate:""}); const [rcvEdit,setRcvEdit]=useState(null); const [finTab,setFinTab]=useState("receivables"); const [expenses,setExpenses]=useState([]); const [showAddExp,setShowAddExp]=useState(false); const [ne,setNe]=useState({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:""}); const [expEdit,setExpEdit]=useState(null); const [expMonth,setExpMonth]=useState(dayStr().slice(0,7));
 
       const realAdmin = profile?.role==="admin";
       const isAdmin = realAdmin && viewAs==="admin";
@@ -128,7 +133,7 @@
         try{
           let prof = profile;
           if(initial){ const {data:p,error:pe}=await db.from("profiles").select("*, companies(*)").eq("id",session.user.id).single(); if(pe) throw pe; prof=p; setProfile(p); try{ await db.rpc("touch_last_seen"); }catch(e){} }
-          const [mb,bd,pr,tk,pf,ld,rc]=await Promise.all([
+          const [mb,bd,pr,tk,pf,ld,rc,ex]=await Promise.all([
             db.from("members").select("*").order("sort_order"),
             db.from("boards").select("*").order("sort_order"),
             db.from("projects").select("*").order("sort_order"),
@@ -136,11 +141,13 @@
             db.from("profiles").select("id,name,role,employee_id,phone,last_seen,keys").order("employee_id"),
             db.from("leads").select("*").order("created_at",{ascending:false}),
             db.from("receivables").select("*").order("sort_order"),
+            db.from("expenses").select("*").order("date",{ascending:false}),
           ]);
           for(const r of [mb,bd,pr,tk]) if(r.error) throw r.error;
           if(!pf.error) setAllProfiles(pf.data||[]);
           if(!ld.error) setLeads((ld.data||[]).map(mapLead));
           if(!rc.error) setReceivables((rc.data||[]).map(mapRcv));
+          if(!ex.error) setExpenses((ex.data||[]).map(mapExp));
           let bds = bd.data.map(mapBoard);
           if(bds.length===0 && prof?.role==="admin"){ const {data:nbd}=await db.from("boards").insert({company_id:prof.company_id,name:"Design Team",description:"",sort_order:0}).select().single(); if(nbd) bds=[mapBoard(nbd)]; }
           const tasks = tk.data.map(mapTask);
@@ -205,6 +212,9 @@
       async function addRcv(){ if(!nr.projectId||!(Number(nr.amount)>0)) return; if(fail((await db.from("receivables").insert({company_id:cid(),project_id:nr.projectId,title:nr.title.trim(),amount:Number(nr.amount||0),due_date:nr.dueDate||null,sort_order:receivables.length})).error)) return; setNr({projectId:"",title:"",amount:"",dueDate:""}); setShowAddRcv(false); await refresh(); }
       async function saveRcv(){ const e=rcvEdit; if(fail((await db.from("receivables").update({title:e.title.trim(),amount:Number(e.amount||0),paid_amount:Number(e.paidAmount||0),due_date:e.dueDate||null,paid_date:e.paidDate||null,note:(e.note||"").trim()}).eq("id",e.id)).error)) return; setRcvEdit(null); await refresh(); }
       async function deleteRcv(id){ if(fail((await db.from("receivables").delete().eq("id",id)).error)) return; setRcvEdit(null); await refresh(); }
+      async function addExp(){ if(!(Number(ne.amount)>0)) return; if(fail((await db.from("expenses").insert({company_id:cid(),date:ne.date||dayStr(),category:ne.category,payee:ne.payee.trim(),amount:Number(ne.amount||0),method:ne.method||null,note:ne.note.trim(),recorded_by:session.user.id,sort_order:expenses.length})).error)) return; setNe({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:""}); setShowAddExp(false); await refresh(); }
+      async function saveExp(){ const e=expEdit; if(fail((await db.from("expenses").update({date:e.date||dayStr(),category:e.category,payee:e.payee.trim(),amount:Number(e.amount||0),method:e.method||null,note:e.note.trim()}).eq("id",e.id)).error)) return; setExpEdit(null); await refresh(); }
+      async function deleteExp(id){ if(fail((await db.from("expenses").delete().eq("id",id)).error)) return; setExpEdit(null); await refresh(); }
       async function patchProject(id,f){ if(fail((await db.from("projects").update(f).eq("id",id)).error)) return; if(f.lead_member_id) await db.from("tasks").update({assignee_member_id:f.lead_member_id}).eq("project_id",id).is("assignee_member_id",null); await refresh(); }
 
       async function addTask(pid){ const sort=(projects.find(p=>p.id===pid)?.tasks.length)||0; const isC=td.type==="__custom"; const label=isC?(td.label.trim()||"Custom task"):td.type; const cat=isC?"CUSTOM":typeCat(td.type,td.workType); const code=isC?"":typeCode(td.type,td.workType); if(fail((await db.from("tasks").insert({project_id:pid,label,work_type:td.workType,cat,code,status:"upcoming",assignee_member_id:td.assignee==="__none"?null:td.assignee,contact:td.contact||"",sort_order:sort})).error)) return; setTd({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:selId||"__none"}); setAddTaskFor(null); await refresh(); }
@@ -656,7 +666,9 @@
               {!leads.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No leads yet. They'll appear here from your website form, or add one manually.</div>}
             </>)}
 
-            {area==="finance" && has("finance") && (()=>{ const billed=receivables.reduce((s,x)=>s+x.amount,0); const received=receivables.reduce((s,x)=>s+x.paidAmount,0); const overdue=receivables.filter(x=>x.dueDate&&x.dueDate<dayStr()&&x.paidAmount<x.amount).reduce((s,x)=>s+(x.amount-x.paidAmount),0); const projOpts=projects.map(p=>({value:p.id,label:(p.code?p.code+" ":"")+(p.nickname||p.client||p.location||"Project")})); const byProj={}; receivables.forEach(x=>{ (byProj[x.projectId]=byProj[x.projectId]||[]).push(x); }); const projsWithItems=projects.filter(p=>byProj[p.id]&&byProj[p.id].length); return (<>
+            {area==="finance" && has("finance") && (<>
+              <div className="mb-3 flex flex-wrap gap-1">{[["receivables","Receivables"],["expenditure","Expenditure"]].map(([k,l])=><button key={k} onClick={()=>setFinTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${finTab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
+              {finTab==="receivables" && (()=>{ const billed=receivables.reduce((s,x)=>s+x.amount,0); const received=receivables.reduce((s,x)=>s+x.paidAmount,0); const overdue=receivables.filter(x=>x.dueDate&&x.dueDate<dayStr()&&x.paidAmount<x.amount).reduce((s,x)=>s+(x.amount-x.paidAmount),0); const projOpts=projects.map(p=>({value:p.id,label:(p.code?p.code+" ":"")+(p.nickname||p.client||p.location||"Project")})); const byProj={}; receivables.forEach(x=>{ (byProj[x.projectId]=byProj[x.projectId]||[]).push(x); }); const projsWithItems=projects.filter(p=>byProj[p.id]&&byProj[p.id].length); return (<>
               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-base font-semibold">Receivables</h2>
                 <button onClick={()=>setShowAddRcv(s=>!s)} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add billing item</button>
@@ -715,6 +727,63 @@
               ); })}
               {!receivables.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No billing items yet. Add one to start tracking what each project owes.</div>}
             </>); })()}
+            {finTab==="expenditure" && (()=>{ const monthExp=expenses.filter(x=>(x.date||"").startsWith(expMonth)); const monthTotal=monthExp.reduce((s,x)=>s+x.amount,0); const allTotal=expenses.reduce((s,x)=>s+x.amount,0); const byCat={}; monthExp.forEach(x=>{ byCat[x.category||"Other"]=(byCat[x.category||"Other"]||0)+x.amount; }); const cats=Object.entries(byCat).sort((a,b)=>b[1]-a[1]); const sorted=[...monthExp].sort((a,b)=>(b.date||"").localeCompare(a.date||"")); return (<>
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <button onClick={()=>setExpMonth(m=>shiftMonth(m,-1))} className="rounded-md border border-zinc-300 px-2.5 py-1 text-[13px] text-zinc-600 hover:bg-zinc-50">‹</button>
+                  <span className="min-w-[120px] text-center text-[13px] font-semibold">{monthName(expMonth)}</span>
+                  <button onClick={()=>setExpMonth(m=>shiftMonth(m,1))} className="rounded-md border border-zinc-300 px-2.5 py-1 text-[13px] text-zinc-600 hover:bg-zinc-50">›</button>
+                </div>
+                <button onClick={()=>setShowAddExp(s=>!s)} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add expense</button>
+              </div>
+              <div className="mb-3 flex flex-wrap gap-x-6 gap-y-2">
+                <Stat n={money(monthTotal)} l={"Spent · "+monthName(expMonth).split(" ")[0]} /><Stat n={monthExp.length} l="Entries" /><Stat n={money(allTotal)} l="All-time" />
+              </div>
+              {cats.length>0 && <div className="mb-4 flex flex-wrap gap-1.5">{cats.map(([c,v])=><span key={c} className="mono rounded-md border border-zinc-200 bg-white px-2 py-1 text-[11px] text-zinc-600">{c} <b className="text-zinc-900">{money(v)}</b></span>)}</div>}
+              {showAddExp && (
+                <div className="mb-4 rounded-lg border border-zinc-300 bg-white p-3">
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    <div><Lbl>Date</Lbl><input type="date" value={ne.date} onChange={e=>setNe({...ne,date:e.target.value})} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
+                    <div><Lbl>Category</Lbl><Select value={ne.category} onChange={v=>setNe({...ne,category:v})} options={EXP_CATS.map(c=>({value:c,label:c}))} className="w-full" /></div>
+                    <div><Lbl>Amount (৳)</Lbl><Input value={ne.amount} onChange={e=>setNe({...ne,amount:e.target.value})} /></div>
+                    <div><Lbl>Paid to</Lbl><Input value={ne.payee} onChange={e=>setNe({...ne,payee:e.target.value})} placeholder="Vendor / person" /></div>
+                    <div><Lbl>Method</Lbl><Select value={ne.method} onChange={v=>setNe({...ne,method:v})} options={[{value:"",label:"—"},...EXP_METHODS.map(m=>({value:m,label:m}))]} className="w-full" /></div>
+                    <div className="col-span-2 sm:col-span-1"><Lbl>Note</Lbl><Input value={ne.note} onChange={e=>setNe({...ne,note:e.target.value})} /></div>
+                  </div>
+                  <div className="mt-3 flex gap-2"><button onClick={addExp} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Add</button><button onClick={()=>setShowAddExp(false)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600">Cancel</button></div>
+                </div>
+              )}
+              <div className="space-y-1.5">{sorted.map(x=>{ const ed=expEdit&&expEdit.id===x.id; return (
+                <div key={x.id} className="rounded-lg border border-zinc-200 bg-white">
+                  <div className="flex items-center gap-2 px-3 py-2">
+                    <button onClick={()=>setExpEdit(ed?null:{...x,amount:String(x.amount),date:x.date||dayStr()})} className="flex min-w-0 flex-1 items-center gap-2 text-left">
+                      <span className="text-[11px] text-zinc-400">{ed?"▾":"▸"}</span>
+                      <span className="mono shrink-0 text-[10px] text-zinc-400">{(x.date||"").slice(5)}</span>
+                      <span className="shrink-0 rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] text-zinc-600">{x.category}</span>
+                      <span className="min-w-0 truncate text-[12px] text-zinc-700">{x.payee||x.note||""}</span>
+                    </button>
+                    <span className="mono text-[12px] font-semibold">{money(x.amount)}</span>
+                  </div>
+                  {ed && <div className="border-t border-zinc-100 p-3">
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      <div><Lbl>Date</Lbl><input type="date" value={expEdit.date} onChange={e=>setExpEdit({...expEdit,date:e.target.value})} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
+                      <div><Lbl>Category</Lbl><Select value={expEdit.category} onChange={v=>setExpEdit({...expEdit,category:v})} options={EXP_CATS.map(c=>({value:c,label:c}))} className="w-full" /></div>
+                      <div><Lbl>Amount (৳)</Lbl><Input value={expEdit.amount} onChange={e=>setExpEdit({...expEdit,amount:e.target.value})} /></div>
+                      <div><Lbl>Paid to</Lbl><Input value={expEdit.payee} onChange={e=>setExpEdit({...expEdit,payee:e.target.value})} /></div>
+                      <div><Lbl>Method</Lbl><Select value={expEdit.method} onChange={v=>setExpEdit({...expEdit,method:v})} options={[{value:"",label:"—"},...EXP_METHODS.map(m=>({value:m,label:m}))]} className="w-full" /></div>
+                      <div className="col-span-2 sm:col-span-1"><Lbl>Note</Lbl><Input value={expEdit.note} onChange={e=>setExpEdit({...expEdit,note:e.target.value})} /></div>
+                    </div>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <button onClick={saveExp} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Save</button>
+                      <button onClick={()=>setExpEdit(null)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600">Cancel</button>
+                      <button onClick={()=>deleteExp(x.id)} className="ml-auto rounded-md border border-zinc-200 px-3 py-1.5 text-[11px] text-zinc-400 hover:border-red-300 hover:text-red-500">Delete</button>
+                    </div>
+                  </div>}
+                </div>
+              ); })}</div>
+              {!monthExp.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No expenses recorded for {monthName(expMonth)}.</div>}
+            </>); })()}
+            </>)}
 
             {["construction","hr","marketing"].includes(area) && (()=>{ const lbl=(ALL_KEYS.find(([k])=>k===area)||[])[1]||area; return (
               <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-10 text-center">
