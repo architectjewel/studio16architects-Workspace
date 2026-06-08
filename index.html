@@ -76,6 +76,10 @@
     const mapExp = r=>({id:r.id,date:r.date,category:r.category||"Other",payee:r.payee||"",amount:Number(r.amount||0),method:r.method||"",note:r.note||"",recordedBy:r.recorded_by,sortOrder:r.sort_order});
     const shiftMonth = (ym,d)=>{ const [y,m]=ym.split("-").map(Number); const dt=new Date(y,(m-1)+d,1); return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0"); };
     const monthName = ym=>{ const [y,m]=ym.split("-").map(Number); return new Date(y,m-1,1).toLocaleDateString("en-GB",{month:"long",year:"numeric"}); };
+    const CON_CATS = ["Materials","Labour","Equipment","Transport","Subcontractor","Permit & fees","Utilities","Other"];
+    const VENDOR_TYPES = ["Material supplier","Labour contractor","Subcontractor","Equipment","Service","Other"];
+    const mapVendor = r=>({id:r.id,name:r.name||"",type:r.type||"",phone:r.phone||"",note:r.note||"",sortOrder:r.sort_order});
+    const mapBill = r=>({id:r.id,projectId:r.project_id,vendorId:r.vendor_id,title:r.title||"",category:r.category||"Other",amount:Number(r.amount||0),paidAmount:Number(r.paid_amount||0),date:r.date,dueDate:r.due_date,paidDate:r.paid_date,note:r.note||"",recordedBy:r.recorded_by,sortOrder:r.sort_order});
 
     /* ===== small components ===== */
     function Select({value,onChange,options,className,tone}){
@@ -117,7 +121,7 @@
       const [boardCfg,setBoardCfg]=useState(false); const [addBoardOpen,setAddBoardOpen]=useState(false); const [nb,setNb]=useState({name:"",desc:"",leadId:""});
       const [showAddP,setShowAddP]=useState(false); const [np,setNp]=useState({raw:"",code:"",nickname:"",client:"",location:"",size:"",address:"",priority:"medium",status:"live",lead:"__none"});
       const [addTaskFor,setAddTaskFor]=useState(null); const [td,setTd]=useState({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:"__none"});
-      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("design"); const [myCheckin,setMyCheckin]=useState(null); const [leads,setLeads]=useState([]); const [showAddLead,setShowAddLead]=useState(false); const [nl,setNl]=useState({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); const [leadEdit,setLeadEdit]=useState(null); const [convFor,setConvFor]=useState(null); const [convDraft,setConvDraft]=useState({code:"",priority:"medium"}); const [receivables,setReceivables]=useState([]); const [showAddRcv,setShowAddRcv]=useState(false); const [nr,setNr]=useState({projectId:"",title:"",amount:"",dueDate:""}); const [rcvEdit,setRcvEdit]=useState(null); const [finTab,setFinTab]=useState("receivables"); const [expenses,setExpenses]=useState([]); const [showAddExp,setShowAddExp]=useState(false); const [ne,setNe]=useState({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:""}); const [expEdit,setExpEdit]=useState(null); const [expMonth,setExpMonth]=useState(dayStr().slice(0,7));
+      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("design"); const [myCheckin,setMyCheckin]=useState(null); const [leads,setLeads]=useState([]); const [showAddLead,setShowAddLead]=useState(false); const [nl,setNl]=useState({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); const [leadEdit,setLeadEdit]=useState(null); const [convFor,setConvFor]=useState(null); const [convDraft,setConvDraft]=useState({code:"",priority:"medium"}); const [receivables,setReceivables]=useState([]); const [showAddRcv,setShowAddRcv]=useState(false); const [nr,setNr]=useState({projectId:"",title:"",amount:"",dueDate:""}); const [rcvEdit,setRcvEdit]=useState(null); const [finTab,setFinTab]=useState("receivables"); const [expenses,setExpenses]=useState([]); const [showAddExp,setShowAddExp]=useState(false); const [ne,setNe]=useState({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:""}); const [expEdit,setExpEdit]=useState(null); const [expMonth,setExpMonth]=useState(dayStr().slice(0,7)); const [conTab,setConTab]=useState("bills"); const [vendors,setVendors]=useState([]); const [bills,setBills]=useState([]); const [showAddVendor,setShowAddVendor]=useState(false); const [nvend,setNvend]=useState({name:"",type:"Material supplier",phone:"",note:""}); const [vendorEdit,setVendorEdit]=useState(null); const [showAddBill,setShowAddBill]=useState(false); const [nbill,setNbill]=useState({projectId:"",vendorId:"",category:"Materials",title:"",amount:"",date:dayStr(),dueDate:""}); const [billEdit,setBillEdit]=useState(null);
 
       const realAdmin = profile?.role==="admin";
       const isAdmin = realAdmin && viewAs==="admin";
@@ -133,7 +137,7 @@
         try{
           let prof = profile;
           if(initial){ const {data:p,error:pe}=await db.from("profiles").select("*, companies(*)").eq("id",session.user.id).single(); if(pe) throw pe; prof=p; setProfile(p); try{ await db.rpc("touch_last_seen"); }catch(e){} }
-          const [mb,bd,pr,tk,pf,ld,rc,ex]=await Promise.all([
+          const [mb,bd,pr,tk,pf,ld,rc,ex,vn,cb]=await Promise.all([
             db.from("members").select("*").order("sort_order"),
             db.from("boards").select("*").order("sort_order"),
             db.from("projects").select("*").order("sort_order"),
@@ -142,12 +146,16 @@
             db.from("leads").select("*").order("created_at",{ascending:false}),
             db.from("receivables").select("*").order("sort_order"),
             db.from("expenses").select("*").order("date",{ascending:false}),
+            db.from("vendors").select("*").order("sort_order"),
+            db.from("con_bills").select("*").order("sort_order"),
           ]);
           for(const r of [mb,bd,pr,tk]) if(r.error) throw r.error;
           if(!pf.error) setAllProfiles(pf.data||[]);
           if(!ld.error) setLeads((ld.data||[]).map(mapLead));
           if(!rc.error) setReceivables((rc.data||[]).map(mapRcv));
           if(!ex.error) setExpenses((ex.data||[]).map(mapExp));
+          if(!vn.error) setVendors((vn.data||[]).map(mapVendor));
+          if(!cb.error) setBills((cb.data||[]).map(mapBill));
           let bds = bd.data.map(mapBoard);
           if(bds.length===0 && prof?.role==="admin"){ const {data:nbd}=await db.from("boards").insert({company_id:prof.company_id,name:"Design Team",description:"",sort_order:0}).select().single(); if(nbd) bds=[mapBoard(nbd)]; }
           const tasks = tk.data.map(mapTask);
@@ -215,6 +223,12 @@
       async function addExp(){ if(!(Number(ne.amount)>0)) return; if(fail((await db.from("expenses").insert({company_id:cid(),date:ne.date||dayStr(),category:ne.category,payee:ne.payee.trim(),amount:Number(ne.amount||0),method:ne.method||null,note:ne.note.trim(),recorded_by:session.user.id,sort_order:expenses.length})).error)) return; setNe({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:""}); setShowAddExp(false); await refresh(); }
       async function saveExp(){ const e=expEdit; if(fail((await db.from("expenses").update({date:e.date||dayStr(),category:e.category,payee:e.payee.trim(),amount:Number(e.amount||0),method:e.method||null,note:e.note.trim()}).eq("id",e.id)).error)) return; setExpEdit(null); await refresh(); }
       async function deleteExp(id){ if(fail((await db.from("expenses").delete().eq("id",id)).error)) return; setExpEdit(null); await refresh(); }
+      async function addVendor(){ if(!nvend.name.trim()) return; if(fail((await db.from("vendors").insert({company_id:cid(),name:nvend.name.trim(),type:nvend.type,phone:nvend.phone.trim(),note:nvend.note.trim(),sort_order:vendors.length})).error)) return; setNvend({name:"",type:"Material supplier",phone:"",note:""}); setShowAddVendor(false); await refresh(); }
+      async function saveVendor(){ const e=vendorEdit; if(fail((await db.from("vendors").update({name:e.name.trim(),type:e.type,phone:e.phone.trim(),note:e.note.trim()}).eq("id",e.id)).error)) return; setVendorEdit(null); await refresh(); }
+      async function deleteVendor(id){ if(fail((await db.from("vendors").delete().eq("id",id)).error)) return; setVendorEdit(null); await refresh(); }
+      async function addBill(){ if(!nbill.projectId||!(Number(nbill.amount)>0)) return; if(fail((await db.from("con_bills").insert({company_id:cid(),project_id:nbill.projectId,vendor_id:nbill.vendorId||null,category:nbill.category,title:nbill.title.trim(),amount:Number(nbill.amount||0),date:nbill.date||dayStr(),due_date:nbill.dueDate||null,recorded_by:session.user.id,sort_order:bills.length})).error)) return; setNbill({projectId:"",vendorId:"",category:"Materials",title:"",amount:"",date:dayStr(),dueDate:""}); setShowAddBill(false); await refresh(); }
+      async function saveBill(){ const e=billEdit; if(fail((await db.from("con_bills").update({project_id:e.projectId||null,vendor_id:e.vendorId||null,category:e.category,title:e.title.trim(),amount:Number(e.amount||0),paid_amount:Number(e.paidAmount||0),date:e.date||dayStr(),due_date:e.dueDate||null,paid_date:e.paidDate||null,note:(e.note||"").trim()}).eq("id",e.id)).error)) return; setBillEdit(null); await refresh(); }
+      async function deleteBill(id){ if(fail((await db.from("con_bills").delete().eq("id",id)).error)) return; setBillEdit(null); await refresh(); }
       async function patchProject(id,f){ if(fail((await db.from("projects").update(f).eq("id",id)).error)) return; if(f.lead_member_id) await db.from("tasks").update({assignee_member_id:f.lead_member_id}).eq("project_id",id).is("assignee_member_id",null); await refresh(); }
 
       async function addTask(pid){ const sort=(projects.find(p=>p.id===pid)?.tasks.length)||0; const isC=td.type==="__custom"; const label=isC?(td.label.trim()||"Custom task"):td.type; const cat=isC?"CUSTOM":typeCat(td.type,td.workType); const code=isC?"":typeCode(td.type,td.workType); if(fail((await db.from("tasks").insert({project_id:pid,label,work_type:td.workType,cat,code,status:"upcoming",assignee_member_id:td.assignee==="__none"?null:td.assignee,contact:td.contact||"",sort_order:sort})).error)) return; setTd({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:selId||"__none"}); setAddTaskFor(null); await refresh(); }
@@ -785,7 +799,118 @@
             </>); })()}
             </>)}
 
-            {["construction","hr","marketing"].includes(area) && (()=>{ const lbl=(ALL_KEYS.find(([k])=>k===area)||[])[1]||area; return (
+            {area==="construction" && has("construction") && (<>
+              <div className="mb-3 flex flex-wrap gap-1">{[["bills","Bills & purchases"],["vendors","Vendors"]].map(([k,l])=><button key={k} onClick={()=>setConTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${conTab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
+              {conTab==="bills" && (()=>{ const billed=bills.reduce((s,x)=>s+x.amount,0); const paid=bills.reduce((s,x)=>s+x.paidAmount,0); const overdue=bills.filter(x=>x.dueDate&&x.dueDate<dayStr()&&x.paidAmount<x.amount).reduce((s,x)=>s+(x.amount-x.paidAmount),0); const projOpts=projects.map(p=>({value:p.id,label:(p.code?p.code+" ":"")+(p.nickname||p.client||p.location||"Project")})); const vendOpts=[{value:"",label:"— no vendor —"},...vendors.map(v=>({value:v.id,label:v.name}))]; const vName=id=>{ const v=vendors.find(z=>z.id===id); return v?v.name:""; }; const byProj={}; bills.forEach(x=>{ const k=projects.some(p=>p.id===x.projectId)?x.projectId:"__none"; (byProj[k]=byProj[k]||[]).push(x); }); const groups=[...projects.filter(p=>byProj[p.id]&&byProj[p.id].length).map(p=>[p,byProj[p.id]]),...(byProj["__none"]?[[null,byProj["__none"]]]:[])]; const billRow=(it)=>{ const ed=billEdit&&billEdit.id===it.id; const st=rcvStatus(it); return (
+                <div key={it.id} className="rounded-lg border border-zinc-200 bg-white">
+                  <div className="flex items-center gap-2 px-3 py-2">
+                    <button onClick={()=>setBillEdit(ed?null:{...it,amount:String(it.amount),paidAmount:String(it.paidAmount),date:it.date||dayStr(),dueDate:it.dueDate||"",paidDate:it.paidDate||"",vendorId:it.vendorId||"",projectId:it.projectId||""})} className="flex min-w-0 flex-1 items-center gap-2 text-left">
+                      <span className="text-[11px] text-zinc-400">{ed?"▾":"▸"}</span>
+                      <span className="shrink-0 rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] text-zinc-600">{it.category}</span>
+                      <span className="min-w-0 truncate text-[12px] font-medium text-zinc-700">{it.title||"Purchase"}{vName(it.vendorId)&&<span className="font-normal text-zinc-400"> · {vName(it.vendorId)}</span>}</span>
+                    </button>
+                    <span className="mono text-[12px] font-semibold">{money(it.amount)}</span>
+                    <span className={`mono shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase ${st[2]}`}>{st[1]}</span>
+                  </div>
+                  {ed && <div className="border-t border-zinc-100 p-3">
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      <div className="col-span-2 sm:col-span-1"><Lbl>Project</Lbl><Select value={billEdit.projectId} onChange={v=>setBillEdit({...billEdit,projectId:v})} options={projOpts} className="w-full" /></div>
+                      <div><Lbl>Vendor</Lbl><Select value={billEdit.vendorId} onChange={v=>setBillEdit({...billEdit,vendorId:v})} options={vendOpts} className="w-full" /></div>
+                      <div><Lbl>Category</Lbl><Select value={billEdit.category} onChange={v=>setBillEdit({...billEdit,category:v})} options={CON_CATS.map(c=>({value:c,label:c}))} className="w-full" /></div>
+                      <div><Lbl>Description</Lbl><Input value={billEdit.title} onChange={e=>setBillEdit({...billEdit,title:e.target.value})} /></div>
+                      <div><Lbl>Amount (৳)</Lbl><Input value={billEdit.amount} onChange={e=>setBillEdit({...billEdit,amount:e.target.value})} /></div>
+                      <div><Lbl>Bill date</Lbl><input type="date" value={billEdit.date} onChange={e=>setBillEdit({...billEdit,date:e.target.value})} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
+                      <div><Lbl>Due date</Lbl><input type="date" value={billEdit.dueDate} onChange={e=>setBillEdit({...billEdit,dueDate:e.target.value})} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
+                      <div><Lbl>Paid (৳)</Lbl><Input value={billEdit.paidAmount} onChange={e=>setBillEdit({...billEdit,paidAmount:e.target.value})} /></div>
+                      <div><Lbl>Paid date</Lbl><input type="date" value={billEdit.paidDate} onChange={e=>setBillEdit({...billEdit,paidDate:e.target.value})} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
+                      <div className="col-span-2 sm:col-span-3"><Lbl>Note</Lbl><Input value={billEdit.note} onChange={e=>setBillEdit({...billEdit,note:e.target.value})} /></div>
+                    </div>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <button onClick={saveBill} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Save</button>
+                      <button onClick={()=>setBillEdit(null)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600">Cancel</button>
+                      <button onClick={()=>setBillEdit({...billEdit,paidAmount:billEdit.amount,paidDate:billEdit.paidDate||dayStr()})} className="rounded-md border border-emerald-300 px-3 py-1.5 text-[11px] font-medium text-emerald-700 hover:bg-emerald-50">Mark fully paid</button>
+                      <button onClick={()=>deleteBill(it.id)} className="ml-auto rounded-md border border-zinc-200 px-3 py-1.5 text-[11px] text-zinc-400 hover:border-red-300 hover:text-red-500">Delete</button>
+                    </div>
+                  </div>}
+                </div>
+              ); }; return (<>
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="text-base font-semibold">Bills &amp; purchases</h2>
+                  <button onClick={()=>setShowAddBill(s=>!s)} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add bill</button>
+                </div>
+                <div className="mb-4 flex flex-wrap gap-x-6 gap-y-2"><Stat n={money(billed)} l="Billed" /><Stat n={money(paid)} l="Paid" /><Stat n={money(billed-paid)} l="Payable" tone={billed-paid>0?"red":undefined} /><Stat n={money(overdue)} l="Overdue" tone={overdue>0?"red":undefined} /></div>
+                {showAddBill && (
+                  <div className="mb-4 rounded-lg border border-zinc-300 bg-white p-3">
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      <div className="col-span-2 sm:col-span-1"><Lbl>Project</Lbl><Select value={nbill.projectId} onChange={v=>setNbill({...nbill,projectId:v})} options={[{value:"",label:"Select project…"},...projOpts]} className="w-full" /></div>
+                      <div><Lbl>Vendor</Lbl><Select value={nbill.vendorId} onChange={v=>setNbill({...nbill,vendorId:v})} options={vendOpts} className="w-full" /></div>
+                      <div><Lbl>Category</Lbl><Select value={nbill.category} onChange={v=>setNbill({...nbill,category:v})} options={CON_CATS.map(c=>({value:c,label:c}))} className="w-full" /></div>
+                      <div><Lbl>Description</Lbl><Input value={nbill.title} onChange={e=>setNbill({...nbill,title:e.target.value})} placeholder="Cement 50 bags…" /></div>
+                      <div><Lbl>Amount (৳)</Lbl><Input value={nbill.amount} onChange={e=>setNbill({...nbill,amount:e.target.value})} /></div>
+                      <div><Lbl>Bill date</Lbl><input type="date" value={nbill.date} onChange={e=>setNbill({...nbill,date:e.target.value})} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
+                      <div><Lbl>Due date</Lbl><input type="date" value={nbill.dueDate} onChange={e=>setNbill({...nbill,dueDate:e.target.value})} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
+                    </div>
+                    <div className="mt-3 flex gap-2"><button onClick={addBill} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Add</button><button onClick={()=>setShowAddBill(false)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600">Cancel</button></div>
+                  </div>
+                )}
+                {groups.map(([p,its])=>{ const b=its.reduce((s,x)=>s+x.amount,0),pd=its.reduce((s,x)=>s+x.paidAmount,0); return (
+                  <section key={p?p.id:"__none"} className="mb-4">
+                    <div className="mb-1.5 flex flex-wrap items-baseline gap-2">
+                      {p?<><span className="mono text-[12px] font-bold">{p.code}</span><span className="text-[13px] font-semibold">{p.nickname||p.client||""}</span>{p.location&&<span className="text-[11px] text-zinc-400">{p.location}</span>}</>:<span className="text-[13px] font-semibold text-zinc-500">No project</span>}
+                      <span className="mono ml-auto text-[11px] text-zinc-500">billed {money(b)} · paid {money(pd)} · <span className={b-pd>0?"font-semibold text-red-500":"font-semibold text-emerald-600"}>owe {money(b-pd)}</span></span>
+                    </div>
+                    <div className="space-y-1.5">{its.map(billRow)}</div>
+                  </section>
+                ); })}
+                {!bills.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No bills yet. Add a vendor bill or purchase to track construction spend per project.</div>}
+              </>); })()}
+              {conTab==="vendors" && (()=>{ return (<>
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="text-base font-semibold">Vendors <span className="mono text-[11px] text-zinc-400">{vendors.length}</span></h2>
+                  <button onClick={()=>setShowAddVendor(s=>!s)} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add vendor</button>
+                </div>
+                {showAddVendor && (
+                  <div className="mb-4 rounded-lg border border-zinc-300 bg-white p-3">
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      <div><Lbl>Name</Lbl><Input value={nvend.name} onChange={e=>setNvend({...nvend,name:e.target.value})} /></div>
+                      <div><Lbl>Type</Lbl><Select value={nvend.type} onChange={v=>setNvend({...nvend,type:v})} options={VENDOR_TYPES.map(t=>({value:t,label:t}))} className="w-full" /></div>
+                      <div><Lbl>Phone</Lbl><Input value={nvend.phone} onChange={e=>setNvend({...nvend,phone:e.target.value})} /></div>
+                      <div><Lbl>Note</Lbl><Input value={nvend.note} onChange={e=>setNvend({...nvend,note:e.target.value})} /></div>
+                    </div>
+                    <div className="mt-3 flex gap-2"><button onClick={addVendor} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Add</button><button onClick={()=>setShowAddVendor(false)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600">Cancel</button></div>
+                  </div>
+                )}
+                <div className="space-y-1.5">{vendors.map(v=>{ const ed=vendorEdit&&vendorEdit.id===v.id; const vTotal=bills.filter(b=>b.vendorId===v.id).reduce((s,b)=>s+b.amount,0); const vOwe=bills.filter(b=>b.vendorId===v.id).reduce((s,b)=>s+(b.amount-b.paidAmount),0); return (
+                  <div key={v.id} className="rounded-lg border border-zinc-200 bg-white">
+                    <div className="flex items-center gap-2 px-3 py-2">
+                      <button onClick={()=>setVendorEdit(ed?null:{...v})} className="flex min-w-0 flex-1 items-center gap-2 text-left">
+                        <span className="text-[11px] text-zinc-400">{ed?"▾":"▸"}</span>
+                        <span className="text-[13px] font-medium">{v.name}</span>
+                        {v.type&&<span className="shrink-0 rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] text-zinc-500">{v.type}</span>}
+                        {v.phone&&<span className="mono hidden text-[11px] text-zinc-400 sm:inline">{v.phone}</span>}
+                      </button>
+                      {vTotal>0&&<span className="mono text-[11px] text-zinc-500">billed {money(vTotal)}{vOwe>0&&<span className="text-red-500"> · owe {money(vOwe)}</span>}</span>}
+                    </div>
+                    {ed && <div className="border-t border-zinc-100 p-3">
+                      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                        <div><Lbl>Name</Lbl><Input value={vendorEdit.name} onChange={e=>setVendorEdit({...vendorEdit,name:e.target.value})} /></div>
+                        <div><Lbl>Type</Lbl><Select value={vendorEdit.type} onChange={v2=>setVendorEdit({...vendorEdit,type:v2})} options={VENDOR_TYPES.map(t=>({value:t,label:t}))} className="w-full" /></div>
+                        <div><Lbl>Phone</Lbl><Input value={vendorEdit.phone} onChange={e=>setVendorEdit({...vendorEdit,phone:e.target.value})} /></div>
+                        <div><Lbl>Note</Lbl><Input value={vendorEdit.note} onChange={e=>setVendorEdit({...vendorEdit,note:e.target.value})} /></div>
+                      </div>
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <button onClick={saveVendor} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Save</button>
+                        <button onClick={()=>setVendorEdit(null)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600">Cancel</button>
+                        <button onClick={()=>deleteVendor(v.id)} className="ml-auto rounded-md border border-zinc-200 px-3 py-1.5 text-[11px] text-zinc-400 hover:border-red-300 hover:text-red-500">Delete</button>
+                      </div>
+                    </div>}
+                  </div>
+                ); })}</div>
+                {!vendors.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No vendors yet. Add suppliers and contractors here, then attach them to bills.</div>}
+              </>); })()}
+            </>)}
+
+            {["hr","marketing"].includes(area) && (()=>{ const lbl=(ALL_KEYS.find(([k])=>k===area)||[])[1]||area; return (
               <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-10 text-center">
                 <div className="text-base font-semibold text-zinc-700">{lbl} — coming soon</div>
                 <p className="mx-auto mt-2 max-w-md text-[12px] leading-relaxed text-zinc-400">This area exists and is access-controlled — only people you give the <b>{lbl}</b> key can open it, and its data will be invisible to everyone else. We'll build its tools in an upcoming step.</p>
