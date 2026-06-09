@@ -92,6 +92,10 @@
     const SITE_BAR = { not_started:"bg-zinc-300", ongoing:"bg-emerald-500", done:"bg-blue-500", delayed:"bg-red-500" };
     const CON_STAGE_DEFAULTS = ["Site preparation","Foundation","Substructure","Superstructure (RCC)","Masonry","Plaster","Electrical rough-in","Plumbing rough-in","Doors & windows","Tiling & flooring","Finishing","Painting","Handover"];
     const mapSite = r=>({id:r.id,projectId:r.project_id,title:r.title||"",startDate:r.start_date,endDate:r.end_date,status:r.status||"not_started",progress:Number(r.progress||0),note:r.note||"",assigneeId:r.assignee_member_id,sortOrder:r.sort_order});
+    const SCOPE_GROUPS = [["1000","Pre-design & general"],["2000","Architectural"],["3000","Authority & approval"],["4000","Structural"],["5000","MEP & fire"],["6000","Interior, landscape & systems"],["7000","Supervision"],["8000","Construction"]];
+    const grpOf = code => (code&&/^\d/.test(code)) ? code[0]+"000" : "0000";
+    const mapScope = r=>({id:r.id,code:r.code||"",name:r.name||"",detail:r.detail||"",sortOrder:r.sort_order});
+    const CATALOG_SEED = [["1100","Master Plan Design / Feasibility Study",""],["1200","Digital Survey",""],["1300","Soil Test Report Preparation",""],["1400","Site and Program Analysis",""],["1500","Authority FAR Calculation & Build Area Analysis",""],["1600","Project Analysis",""],["1700","Tender & Bidding Documents Preparation",""],["1800","Brochure / Animation / Model for Marketing",""],["2100","Architectural Conceptual Design","Site study & functional zoning; hand drawing of conceptual idea and layout."],["2200","Architectural Basic Floor Plans","Basic furniture layout plan with actual measurements showing structural elements, complying RAJUK rules."],["2300","Architectural 3D Perspective Views","Exterior perspective views reflecting the final basic floor plans with aesthetic detail."],["2400","Architectural Detail Working Drawing","Construction details: furniture, fixtures, walls, slabs, column layout; door & window schedule; finishing material details as per approved design."],["3100","Local Authority Approval Drawing","Plans, elevations, sections, area calculations and required drawings per BNBC, prepared for construction permit submission."],["3200","Other Authority Approval Drawing for NOC",""],["3300","Logistical Support (Land-use & approvals)",""],["3400","As-Built Drawing Preparation (Occupancy Certificate)",""],["4100","Structural Detail Working Drawing","Piles, pile cap/footing, grade beam, column, beams, slab, RCC & retaining wall, UGWR, OHWR, septic tank and stair details per BNBC."],["4200","RCC Cost Estimation / BOQ Preparation",""],["5100","Electrical Detail Working Drawing","Single line diagram (SLD), layout diagram (ELD), earthing and lightning protection (LPS) per BNBC."],["5200","Plumbing Detail Working Drawing","Water supply, sewerage and drainage diagrams; UGWR/OHWR volume; septic tank and soak pit details per BNBC."],["5300","Air Conditioning / HVAC Design",""],["5400","HVAC Working Drawing for Construction",""],["5500","Fire Fighting Detail Design",""],["5600","Fire Fighting Working Drawing for Construction",""],["5700","Fire Fighting Authority Approval Drawing for NOC",""],["6100","Landscape Detail Design",""],["6200","Landscape Working Drawing for Construction",""],["6300","Interior / Furniture Detail Design",""],["6400","Interior Working Drawing for Construction",""],["6500","Sound / Automation / Security System Design",""],["6600","Sound / Automation / Security Working Drawing",""],["6700","Non-RCC Cost Estimation / BOQ Preparation",""],["7100","Site Visit for Supervision",""],["7200","Construction Top Supervision",""],["7300","Construction Support",""],["8100","Construction Execution",""]];
 
     /* ===== small components ===== */
     function Select({value,onChange,options,className,tone}){
@@ -133,7 +137,7 @@
       const [boardCfg,setBoardCfg]=useState(false); const [addBoardOpen,setAddBoardOpen]=useState(false); const [nb,setNb]=useState({name:"",desc:"",leadId:""});
       const [showAddP,setShowAddP]=useState(false); const [np,setNp]=useState({raw:"",code:"",nickname:"",client:"",location:"",size:"",address:"",priority:"medium",status:"live",lead:"__none"});
       const [addTaskFor,setAddTaskFor]=useState(null); const [td,setTd]=useState({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:"__none"});
-      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("design"); const [myCheckin,setMyCheckin]=useState(null); const [leads,setLeads]=useState([]); const [showAddLead,setShowAddLead]=useState(false); const [nl,setNl]=useState({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); const [leadEdit,setLeadEdit]=useState(null); const [convFor,setConvFor]=useState(null); const [convDraft,setConvDraft]=useState({code:"",priority:"medium"}); const [receivables,setReceivables]=useState([]); const [showAddRcv,setShowAddRcv]=useState(false); const [nr,setNr]=useState({projectId:"",title:"",amount:"",dueDate:""}); const [rcvEdit,setRcvEdit]=useState(null); const [finTab,setFinTab]=useState("receivables"); const [expenses,setExpenses]=useState([]); const [showAddExp,setShowAddExp]=useState(false); const [ne,setNe]=useState({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:""}); const [expEdit,setExpEdit]=useState(null); const [expMonth,setExpMonth]=useState(dayStr().slice(0,7)); const [conTab,setConTab]=useState("site"); const [vendors,setVendors]=useState([]); const [bills,setBills]=useState([]); const [showAddVendor,setShowAddVendor]=useState(false); const [nvend,setNvend]=useState({name:"",type:"Material supplier",phone:"",note:""}); const [vendorEdit,setVendorEdit]=useState(null); const [showAddBill,setShowAddBill]=useState(false); const [nbill,setNbill]=useState({projectId:"",vendorId:"",category:"Materials",title:"",amount:"",date:dayStr(),dueDate:""}); const [billEdit,setBillEdit]=useState(null); const [siteTasks,setSiteTasks]=useState([]); const [showAddSite,setShowAddSite]=useState(false); const [ns,setNs]=useState({projectId:"",title:"",startDate:"",endDate:"",status:"not_started",progress:"0"}); const [siteEdit,setSiteEdit]=useState(null); const [investments,setInvestments]=useState([]); const [showAddInv,setShowAddInv]=useState(false); const [ni,setNi]=useState({business:"",type:"Equity stake",amount:"",date:dayStr(),status:"active"}); const [invEdit,setInvEdit]=useState(null);
+      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("design"); const [myCheckin,setMyCheckin]=useState(null); const [leads,setLeads]=useState([]); const [showAddLead,setShowAddLead]=useState(false); const [nl,setNl]=useState({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); const [leadEdit,setLeadEdit]=useState(null); const [convFor,setConvFor]=useState(null); const [convDraft,setConvDraft]=useState({code:"",priority:"medium"}); const [receivables,setReceivables]=useState([]); const [showAddRcv,setShowAddRcv]=useState(false); const [nr,setNr]=useState({projectId:"",title:"",amount:"",dueDate:""}); const [rcvEdit,setRcvEdit]=useState(null); const [finTab,setFinTab]=useState("receivables"); const [expenses,setExpenses]=useState([]); const [showAddExp,setShowAddExp]=useState(false); const [ne,setNe]=useState({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:""}); const [expEdit,setExpEdit]=useState(null); const [expMonth,setExpMonth]=useState(dayStr().slice(0,7)); const [conTab,setConTab]=useState("site"); const [vendors,setVendors]=useState([]); const [bills,setBills]=useState([]); const [showAddVendor,setShowAddVendor]=useState(false); const [nvend,setNvend]=useState({name:"",type:"Material supplier",phone:"",note:""}); const [vendorEdit,setVendorEdit]=useState(null); const [showAddBill,setShowAddBill]=useState(false); const [nbill,setNbill]=useState({projectId:"",vendorId:"",category:"Materials",title:"",amount:"",date:dayStr(),dueDate:""}); const [billEdit,setBillEdit]=useState(null); const [siteTasks,setSiteTasks]=useState([]); const [showAddSite,setShowAddSite]=useState(false); const [ns,setNs]=useState({projectId:"",title:"",startDate:"",endDate:"",status:"not_started",progress:"0"}); const [siteEdit,setSiteEdit]=useState(null); const [salesTab,setSalesTab]=useState("leads"); const [catalog,setCatalog]=useState([]); const [showAddScope,setShowAddScope]=useState(false); const [nsc,setNsc]=useState({code:"",name:"",detail:""}); const [scopeEdit,setScopeEdit]=useState(null); const [investments,setInvestments]=useState([]); const [showAddInv,setShowAddInv]=useState(false); const [ni,setNi]=useState({business:"",type:"Equity stake",amount:"",date:dayStr(),status:"active"}); const [invEdit,setInvEdit]=useState(null);
 
       const realAdmin = profile?.role==="admin";
       const isAdmin = realAdmin && viewAs==="admin";
@@ -149,7 +153,7 @@
         try{
           let prof = profile;
           if(initial){ const {data:p,error:pe}=await db.from("profiles").select("*, companies(*)").eq("id",session.user.id).single(); if(pe) throw pe; prof=p; setProfile(p); try{ await db.rpc("touch_last_seen"); }catch(e){} }
-          const [mb,bd,pr,tk,pf,ld,rc,ex,vn,cb,iv,st]=await Promise.all([
+          const [mb,bd,pr,tk,pf,ld,rc,ex,vn,cb,iv,st,sc]=await Promise.all([
             db.from("members").select("*").order("sort_order"),
             db.from("boards").select("*").order("sort_order"),
             db.from("projects").select("*").order("sort_order"),
@@ -162,6 +166,7 @@
             db.from("con_bills").select("*").order("sort_order"),
             db.from("investments").select("*").order("sort_order"),
             db.from("site_tasks").select("*").order("sort_order"),
+            db.from("scope_catalog").select("*").order("code"),
           ]);
           for(const r of [mb,bd,pr,tk]) if(r.error) throw r.error;
           if(!pf.error) setAllProfiles(pf.data||[]);
@@ -172,6 +177,7 @@
           if(!cb.error) setBills((cb.data||[]).map(mapBill));
           if(!iv.error) setInvestments((iv.data||[]).map(mapInv));
           if(!st.error) setSiteTasks((st.data||[]).map(mapSite));
+          if(!sc.error) setCatalog((sc.data||[]).map(mapScope));
           let bds = bd.data.map(mapBoard);
           if(bds.length===0 && prof?.role==="admin"){ const {data:nbd}=await db.from("boards").insert({company_id:prof.company_id,name:"Design Team",description:"",sort_order:0}).select().single(); if(nbd) bds=[mapBoard(nbd)]; }
           const tasks = tk.data.map(mapTask);
@@ -254,6 +260,10 @@
       async function deleteSite(id){ if(fail((await db.from("site_tasks").delete().eq("id",id)).error)) return; setSiteEdit(null); await refresh(); }
       async function genClientLink(id){ const t=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():(Date.now()+"-"+Math.random().toString(36).slice(2)); if(fail((await db.from("projects").update({client_token:t}).eq("id",id)).error)) return; await refresh(); }
       async function clearClientLink(id){ if(fail((await db.from("projects").update({client_token:null}).eq("id",id)).error)) return; await refresh(); }
+      async function addScope(){ if(!nsc.code.trim()&&!nsc.name.trim()) return; if(fail((await db.from("scope_catalog").insert({company_id:cid(),code:nsc.code.trim(),name:nsc.name.trim(),detail:nsc.detail.trim(),sort_order:catalog.length})).error)) return; setNsc({code:"",name:"",detail:""}); setShowAddScope(false); await refresh(); }
+      async function saveScope(){ const e=scopeEdit; if(fail((await db.from("scope_catalog").update({code:e.code.trim(),name:e.name.trim(),detail:(e.detail||"").trim()}).eq("id",e.id)).error)) return; setScopeEdit(null); await refresh(); }
+      async function deleteScope(id){ if(fail((await db.from("scope_catalog").delete().eq("id",id)).error)) return; setScopeEdit(null); await refresh(); }
+      async function seedCatalog(){ const rows=CATALOG_SEED.map((r,i)=>({company_id:cid(),code:r[0],name:r[1],detail:r[2]||"",sort_order:i})); if(fail((await db.from("scope_catalog").insert(rows)).error)) return; await refresh(); }
       async function patchProject(id,f){ if(fail((await db.from("projects").update(f).eq("id",id)).error)) return; if(f.lead_member_id) await db.from("tasks").update({assignee_member_id:f.lead_member_id}).eq("project_id",id).is("assignee_member_id",null); await refresh(); }
 
       async function addTask(pid){ const sort=(projects.find(p=>p.id===pid)?.tasks.length)||0; const isC=td.type==="__custom"; const label=isC?(td.label.trim()||"Custom task"):td.type; const cat=isC?"CUSTOM":typeCat(td.type,td.workType); const code=isC?"":typeCode(td.type,td.workType); if(fail((await db.from("tasks").insert({project_id:pid,label,work_type:td.workType,cat,code,status:"upcoming",assignee_member_id:td.assignee==="__none"?null:td.assignee,contact:td.contact||"",sort_order:sort})).error)) return; setTd({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:selId||"__none"}); setAddTaskFor(null); await refresh(); }
@@ -644,6 +654,8 @@
               </div>
             </>)}
             {area==="sales" && has("sales") && (<>
+              <div className="mb-3 flex flex-wrap gap-1">{[["leads","Leads"],["catalog","Scope catalog"]].map(([k,l])=><button key={k} onClick={()=>setSalesTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${salesTab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
+              {salesTab==="leads" && (<>
               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-base font-semibold">Leads &amp; Proposals <span className="mono text-[11px] text-zinc-400">{leads.length} total</span></h2>
                 <button onClick={()=>setShowAddLead(s=>!s)} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add lead</button>
@@ -717,6 +729,51 @@
                 </section>
               ); })}
               {!leads.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No leads yet. They'll appear here from your website form, or add one manually.</div>}
+              </>)}
+              {salesTab==="catalog" && (()=>{ const byGrp={}; catalog.forEach(x=>{ const g=grpOf(x.code); (byGrp[g]=byGrp[g]||[]).push(x); }); return (<>
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="text-base font-semibold">Scope catalog <span className="mono text-[11px] text-zinc-400">{catalog.length}</span></h2>
+                  {isAdmin && <div className="flex gap-2">{!catalog.length && <button onClick={seedCatalog} className="rounded-md border border-emerald-300 px-3 py-1.5 text-[12px] font-medium text-emerald-700 hover:bg-emerald-50">Load standard catalog</button>}<button onClick={()=>setShowAddScope(s=>!s)} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add scope</button></div>}
+                </div>
+                {!isAdmin && <p className="mb-3 text-[11px] text-zinc-400">The master list of services &amp; tasks. Editing is limited to the owner.</p>}
+                {isAdmin && showAddScope && (
+                  <div className="mb-4 rounded-lg border border-zinc-300 bg-white p-3">
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      <div><Lbl>Code</Lbl><Input value={nsc.code} onChange={e=>setNsc({...nsc,code:e.target.value})} placeholder="2100" /></div>
+                      <div className="sm:col-span-3"><Lbl>Task name</Lbl><Input value={nsc.name} onChange={e=>setNsc({...nsc,name:e.target.value})} /></div>
+                      <div className="col-span-2 sm:col-span-4"><Lbl>Client-facing detail (optional)</Lbl><textarea value={nsc.detail} onChange={e=>setNsc({...nsc,detail:e.target.value})} rows={2} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
+                    </div>
+                    <div className="mt-3 flex gap-2"><button onClick={addScope} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Add</button><button onClick={()=>setShowAddScope(false)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600">Cancel</button></div>
+                  </div>
+                )}
+                {SCOPE_GROUPS.map(([g,label])=>{ const rows=(byGrp[g]||[]).slice().sort((a,b)=>(a.code||"").localeCompare(b.code||"")); if(!rows.length) return null; return (
+                  <section key={g} className="mb-4">
+                    <div className="mb-1.5 flex items-baseline gap-2"><span className="mono text-[11px] font-bold text-zinc-400">{g}</span><span className="text-[12px] font-semibold text-zinc-600">{label}</span><div className="ml-1 h-px flex-1 bg-zinc-200" /></div>
+                    <div className="space-y-1.5">{rows.map(x=>{ const ed=scopeEdit&&scopeEdit.id===x.id; return (
+                      <div key={x.id} className="rounded-lg border border-zinc-200 bg-white">
+                        <div className="flex items-center gap-2 px-3 py-2">
+                          {isAdmin ? <button onClick={()=>setScopeEdit(ed?null:{...x})} className="flex min-w-0 flex-1 items-center gap-2 text-left"><span className="text-[11px] text-zinc-400">{ed?"▾":"▸"}</span><span className="mono shrink-0 text-[11px] font-bold text-zinc-500">{x.code}</span><span className="min-w-0 truncate text-[13px] font-medium">{x.name}</span></button>
+                            : <div className="flex min-w-0 flex-1 items-center gap-2"><span className="mono shrink-0 text-[11px] font-bold text-zinc-500">{x.code}</span><span className="min-w-0 truncate text-[13px] font-medium">{x.name}</span></div>}
+                        </div>
+                        {!isAdmin && x.detail && <div className="px-3 pb-2 text-[11px] text-zinc-400">{x.detail}</div>}
+                        {ed && <div className="border-t border-zinc-100 p-3">
+                          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                            <div><Lbl>Code</Lbl><Input value={scopeEdit.code} onChange={e=>setScopeEdit({...scopeEdit,code:e.target.value})} /></div>
+                            <div className="sm:col-span-3"><Lbl>Task name</Lbl><Input value={scopeEdit.name} onChange={e=>setScopeEdit({...scopeEdit,name:e.target.value})} /></div>
+                            <div className="col-span-2 sm:col-span-4"><Lbl>Client-facing detail</Lbl><textarea value={scopeEdit.detail} onChange={e=>setScopeEdit({...scopeEdit,detail:e.target.value})} rows={2} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
+                          </div>
+                          <div className="mt-3 flex flex-wrap items-center gap-2">
+                            <button onClick={saveScope} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Save</button>
+                            <button onClick={()=>setScopeEdit(null)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600">Cancel</button>
+                            <button onClick={()=>deleteScope(x.id)} className="ml-auto rounded-md border border-zinc-200 px-3 py-1.5 text-[11px] text-zinc-400 hover:border-red-300 hover:text-red-500">Delete</button>
+                          </div>
+                        </div>}
+                      </div>
+                    ); })}</div>
+                  </section>
+                ); })}
+                {!catalog.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">{isAdmin?"Empty. Tap \u201cLoad standard catalog\u201d to seed it from your offer letter, then revise freely.":"No scopes yet."}</div>}
+              </>); })()}
             </>)}
 
             {area==="finance" && has("finance") && (<>
