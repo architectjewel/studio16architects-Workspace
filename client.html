@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Project Status — Studio 16 Architects</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body{font-family:'Archivo',system-ui,sans-serif;background:#fafafa;color:#18181b;}
+  .mono{font-family:'Spline Sans Mono',monospace;}
+</style>
+</head>
+<body>
+<!-- STEP A: paste your Supabase project URL once (same value used in the staff app), then deploy. -->
+<script>const SUPABASE_URL = "https://wznspowrhxpugfphwowl.supabase.co";</script>
+<div id="app" class="mx-auto max-w-[640px] px-4 py-8"></div>
+<script>
+(function(){
+  var app = document.getElementById("app");
+  var token = new URLSearchParams(location.search).get("token");
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+  function money(n){ return "৳ " + Number(n||0).toLocaleString("en-IN"); }
+  var STAT_LABEL = { live:"In progress", hold:"On hold", complete:"Completed", dead:"Closed", closed:"Closed" };
+  var SITE_LABEL = { not_started:"Not started", ongoing:"In progress", done:"Done", delayed:"Delayed" };
+  var SITE_BADGE = { not_started:"bg-zinc-100 text-zinc-500", ongoing:"bg-emerald-50 text-emerald-700", done:"bg-blue-50 text-blue-600", delayed:"bg-red-50 text-red-600" };
+  var SITE_BAR = { not_started:"bg-zinc-300", ongoing:"bg-emerald-500", done:"bg-blue-500", delayed:"bg-red-500" };
+
+  function shell(inner){ return '<div class="mb-6 flex items-center gap-2"><div class="text-[13px] font-bold tracking-tight">STUDIO 16 ARCHITECTS</div><div class="text-[11px] text-zinc-400">· Project status</div></div>' + inner + '<div class="mt-8 border-t border-zinc-200 pt-4 text-center text-[11px] text-zinc-400">Read-only view · studio16architectsbd.com</div>'; }
+
+  function note(msg){ app.innerHTML = shell('<div class="rounded-xl border border-zinc-200 bg-white p-8 text-center text-[13px] text-zinc-500">' + msg + '</div>'); }
+
+  if(!token){ note("This link is missing its code. Please use the full link your architect shared with you."); return; }
+
+  note("Loading your project…");
+
+  fetch(SUPABASE_URL + "/functions/v1/client-view?token=" + encodeURIComponent(token))
+    .then(function(r){ return r.json().catch(function(){ return {}; }); })
+    .then(function(d){
+      if(!d || !d.ok){ note("We couldn't find this project. The link may have been updated — please ask your architect for the current one."); return; }
+      render(d);
+    })
+    .catch(function(){ note("Something went wrong loading your project. Please try again in a moment."); });
+
+  function payStatus(it){
+    if(it.amount>0 && it.paid>=it.amount) return ["Paid","bg-emerald-50 text-emerald-700"];
+    if(it.paid>0) return ["Part-paid","bg-amber-50 text-amber-700"];
+    if(it.due && it.due < new Date().toLocaleDateString("en-CA")) return ["Overdue","bg-red-50 text-red-600"];
+    return ["Pending","bg-zinc-100 text-zinc-500"];
+  }
+
+  function render(d){
+    var p = d.project, pg = d.progress, pay = d.payments;
+    var html = "";
+
+    // project header
+    html += '<div class="rounded-xl border border-zinc-200 bg-white p-5">';
+    html += '<div class="flex flex-wrap items-center gap-2">';
+    html += '<span class="mono text-[12px] font-bold text-zinc-500">' + esc(p.code||"") + '</span>';
+    html += '<span class="text-[17px] font-semibold">' + esc(p.name||"Your project") + '</span>';
+    html += '<span class="ml-auto rounded-full bg-zinc-100 px-2.5 py-1 text-[11px] font-medium text-zinc-600">' + esc(STAT_LABEL[p.status]||p.status||"") + '</span>';
+    html += '</div>';
+    if(p.location) html += '<div class="mt-1 text-[12px] text-zinc-400">' + esc(p.location) + '</div>';
+    html += '</div>';
+
+    // overall progress
+    if(pg.total>0){
+      html += '<div class="mt-4 rounded-xl border border-zinc-200 bg-white p-5">';
+      html += '<div class="flex items-baseline justify-between"><div class="text-[12px] font-medium text-zinc-500">Construction progress</div><div class="mono text-[22px] font-bold">' + pg.overall + '%</div></div>';
+      html += '<div class="mt-2 h-2 w-full rounded bg-zinc-100"><div class="h-2 rounded bg-emerald-500" style="width:' + Math.max(0,Math.min(100,pg.overall)) + '%"></div></div>';
+      html += '<div class="mt-1.5 text-[11px] text-zinc-400">' + pg.done + ' of ' + pg.total + ' stages complete</div>';
+      html += '</div>';
+
+      // stages
+      html += '<div class="mt-4 rounded-xl border border-zinc-200 bg-white p-5">';
+      html += '<div class="mb-3 text-[12px] font-medium text-zinc-500">Site stages</div>';
+      d.stages.forEach(function(s){
+        html += '<div class="mb-3 last:mb-0">';
+        html += '<div class="flex items-center gap-2"><span class="min-w-0 flex-1 truncate text-[13px] font-medium">' + esc(s.title) + '</span>';
+        html += '<span class="mono text-[11px] text-zinc-400">' + Number(s.progress||0) + '%</span>';
+        html += '<span class="rounded px-1.5 py-0.5 text-[10px] font-semibold ' + (SITE_BADGE[s.status]||"bg-zinc-100 text-zinc-500") + '">' + esc(SITE_LABEL[s.status]||s.status||"") + '</span></div>';
+        html += '<div class="mt-1 h-1.5 w-full rounded bg-zinc-100"><div class="h-1.5 rounded ' + (SITE_BAR[s.status]||"bg-zinc-300") + '" style="width:' + Math.max(0,Math.min(100,Number(s.progress||0))) + '%"></div></div>';
+        if(s.start || s.end) html += '<div class="mono mt-1 text-[10px] text-zinc-400">' + esc(s.start||"?") + ' → ' + esc(s.end||"?") + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+
+    // payments
+    html += '<div class="mt-4 rounded-xl border border-zinc-200 bg-white p-5">';
+    html += '<div class="mb-3 text-[12px] font-medium text-zinc-500">Payment summary</div>';
+    html += '<div class="flex flex-wrap gap-x-6 gap-y-2">';
+    html += '<div><div class="mono text-[16px] font-bold">' + money(pay.billed) + '</div><div class="text-[11px] text-zinc-400">Billed</div></div>';
+    html += '<div><div class="mono text-[16px] font-bold text-emerald-600">' + money(pay.received) + '</div><div class="text-[11px] text-zinc-400">Received</div></div>';
+    html += '<div><div class="mono text-[16px] font-bold ' + (pay.outstanding>0?"text-red-500":"text-zinc-700") + '">' + money(pay.outstanding) + '</div><div class="text-[11px] text-zinc-400">Outstanding</div></div>';
+    html += '</div>';
+    if(pay.items && pay.items.length){
+      html += '<div class="mt-4 space-y-1.5">';
+      pay.items.forEach(function(it){
+        var st = payStatus(it);
+        html += '<div class="flex items-center gap-2 border-t border-zinc-100 pt-1.5"><span class="min-w-0 flex-1 truncate text-[12px] text-zinc-600">' + esc(it.title||"Billing") + '</span>';
+        html += '<span class="mono text-[12px] font-semibold">' + money(it.amount) + '</span>';
+        html += '<span class="rounded px-1.5 py-0.5 text-[10px] font-semibold ' + st[1] + '">' + st[0] + '</span></div>';
+      });
+      html += '</div>';
+    } else {
+      html += '<div class="mt-2 text-[11px] text-zinc-400">No billing items yet.</div>';
+    }
+    html += '</div>';
+
+    app.innerHTML = shell(html);
+  }
+})();
+</script>
+</body>
+</html>
