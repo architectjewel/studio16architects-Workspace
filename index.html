@@ -62,6 +62,7 @@
     const relTime = (iso)=>{ if(!iso) return ""; const d=new Date(iso); const s=Math.floor((Date.now()-d.getTime())/1000); if(s<60) return "just now"; const m=Math.floor(s/60); if(m<60) return m+"m ago"; const h=Math.floor(m/60); if(h<24) return h+"h ago"; const dd=Math.floor(h/24); if(dd<7) return dd+"d ago"; return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"}); };
     const ALL_KEYS = [["design","Design"],["finance","Finance"],["construction","Construction"],["sales","Sales"],["hr","HR"],["marketing","Marketing"]];
     const dayStr = ()=> new Date().toLocaleDateString("en-CA");
+    const clientUrl = t => window.location.origin + "/client.html?token=" + t;
     const yearOf = (code)=>{ const d=String(code||"").replace(/\D/g,""); if(d.length>=5) return 2000+parseInt(d.slice(0,2),10); if(d.length===4) return 2020+parseInt(d.slice(0,1),10); return null; };
     const STATUS_TONE = { live:"bg-emerald-50 text-emerald-600", hold:"bg-amber-50 text-amber-600", dead:"bg-zinc-100 text-zinc-400", complete:"bg-blue-50 text-blue-600", closed:"bg-zinc-100 text-zinc-500" };
     const LEAD_STATUS = [["new","New"],["reviewing","Reviewing"],["proposal","Proposal sent"],["won","Won"],["lost","Lost"]];
@@ -80,6 +81,17 @@
     const VENDOR_TYPES = ["Material supplier","Labour contractor","Subcontractor","Equipment","Service","Other"];
     const mapVendor = r=>({id:r.id,name:r.name||"",type:r.type||"",phone:r.phone||"",note:r.note||"",sortOrder:r.sort_order});
     const mapBill = r=>({id:r.id,projectId:r.project_id,vendorId:r.vendor_id,title:r.title||"",category:r.category||"Other",amount:Number(r.amount||0),paidAmount:Number(r.paid_amount||0),date:r.date,dueDate:r.due_date,paidDate:r.paid_date,note:r.note||"",recordedBy:r.recorded_by,sortOrder:r.sort_order});
+    const INV_TYPES = ["Equity stake","Loan","Property","Fixed deposit","Equipment","Other"];
+    const INV_STATUS = [["active","Active"],["exited","Exited"],["writeoff","Written off"]];
+    const INV_TONE = { active:"bg-emerald-50 text-emerald-700 border-emerald-200", exited:"bg-zinc-100 text-zinc-500 border-zinc-300", writeoff:"bg-red-50 text-red-600 border-red-200" };
+    const INV_LABEL = Object.fromEntries(INV_STATUS);
+    const mapInv = r=>({id:r.id,business:r.business||"",type:r.type||"",amount:Number(r.amount||0),returned:Number(r.returned||0),date:r.date,status:r.status||"active",note:r.note||"",recordedBy:r.recorded_by,sortOrder:r.sort_order});
+    const SITE_STATUS = [["not_started","Not started"],["ongoing","In progress"],["done","Done"],["delayed","Delayed"]];
+    const SITE_LABEL = Object.fromEntries(SITE_STATUS);
+    const SITE_TONE = { not_started:"bg-zinc-100 text-zinc-500 border-zinc-300", ongoing:"bg-emerald-50 text-emerald-700 border-emerald-200", done:"bg-blue-50 text-blue-600 border-blue-200", delayed:"bg-red-50 text-red-600 border-red-200" };
+    const SITE_BAR = { not_started:"bg-zinc-300", ongoing:"bg-emerald-500", done:"bg-blue-500", delayed:"bg-red-500" };
+    const CON_STAGE_DEFAULTS = ["Site preparation","Foundation","Substructure","Superstructure (RCC)","Masonry","Plaster","Electrical rough-in","Plumbing rough-in","Doors & windows","Tiling & flooring","Finishing","Painting","Handover"];
+    const mapSite = r=>({id:r.id,projectId:r.project_id,title:r.title||"",startDate:r.start_date,endDate:r.end_date,status:r.status||"not_started",progress:Number(r.progress||0),note:r.note||"",assigneeId:r.assignee_member_id,sortOrder:r.sort_order});
 
     /* ===== small components ===== */
     function Select({value,onChange,options,className,tone}){
@@ -98,7 +110,7 @@
     /* ===== mappers (db row -> app shape) ===== */
     const mapMember = r=>({id:r.id,name:r.name,role:r.role,teamId:r.team_id,boardId:r.board_id,status:r.status,archivedDate:r.archived_date,sort:r.sort_order,projOrder:r.project_order||[]});
     const mapBoard = r=>({id:r.id,name:r.name,desc:r.description||"",leadId:r.lead_member_id,sort:r.sort_order});
-    const mapProject = r=>({id:r.id,code:r.code,nickname:r.nickname,client:r.client,location:r.location,size:r.size,address:r.address,priority:r.priority,status:r.status,lead:r.lead_member_id,sort:r.sort_order,tasks:[]});
+    const mapProject = r=>({id:r.id,code:r.code,nickname:r.nickname,client:r.client,location:r.location,size:r.size,address:r.address,priority:r.priority,status:r.status,lead:r.lead_member_id,sort:r.sort_order,clientToken:r.client_token,tasks:[]});
     const mapTask = r=>({id:r.id,projectId:r.project_id,label:r.label,workType:r.work_type,cat:r.cat,code:r.code,status:r.status,assignee:r.assignee_member_id,contact:r.contact||"",doneDate:r.done_date,sort:r.sort_order,working:!!r.working});
 
     function App(){
@@ -121,7 +133,7 @@
       const [boardCfg,setBoardCfg]=useState(false); const [addBoardOpen,setAddBoardOpen]=useState(false); const [nb,setNb]=useState({name:"",desc:"",leadId:""});
       const [showAddP,setShowAddP]=useState(false); const [np,setNp]=useState({raw:"",code:"",nickname:"",client:"",location:"",size:"",address:"",priority:"medium",status:"live",lead:"__none"});
       const [addTaskFor,setAddTaskFor]=useState(null); const [td,setTd]=useState({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:"__none"});
-      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("design"); const [myCheckin,setMyCheckin]=useState(null); const [leads,setLeads]=useState([]); const [showAddLead,setShowAddLead]=useState(false); const [nl,setNl]=useState({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); const [leadEdit,setLeadEdit]=useState(null); const [convFor,setConvFor]=useState(null); const [convDraft,setConvDraft]=useState({code:"",priority:"medium"}); const [receivables,setReceivables]=useState([]); const [showAddRcv,setShowAddRcv]=useState(false); const [nr,setNr]=useState({projectId:"",title:"",amount:"",dueDate:""}); const [rcvEdit,setRcvEdit]=useState(null); const [finTab,setFinTab]=useState("receivables"); const [expenses,setExpenses]=useState([]); const [showAddExp,setShowAddExp]=useState(false); const [ne,setNe]=useState({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:""}); const [expEdit,setExpEdit]=useState(null); const [expMonth,setExpMonth]=useState(dayStr().slice(0,7)); const [conTab,setConTab]=useState("bills"); const [vendors,setVendors]=useState([]); const [bills,setBills]=useState([]); const [showAddVendor,setShowAddVendor]=useState(false); const [nvend,setNvend]=useState({name:"",type:"Material supplier",phone:"",note:""}); const [vendorEdit,setVendorEdit]=useState(null); const [showAddBill,setShowAddBill]=useState(false); const [nbill,setNbill]=useState({projectId:"",vendorId:"",category:"Materials",title:"",amount:"",date:dayStr(),dueDate:""}); const [billEdit,setBillEdit]=useState(null);
+      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("design"); const [myCheckin,setMyCheckin]=useState(null); const [leads,setLeads]=useState([]); const [showAddLead,setShowAddLead]=useState(false); const [nl,setNl]=useState({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); const [leadEdit,setLeadEdit]=useState(null); const [convFor,setConvFor]=useState(null); const [convDraft,setConvDraft]=useState({code:"",priority:"medium"}); const [receivables,setReceivables]=useState([]); const [showAddRcv,setShowAddRcv]=useState(false); const [nr,setNr]=useState({projectId:"",title:"",amount:"",dueDate:""}); const [rcvEdit,setRcvEdit]=useState(null); const [finTab,setFinTab]=useState("receivables"); const [expenses,setExpenses]=useState([]); const [showAddExp,setShowAddExp]=useState(false); const [ne,setNe]=useState({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:""}); const [expEdit,setExpEdit]=useState(null); const [expMonth,setExpMonth]=useState(dayStr().slice(0,7)); const [conTab,setConTab]=useState("site"); const [vendors,setVendors]=useState([]); const [bills,setBills]=useState([]); const [showAddVendor,setShowAddVendor]=useState(false); const [nvend,setNvend]=useState({name:"",type:"Material supplier",phone:"",note:""}); const [vendorEdit,setVendorEdit]=useState(null); const [showAddBill,setShowAddBill]=useState(false); const [nbill,setNbill]=useState({projectId:"",vendorId:"",category:"Materials",title:"",amount:"",date:dayStr(),dueDate:""}); const [billEdit,setBillEdit]=useState(null); const [siteTasks,setSiteTasks]=useState([]); const [showAddSite,setShowAddSite]=useState(false); const [ns,setNs]=useState({projectId:"",title:"",startDate:"",endDate:"",status:"not_started",progress:"0"}); const [siteEdit,setSiteEdit]=useState(null); const [investments,setInvestments]=useState([]); const [showAddInv,setShowAddInv]=useState(false); const [ni,setNi]=useState({business:"",type:"Equity stake",amount:"",date:dayStr(),status:"active"}); const [invEdit,setInvEdit]=useState(null);
 
       const realAdmin = profile?.role==="admin";
       const isAdmin = realAdmin && viewAs==="admin";
@@ -137,7 +149,7 @@
         try{
           let prof = profile;
           if(initial){ const {data:p,error:pe}=await db.from("profiles").select("*, companies(*)").eq("id",session.user.id).single(); if(pe) throw pe; prof=p; setProfile(p); try{ await db.rpc("touch_last_seen"); }catch(e){} }
-          const [mb,bd,pr,tk,pf,ld,rc,ex,vn,cb]=await Promise.all([
+          const [mb,bd,pr,tk,pf,ld,rc,ex,vn,cb,iv,st]=await Promise.all([
             db.from("members").select("*").order("sort_order"),
             db.from("boards").select("*").order("sort_order"),
             db.from("projects").select("*").order("sort_order"),
@@ -148,6 +160,8 @@
             db.from("expenses").select("*").order("date",{ascending:false}),
             db.from("vendors").select("*").order("sort_order"),
             db.from("con_bills").select("*").order("sort_order"),
+            db.from("investments").select("*").order("sort_order"),
+            db.from("site_tasks").select("*").order("sort_order"),
           ]);
           for(const r of [mb,bd,pr,tk]) if(r.error) throw r.error;
           if(!pf.error) setAllProfiles(pf.data||[]);
@@ -156,6 +170,8 @@
           if(!ex.error) setExpenses((ex.data||[]).map(mapExp));
           if(!vn.error) setVendors((vn.data||[]).map(mapVendor));
           if(!cb.error) setBills((cb.data||[]).map(mapBill));
+          if(!iv.error) setInvestments((iv.data||[]).map(mapInv));
+          if(!st.error) setSiteTasks((st.data||[]).map(mapSite));
           let bds = bd.data.map(mapBoard);
           if(bds.length===0 && prof?.role==="admin"){ const {data:nbd}=await db.from("boards").insert({company_id:prof.company_id,name:"Design Team",description:"",sort_order:0}).select().single(); if(nbd) bds=[mapBoard(nbd)]; }
           const tasks = tk.data.map(mapTask);
@@ -229,6 +245,15 @@
       async function addBill(){ if(!nbill.projectId||!(Number(nbill.amount)>0)) return; if(fail((await db.from("con_bills").insert({company_id:cid(),project_id:nbill.projectId,vendor_id:nbill.vendorId||null,category:nbill.category,title:nbill.title.trim(),amount:Number(nbill.amount||0),date:nbill.date||dayStr(),due_date:nbill.dueDate||null,recorded_by:session.user.id,sort_order:bills.length})).error)) return; setNbill({projectId:"",vendorId:"",category:"Materials",title:"",amount:"",date:dayStr(),dueDate:""}); setShowAddBill(false); await refresh(); }
       async function saveBill(){ const e=billEdit; if(fail((await db.from("con_bills").update({project_id:e.projectId||null,vendor_id:e.vendorId||null,category:e.category,title:e.title.trim(),amount:Number(e.amount||0),paid_amount:Number(e.paidAmount||0),date:e.date||dayStr(),due_date:e.dueDate||null,paid_date:e.paidDate||null,note:(e.note||"").trim()}).eq("id",e.id)).error)) return; setBillEdit(null); await refresh(); }
       async function deleteBill(id){ if(fail((await db.from("con_bills").delete().eq("id",id)).error)) return; setBillEdit(null); await refresh(); }
+      async function addInv(){ if(!ni.business.trim()||!(Number(ni.amount)>0)) return; if(fail((await db.from("investments").insert({company_id:cid(),business:ni.business.trim(),type:ni.type,amount:Number(ni.amount||0),date:ni.date||dayStr(),status:ni.status,recorded_by:session.user.id,sort_order:investments.length})).error)) return; setNi({business:"",type:"Equity stake",amount:"",date:dayStr(),status:"active"}); setShowAddInv(false); await refresh(); }
+      async function saveInv(){ const e=invEdit; if(fail((await db.from("investments").update({business:e.business.trim(),type:e.type,amount:Number(e.amount||0),returned:Number(e.returned||0),date:e.date||dayStr(),status:e.status,note:(e.note||"").trim()}).eq("id",e.id)).error)) return; setInvEdit(null); await refresh(); }
+      async function deleteInv(id){ if(fail((await db.from("investments").delete().eq("id",id)).error)) return; setInvEdit(null); await refresh(); }
+      async function addSite(){ if(!ns.projectId||!ns.title.trim()) return; if(fail((await db.from("site_tasks").insert({company_id:cid(),project_id:ns.projectId,title:ns.title.trim(),start_date:ns.startDate||null,end_date:ns.endDate||null,status:ns.status,progress:Number(ns.progress||0),sort_order:siteTasks.length})).error)) return; setNs({projectId:ns.projectId,title:"",startDate:"",endDate:"",status:"not_started",progress:"0"}); await refresh(); }
+      async function seedStages(){ if(!ns.projectId) return; const base=siteTasks.length; const rows=CON_STAGE_DEFAULTS.map((t,i)=>({company_id:cid(),project_id:ns.projectId,title:t,status:"not_started",progress:0,sort_order:base+i})); if(fail((await db.from("site_tasks").insert(rows)).error)) return; setShowAddSite(false); await refresh(); }
+      async function saveSite(){ const e=siteEdit; const prog=e.status==="done"?100:Number(e.progress||0); if(fail((await db.from("site_tasks").update({title:e.title.trim(),start_date:e.startDate||null,end_date:e.endDate||null,status:e.status,progress:prog,note:(e.note||"").trim(),assignee_member_id:e.assigneeId==="__none"||!e.assigneeId?null:e.assigneeId}).eq("id",e.id)).error)) return; setSiteEdit(null); await refresh(); }
+      async function deleteSite(id){ if(fail((await db.from("site_tasks").delete().eq("id",id)).error)) return; setSiteEdit(null); await refresh(); }
+      async function genClientLink(id){ const t=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():(Date.now()+"-"+Math.random().toString(36).slice(2)); if(fail((await db.from("projects").update({client_token:t}).eq("id",id)).error)) return; await refresh(); }
+      async function clearClientLink(id){ if(fail((await db.from("projects").update({client_token:null}).eq("id",id)).error)) return; await refresh(); }
       async function patchProject(id,f){ if(fail((await db.from("projects").update(f).eq("id",id)).error)) return; if(f.lead_member_id) await db.from("tasks").update({assignee_member_id:f.lead_member_id}).eq("project_id",id).is("assignee_member_id",null); await refresh(); }
 
       async function addTask(pid){ const sort=(projects.find(p=>p.id===pid)?.tasks.length)||0; const isC=td.type==="__custom"; const label=isC?(td.label.trim()||"Custom task"):td.type; const cat=isC?"CUSTOM":typeCat(td.type,td.workType); const code=isC?"":typeCode(td.type,td.workType); if(fail((await db.from("tasks").insert({project_id:pid,label,work_type:td.workType,cat,code,status:"upcoming",assignee_member_id:td.assignee==="__none"?null:td.assignee,contact:td.contact||"",sort_order:sort})).error)) return; setTd({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:selId||"__none"}); setAddTaskFor(null); await refresh(); }
@@ -564,6 +589,20 @@
                           <span className="ml-auto" />
                           {delP===p.id ? <span className="flex items-center gap-2 text-[11px] text-red-600">Delete this project &amp; its tasks?<button onClick={()=>deleteProject(p.id)} className="rounded-md bg-red-600 px-2 py-1 font-medium text-white">Yes, delete</button><button onClick={()=>setDelP(null)} className="rounded-md border border-zinc-300 px-2 py-1 text-zinc-600">No</button></span> : <button onClick={()=>setDelP(p.id)} className="rounded-md border border-zinc-200 px-3 py-1.5 text-[11px] text-zinc-400 hover:border-red-300 hover:text-red-500">Delete</button>}
                         </div>
+                        <div className="mt-3 border-t border-zinc-100 pt-3">
+                          <div className="mb-2 mono text-[10px] uppercase tracking-wider text-zinc-400">Client link</div>
+                          {p.clientToken ? (
+                            <div className="flex flex-wrap items-center gap-2">
+                              <code className="mono min-w-0 flex-1 truncate rounded bg-zinc-50 px-2 py-1.5 text-[11px] text-zinc-600">{clientUrl(p.clientToken)}</code>
+                              <button onClick={()=>copyText(clientUrl(p.clientToken))} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[11px] text-zinc-600 hover:bg-zinc-50">Copy</button>
+                              <button onClick={()=>genClientLink(p.id)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[11px] text-zinc-600 hover:bg-zinc-50">Regenerate</button>
+                              <button onClick={()=>clearClientLink(p.id)} className="rounded-md border border-zinc-200 px-3 py-1.5 text-[11px] text-zinc-400 hover:border-red-300 hover:text-red-500">Disable</button>
+                            </div>
+                          ) : (
+                            <button onClick={()=>genClientLink(p.id)} className="rounded-md border border-emerald-300 px-3 py-1.5 text-[11px] font-medium text-emerald-700 hover:bg-emerald-50">Create client link</button>
+                          )}
+                          <p className="mt-1.5 text-[10px] text-zinc-400">A read-only page showing status, site progress &amp; payments for this project only. Regenerate to revoke the old link.</p>
+                        </div>
                         <div className="mt-3 border-t border-zinc-100 pt-3"><div className="mb-2 mono text-[10px] uppercase tracking-wider text-zinc-400">Tasks</div>{renderTasks(p)}</div>
                       </div>}
                     </div>
@@ -681,7 +720,7 @@
             </>)}
 
             {area==="finance" && has("finance") && (<>
-              <div className="mb-3 flex flex-wrap gap-1">{[["receivables","Receivables"],["expenditure","Expenditure"]].map(([k,l])=><button key={k} onClick={()=>setFinTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${finTab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
+              <div className="mb-3 flex flex-wrap gap-1">{[["receivables","Receivables"],["expenditure","Expenditure"],...(isAdmin?[["investments","Investments"]]:[])].map(([k,l])=><button key={k} onClick={()=>setFinTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${finTab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
               {finTab==="receivables" && (()=>{ const billed=receivables.reduce((s,x)=>s+x.amount,0); const received=receivables.reduce((s,x)=>s+x.paidAmount,0); const overdue=receivables.filter(x=>x.dueDate&&x.dueDate<dayStr()&&x.paidAmount<x.amount).reduce((s,x)=>s+(x.amount-x.paidAmount),0); const projOpts=projects.map(p=>({value:p.id,label:(p.code?p.code+" ":"")+(p.nickname||p.client||p.location||"Project")})); const byProj={}; receivables.forEach(x=>{ (byProj[x.projectId]=byProj[x.projectId]||[]).push(x); }); const projsWithItems=projects.filter(p=>byProj[p.id]&&byProj[p.id].length); return (<>
               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-base font-semibold">Receivables</h2>
@@ -797,10 +836,128 @@
               ); })}</div>
               {!monthExp.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No expenses recorded for {monthName(expMonth)}.</div>}
             </>); })()}
+            {finTab==="investments" && isAdmin && (()=>{ const invested=investments.reduce((s,x)=>s+x.amount,0); const returned=investments.reduce((s,x)=>s+x.returned,0); const byBiz={}; investments.forEach(x=>{ const k=x.business||"—"; (byBiz[k]=byBiz[k]||[]).push(x); }); const bizes=Object.entries(byBiz).sort((a,b)=>b[1].reduce((s,x)=>s+x.amount,0)-a[1].reduce((s,x)=>s+x.amount,0)); return (<>
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-base font-semibold">Investments</h2>
+                <button onClick={()=>setShowAddInv(s=>!s)} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add investment</button>
+              </div>
+              <div className="mb-4 flex flex-wrap gap-x-6 gap-y-2"><Stat n={money(invested)} l="Invested" /><Stat n={money(returned)} l="Returned" /><Stat n={money(invested-returned)} l="Net deployed" tone={invested-returned>0?undefined:undefined} /></div>
+              {showAddInv && (
+                <div className="mb-4 rounded-lg border border-zinc-300 bg-white p-3">
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    <div className="col-span-2 sm:col-span-1"><Lbl>Business / venture</Lbl><Input value={ni.business} onChange={e=>setNi({...ni,business:e.target.value})} placeholder="e.g. Land project, Restaurant…" /></div>
+                    <div><Lbl>Type</Lbl><Select value={ni.type} onChange={v=>setNi({...ni,type:v})} options={INV_TYPES.map(t=>({value:t,label:t}))} className="w-full" /></div>
+                    <div><Lbl>Amount (৳)</Lbl><Input value={ni.amount} onChange={e=>setNi({...ni,amount:e.target.value})} /></div>
+                    <div><Lbl>Date</Lbl><input type="date" value={ni.date} onChange={e=>setNi({...ni,date:e.target.value})} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
+                    <div><Lbl>Status</Lbl><Select value={ni.status} onChange={v=>setNi({...ni,status:v})} options={INV_STATUS.map(([v,l])=>({value:v,label:l}))} className="w-full" /></div>
+                  </div>
+                  <div className="mt-3 flex gap-2"><button onClick={addInv} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Add</button><button onClick={()=>setShowAddInv(false)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600">Cancel</button></div>
+                </div>
+              )}
+              {bizes.map(([biz,its])=>{ const inv=its.reduce((s,x)=>s+x.amount,0),ret=its.reduce((s,x)=>s+x.returned,0); return (
+                <section key={biz} className="mb-4">
+                  <div className="mb-1.5 flex flex-wrap items-baseline gap-2">
+                    <span className="text-[13px] font-semibold">{biz}</span>
+                    <span className="mono ml-auto text-[11px] text-zinc-500">in {money(inv)} · back {money(ret)} · <span className="font-semibold text-zinc-700">net {money(inv-ret)}</span></span>
+                  </div>
+                  <div className="space-y-1.5">{its.map(it=>{ const ed=invEdit&&invEdit.id===it.id; return (
+                    <div key={it.id} className="rounded-lg border border-zinc-200 bg-white">
+                      <div className="flex items-center gap-2 px-3 py-2">
+                        <button onClick={()=>setInvEdit(ed?null:{...it,amount:String(it.amount),returned:String(it.returned),date:it.date||dayStr()})} className="flex min-w-0 flex-1 items-center gap-2 text-left">
+                          <span className="text-[11px] text-zinc-400">{ed?"▾":"▸"}</span>
+                          {it.type&&<span className="shrink-0 rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] text-zinc-600">{it.type}</span>}
+                          <span className="mono text-[10px] text-zinc-400">{it.date||""}</span>
+                          {it.returned>0&&<span className="mono text-[10px] text-emerald-600">back {money(it.returned)}</span>}
+                        </button>
+                        <span className="mono text-[12px] font-semibold">{money(it.amount)}</span>
+                        <span className={`mono shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase ${INV_TONE[it.status]}`}>{INV_LABEL[it.status]}</span>
+                      </div>
+                      {ed && <div className="border-t border-zinc-100 p-3">
+                        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                          <div className="col-span-2 sm:col-span-1"><Lbl>Business / venture</Lbl><Input value={invEdit.business} onChange={e=>setInvEdit({...invEdit,business:e.target.value})} /></div>
+                          <div><Lbl>Type</Lbl><Select value={invEdit.type} onChange={v=>setInvEdit({...invEdit,type:v})} options={INV_TYPES.map(t=>({value:t,label:t}))} className="w-full" /></div>
+                          <div><Lbl>Amount in (৳)</Lbl><Input value={invEdit.amount} onChange={e=>setInvEdit({...invEdit,amount:e.target.value})} /></div>
+                          <div><Lbl>Returned (৳)</Lbl><Input value={invEdit.returned} onChange={e=>setInvEdit({...invEdit,returned:e.target.value})} /></div>
+                          <div><Lbl>Date</Lbl><input type="date" value={invEdit.date} onChange={e=>setInvEdit({...invEdit,date:e.target.value})} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
+                          <div><Lbl>Status</Lbl><Select value={invEdit.status} onChange={v=>setInvEdit({...invEdit,status:v})} options={INV_STATUS.map(([v,l])=>({value:v,label:l}))} className="w-full" /></div>
+                          <div className="col-span-2 sm:col-span-3"><Lbl>Note</Lbl><Input value={invEdit.note} onChange={e=>setInvEdit({...invEdit,note:e.target.value})} /></div>
+                        </div>
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <button onClick={saveInv} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Save</button>
+                          <button onClick={()=>setInvEdit(null)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600">Cancel</button>
+                          <button onClick={()=>deleteInv(it.id)} className="ml-auto rounded-md border border-zinc-200 px-3 py-1.5 text-[11px] text-zinc-400 hover:border-red-300 hover:text-red-500">Delete</button>
+                        </div>
+                      </div>}
+                    </div>
+                  ); })}</div>
+                </section>
+              ); })}
+              {!investments.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No investments recorded. Track profit moved into your other ventures here.</div>}
+            </>); })()}
             </>)}
 
             {area==="construction" && has("construction") && (<>
-              <div className="mb-3 flex flex-wrap gap-1">{[["bills","Bills & purchases"],["vendors","Vendors"]].map(([k,l])=><button key={k} onClick={()=>setConTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${conTab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
+              <div className="mb-3 flex flex-wrap gap-1">{[["site","Site schedule"],["bills","Bills & purchases"],["vendors","Vendors"]].map(([k,l])=><button key={k} onClick={()=>setConTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${conTab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
+              {conTab==="site" && (()=>{ const projOpts=projects.map(p=>({value:p.id,label:(p.code?p.code+" ":"")+(p.nickname||p.client||p.location||"Project")})); const byProj={}; siteTasks.forEach(x=>{ const k=projects.some(p=>p.id===x.projectId)?x.projectId:"__none"; (byProj[k]=byProj[k]||[]).push(x); }); const groups=[...projects.filter(p=>byProj[p.id]&&byProj[p.id].length).map(p=>[p,byProj[p.id]]),...(byProj["__none"]?[[null,byProj["__none"]]]:[])]; return (<>
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="text-base font-semibold">Site schedule</h2>
+                  <button onClick={()=>setShowAddSite(s=>!s)} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add stage</button>
+                </div>
+                {showAddSite && (
+                  <div className="mb-4 rounded-lg border border-zinc-300 bg-white p-3">
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      <div className="col-span-2 sm:col-span-1"><Lbl>Project</Lbl><Select value={ns.projectId} onChange={v=>setNs({...ns,projectId:v})} options={[{value:"",label:"Select project…"},...projOpts]} className="w-full" /></div>
+                      <div className="col-span-2 sm:col-span-1"><Lbl>Stage / activity</Lbl><Input value={ns.title} onChange={e=>setNs({...ns,title:e.target.value})} placeholder="Foundation, Masonry…" /></div>
+                      <div><Lbl>Status</Lbl><Select value={ns.status} onChange={v=>setNs({...ns,status:v})} options={SITE_STATUS.map(([v,l])=>({value:v,label:l}))} className="w-full" /></div>
+                      <div><Lbl>Start</Lbl><input type="date" value={ns.startDate} onChange={e=>setNs({...ns,startDate:e.target.value})} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
+                      <div><Lbl>Target end</Lbl><input type="date" value={ns.endDate} onChange={e=>setNs({...ns,endDate:e.target.value})} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
+                      <div><Lbl>Progress %</Lbl><Input value={ns.progress} onChange={e=>setNs({...ns,progress:e.target.value})} /></div>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2"><button onClick={addSite} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Add stage</button>{ns.projectId&&<button onClick={seedStages} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600 hover:bg-zinc-50">+ Standard sequence (13 stages)</button>}<button onClick={()=>setShowAddSite(false)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600">Cancel</button></div>
+                  </div>
+                )}
+                {groups.map(([p,its])=>{ const done=its.filter(x=>x.status==="done").length; const avg=its.length?Math.round(its.reduce((s,x)=>s+x.progress,0)/its.length):0; const delayed=its.some(x=>x.status==="delayed"); return (
+                  <section key={p?p.id:"__none"} className="mb-4">
+                    <div className="mb-1.5 flex flex-wrap items-baseline gap-2">
+                      {p?<><span className="mono text-[12px] font-bold">{p.code}</span><span className="text-[13px] font-semibold">{p.nickname||p.client||""}</span>{p.location&&<span className="text-[11px] text-zinc-400">{p.location}</span>}</>:<span className="text-[13px] font-semibold text-zinc-500">No project</span>}
+                      <span className="mono ml-auto text-[11px] text-zinc-500">{done}/{its.length} done · <span className={delayed?"font-semibold text-red-500":"font-semibold text-zinc-700"}>{avg}%</span></span>
+                    </div>
+                    <div className="space-y-1.5">{its.map(it=>{ const ed=siteEdit&&siteEdit.id===it.id; return (
+                      <div key={it.id} className="rounded-lg border border-zinc-200 bg-white">
+                        <div className="px-3 py-2">
+                          <div className="flex items-center gap-2">
+                            <button onClick={()=>setSiteEdit(ed?null:{...it,progress:String(it.progress),startDate:it.startDate||"",endDate:it.endDate||"",assigneeId:it.assigneeId||"__none"})} className="flex min-w-0 flex-1 items-center gap-2 text-left">
+                              <span className="text-[11px] text-zinc-400">{ed?"▾":"▸"}</span>
+                              <span className="min-w-0 truncate text-[13px] font-medium">{it.title}</span>
+                              {(it.startDate||it.endDate)&&<span className="mono hidden shrink-0 text-[10px] text-zinc-400 sm:inline">{(it.startDate||"?")}→{(it.endDate||"?")}</span>}
+                            </button>
+                            <span className="mono shrink-0 text-[11px] text-zinc-500">{it.progress}%</span>
+                            <span className={`mono shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase ${SITE_TONE[it.status]}`}>{SITE_LABEL[it.status]}</span>
+                          </div>
+                          <div className="mt-1.5 h-1.5 w-full rounded bg-zinc-100"><div className={`h-1.5 rounded ${SITE_BAR[it.status]}`} style={{width:Math.max(0,Math.min(100,it.progress))+"%"}} /></div>
+                        </div>
+                        {ed && <div className="border-t border-zinc-100 p-3">
+                          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                            <div className="col-span-2 sm:col-span-1"><Lbl>Stage / activity</Lbl><Input value={siteEdit.title} onChange={e=>setSiteEdit({...siteEdit,title:e.target.value})} /></div>
+                            <div><Lbl>Status</Lbl><Select value={siteEdit.status} onChange={v=>setSiteEdit({...siteEdit,status:v})} options={SITE_STATUS.map(([v,l])=>({value:v,label:l}))} className="w-full" /></div>
+                            <div><Lbl>Progress %</Lbl><Input value={siteEdit.progress} onChange={e=>setSiteEdit({...siteEdit,progress:e.target.value})} /></div>
+                            <div><Lbl>Start</Lbl><input type="date" value={siteEdit.startDate} onChange={e=>setSiteEdit({...siteEdit,startDate:e.target.value})} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
+                            <div><Lbl>Target end</Lbl><input type="date" value={siteEdit.endDate} onChange={e=>setSiteEdit({...siteEdit,endDate:e.target.value})} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
+                            <div><Lbl>Site in-charge</Lbl><Select value={siteEdit.assigneeId} onChange={v=>setSiteEdit({...siteEdit,assigneeId:v})} options={[{value:"__none",label:"—"},...active.map(m=>({value:m.id,label:m.name}))]} className="w-full" /></div>
+                            <div className="col-span-2 sm:col-span-3"><Lbl>Note</Lbl><Input value={siteEdit.note} onChange={e=>setSiteEdit({...siteEdit,note:e.target.value})} /></div>
+                          </div>
+                          <div className="mt-3 flex flex-wrap items-center gap-2">
+                            <button onClick={saveSite} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Save</button>
+                            <button onClick={()=>setSiteEdit(null)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600">Cancel</button>
+                            <button onClick={()=>deleteSite(it.id)} className="ml-auto rounded-md border border-zinc-200 px-3 py-1.5 text-[11px] text-zinc-400 hover:border-red-300 hover:text-red-500">Delete</button>
+                          </div>
+                        </div>}
+                      </div>
+                    ); })}</div>
+                  </section>
+                ); })}
+                {!siteTasks.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No site stages yet. Pick a project and add stages — or use the standard 13-stage sequence to start fast.</div>}
+              </>); })()}
               {conTab==="bills" && (()=>{ const billed=bills.reduce((s,x)=>s+x.amount,0); const paid=bills.reduce((s,x)=>s+x.paidAmount,0); const overdue=bills.filter(x=>x.dueDate&&x.dueDate<dayStr()&&x.paidAmount<x.amount).reduce((s,x)=>s+(x.amount-x.paidAmount),0); const projOpts=projects.map(p=>({value:p.id,label:(p.code?p.code+" ":"")+(p.nickname||p.client||p.location||"Project")})); const vendOpts=[{value:"",label:"— no vendor —"},...vendors.map(v=>({value:v.id,label:v.name}))]; const vName=id=>{ const v=vendors.find(z=>z.id===id); return v?v.name:""; }; const byProj={}; bills.forEach(x=>{ const k=projects.some(p=>p.id===x.projectId)?x.projectId:"__none"; (byProj[k]=byProj[k]||[]).push(x); }); const groups=[...projects.filter(p=>byProj[p.id]&&byProj[p.id].length).map(p=>[p,byProj[p.id]]),...(byProj["__none"]?[[null,byProj["__none"]]]:[])]; const billRow=(it)=>{ const ed=billEdit&&billEdit.id===it.id; const st=rcvStatus(it); return (
                 <div key={it.id} className="rounded-lg border border-zinc-200 bg-white">
                   <div className="flex items-center gap-2 px-3 py-2">
