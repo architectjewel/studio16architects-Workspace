@@ -341,6 +341,97 @@ details.audit summary:hover{color:var(--ink)}
     .siteoverview svg{max-width:248px!important}
   }
 </style>
+
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ===== Studio 16 app-match reskin v2 (screen-scoped; print untouched) ===== */
+:root{
+  --paper:#fafafa; --paper-2:#ffffff; --card:#ffffff; --ink:#18181b;
+  --muted:#71717a; --faint:#a1a1aa; --line:#e4e4e7; --line-2:#f4f4f5;
+  --teal:#18181b; --teal-2:#27272a;
+  --brass:#059669; --brass-2:#10b981;
+  --good:#059669; --warn:#d97706; --cap:#dc2626; --capbg:#dc26260f;
+  --shadow:0 1px 2px #18181b0a,0 10px 30px -22px #18181b1f;
+  --r:8px; --r-sm:6px;
+  --sans:'Archivo',system-ui,-apple-system,sans-serif;
+  --serif:'Archivo',system-ui,sans-serif;
+  --mono:'Spline Sans Mono',ui-monospace,monospace;
+}
+@media screen{
+  body{font-size:13px !important;line-height:1.5}
+  .wrap{max-width:1100px;padding:0 16px 40px}
+  .top-in{padding:10px 16px;gap:12px}
+  .logo-img,.logo-svg{height:30px !important}
+  .logomark{width:32px;height:32px;font-size:13px;border-width:1px}
+  .brand .nm{font-size:12px !important;text-transform:none !important;letter-spacing:0 !important}
+  .brand .tg{font-size:8.5px !important;letter-spacing:.14em !important}
+  .contact{gap:14px;font-size:11px}
+  .contact b{font-size:9px !important;letter-spacing:.08em !important}
+  .theme-btn{width:30px;height:30px;font-size:14px;border-radius:var(--r-sm)}
+  .zonetoggle{padding:8px 16px;gap:6px}
+  .zonetoggle a{padding:8px 12px;font-size:12px !important;border-radius:var(--r-sm)}
+  .hero{padding:18px 0 14px}
+  .hero .eyebrow{font-size:9.5px !important;letter-spacing:.14em !important;color:var(--brass) !important}
+  .hero h1{font-size:clamp(18px,2.6vw,22px) !important;text-transform:none !important;letter-spacing:-.01em !important;font-weight:700 !important;margin:6px 0 6px !important;line-height:1.15 !important}
+  .hero .sub{font-size:12.5px !important;opacity:.9}
+  .hero .sub2{font-size:10.5px !important;letter-spacing:.04em !important;text-transform:none !important}
+  .chip{font-size:10px !important;letter-spacing:.02em !important;text-transform:none !important;padding:4px 10px;border-radius:999px}
+  .inputs{padding:0 20px 24px 0}
+  .step{padding:14px 0}
+  .step .lbl{margin-bottom:10px;gap:9px}
+  .step .n{width:20px;height:20px;font-size:10px;border-radius:5px}
+  .step .t{font-size:11px !important;letter-spacing:.04em !important}
+  .step .ref{font-size:9px !important;letter-spacing:.03em !important}
+  label.fld{font-size:10px !important;letter-spacing:.04em !important;text-transform:none !important}
+  select,input[type=text],input[type=number]{font-size:13px !important;padding:9px 11px !important;border-radius:var(--r-sm) !important}
+  .seg{border-radius:var(--r-sm);overflow:hidden}
+  .seg button{font-size:10.5px !important;letter-spacing:.04em !important;text-transform:none !important;padding:8px}
+  .hint{font-size:10.5px}
+  .plot .pn{font-size:10.5px}
+  .plot .rm{border-radius:var(--r-sm)}
+  .addplot{border-radius:var(--r-sm);font-size:10.5px !important;letter-spacing:.04em !important;text-transform:none !important;padding:8px}
+  .totline{font-size:12px}
+  .inc{font-size:12.5px;padding:7px 0}
+  .inc .iv{font-size:10.5px}
+  .calc-btn{font-size:12px !important;letter-spacing:.06em !important;padding:12px !important;border-radius:var(--r-sm) !important;font-weight:600}
+  .errbox{border-radius:var(--r-sm);font-size:12px}
+  .empty{padding:48px 28px}
+  .empty .big{font-size:14px !important;letter-spacing:.02em !important;text-transform:none !important}
+  .rep-head{padding:16px 18px;gap:12px}
+  .rep-head .ttl{font-size:12px !important;letter-spacing:.04em !important}
+  .rep-sub{font-size:10.5px}
+  .rep-modemeta{font-size:12px}
+  .rep-head .meta{font-size:10px}
+  .rep-actions button{font-size:10px !important;letter-spacing:.04em !important;padding:7px 12px;border-radius:var(--r-sm)}
+  .hl{padding:14px}
+  .hl .k{font-size:9.5px !important;letter-spacing:.06em !important}
+  .hl .v{font-size:22px !important;font-family:var(--mono) !important}
+  .hl .v small{font-size:11px}
+  .hl.accent{background:#18181b !important}
+  .hl.accent .k{color:#a1a1aa !important}
+  section.sec{padding:16px 18px}
+  section.sec h2{font-size:10.5px !important;letter-spacing:.06em !important;margin-bottom:12px}
+  table.kv{font-size:12.5px}
+  table.kv td{padding:7px 0}
+  .badge{font-size:8.5px !important;letter-spacing:.03em !important;border-radius:4px}
+  .fc{padding:12px}
+  .fc .lab{font-size:9px !important;letter-spacing:.04em !important}
+  .fc .gn{font-size:20px !important;font-family:var(--mono) !important}
+  .fc .st{font-size:9.5px !important;letter-spacing:.03em !important}
+  .fc .pl{font-size:10.5px}
+  details.audit{padding:0 18px 18px}
+  details.audit summary{font-size:10.5px !important;letter-spacing:.04em !important}
+  .auditlist{font-size:11px;border-radius:var(--r-sm)}
+  .disclaimer{font-size:11px}
+  .disclaimer h3{font-size:10.5px !important;letter-spacing:.04em !important}
+  .foot{font-size:9.5px;letter-spacing:.04em}
+  .refnote{font-size:10.5px}
+  .cta-cap{font-size:10px !important;letter-spacing:.06em !important}
+  .cta-url{font-size:12px;border-radius:var(--r-sm)}
+  .shm{border-radius:var(--r-sm);font-size:10.5px}
+  .sharebar-h{font-size:9px !important;letter-spacing:.06em !important}
+}
+</style>
 </head>
 <body>
 
