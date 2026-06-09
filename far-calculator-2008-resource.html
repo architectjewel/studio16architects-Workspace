@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAR Calculator · Bidhimala 2008 — Studio 16 Architects (Outside RAJUK / CDA · KDA · RDA)</title>
+<style>
+/* ============================================================
+   FAR CALCULATOR 2026 — Studio 16 Architects house style
+   Warm bone paper · near-black ink · taupe rules · gold accent
+   Helvetica/Arial · uppercase tracked headings · hairlines
+   ============================================================ */
+:root{
+  --paper:#F4F2EB; --paper-2:#FAF8F2; --card:#FFFFFF; --ink:#1A1916;
+  --muted:#8B867B; --faint:#B7B1A6; --line:#E2DED5; --line-2:#EDEAE2;
+  --teal:#1A1916; --teal-2:#3A352C;            /* primary (kept var names) */
+  --brass:#9C6B1E; --brass-2:#B98A3C;          /* gold accent */
+  --good:#2E6B3E; --warn:#9A6B12; --cap:#A8412F; --capbg:#a8412f12;
+  --shadow:0 1px 2px #1a191608, 0 12px 34px -20px #1a191626;
+  --r:4px; --r-sm:3px;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --serif:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+html[data-theme="dark"]{
+  --paper:#14130F; --paper-2:#1A1813; --card:#1E1C16; --ink:#ECEAE1;
+  --muted:#9A958A; --faint:#6E695E; --line:#ffffff1c; --line-2:#ffffff0e;
+  --teal:#ECEAE1; --teal-2:#CFC9BC; --brass:#C99A4E; --brass-2:#DDB877;
+  --good:#7FB98C; --warn:#D6A444; --cap:#E08868; --capbg:#e0886816;
+  --shadow:0 1px 2px #0006, 0 18px 42px -22px #000a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--sans);color:var(--ink);background:var(--paper);
+  line-height:1.55;-webkit-font-smoothing:antialiased;font-size:15px;}
+a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line)}
+a:hover{border-color:var(--ink)}
+h1,h2,h3{margin:0;font-weight:600}
+.mono{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px 72px}
+
+/* ---------- Header ---------- */
+.zonetoggle{display:flex;flex-wrap:wrap;gap:8px;padding:12px 22px;background:var(--paper-2);border-bottom:1px solid var(--line)}
+.zonetoggle a{flex:1;min-width:150px;text-align:center;padding:11px 14px;border:1px solid var(--line);border-radius:6px;text-decoration:none;font-size:12.5px;font-weight:600;color:var(--ink);background:var(--card)}
+.zonetoggle a.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.zonetoggle a:not(.active):hover{border-color:var(--brass);color:var(--brass)}
+header.top{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--paper) 88%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:0 auto;padding:14px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:13px;min-width:0}
+.logo-img{height:42px;width:auto;display:block}
+.logo-svg{height:40px;width:auto;display:block;color:var(--ink)}
+@media(max-width:520px){.logo-svg{height:34px}}
+.logomark{width:42px;height:42px;border:1.5px solid var(--ink);display:grid;place-items:center;
+  font-weight:700;font-size:17px;flex:none;background:var(--ink);color:var(--paper);letter-spacing:.02em}
+.brand .nm{font-weight:700;font-size:15px;line-height:1.05;letter-spacing:.02em;text-transform:uppercase}
+.brand .tg{font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.contact{margin-left:auto;display:flex;gap:22px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.contact a{color:var(--muted);border:0}
+.contact a:hover{color:var(--ink)}
+.contact b{color:var(--ink);font-weight:600;display:block;font-size:10px;text-transform:uppercase;letter-spacing:.12em;margin-bottom:2px}
+.theme-btn{flex:none;border:1px solid var(--line);background:transparent;color:var(--ink);
+  width:38px;height:38px;border-radius:0;cursor:pointer;font-size:16px;display:grid;place-items:center}
+.theme-btn:hover{border-color:var(--ink)}
+
+/* ---------- Title block ---------- */
+.hero{padding:46px 0 26px;border-bottom:1px solid var(--line)}
+.hero .eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--brass);font-weight:600}
+.hero h1{font-size:clamp(28px,4.6vw,44px);margin:14px 0 12px;line-height:1.04;
+  text-transform:uppercase;letter-spacing:.01em;font-weight:600}
+.hero .sub{color:var(--ink);font-size:15px;max-width:640px;opacity:.85}
+.hero .sub2{color:var(--muted);font-size:12px;margin-top:8px;letter-spacing:.04em;text-transform:uppercase}
+.coverage{margin-top:20px;display:flex;gap:7px;flex-wrap:wrap}
+.chip{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;border:1px solid var(--line);color:var(--muted)}
+.chip.no{color:var(--cap);border-color:var(--cap)}
+.chip.yes{color:var(--paper);background:var(--ink);border-color:var(--ink);font-weight:600}
+.combo{position:relative}
+.combo-list{position:absolute;top:calc(100% - 1px);left:0;right:0;z-index:30;background:var(--card);
+  border:1px solid var(--ink);border-top:0;max-height:280px;overflow:auto;display:none;box-shadow:var(--shadow)}
+.combo-item{padding:9px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--line-2);display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.combo-item:last-child{border-bottom:0}
+.combo-item:hover,.combo-item.active{background:var(--paper-2)}
+.combo-item b{font-weight:600}
+.combo-item .ci-meta{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;font-variant-numeric:tabular-nums}
+.combo-empty{padding:11px 12px;font-size:12px;color:var(--muted)}
+
+/* ---------- Layout ---------- */
+.grid{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:0;margin-top:0;align-items:start;
+  border-bottom:1px solid var(--line)}
+@media(max-width:920px){.grid{grid-template-columns:1fr}}
+.panel{background:transparent}
+.inputs{position:sticky;top:78px;border-right:1px solid var(--line)}
+@media(max-width:920px){.inputs{position:static;border-right:0;border-bottom:1px solid var(--line)}}
+.report{background:var(--paper-2)}
+
+/* ---------- Steps ---------- */
+.inputs{padding:0 26px 30px 0}
+@media(max-width:920px){.inputs{padding:0 0 24px 0}}
+.step{border-bottom:1px solid var(--line-2);padding:20px 0}
+.step:last-of-type{border-bottom:0}
+.step .lbl{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.step .n{font-size:11px;width:24px;height:24px;border:1px solid var(--ink);color:var(--ink);
+  display:grid;place-items:center;font-weight:600;flex:none;font-variant-numeric:tabular-nums}
+.step .t{font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.14em}
+.step .ref{margin-left:auto;font-size:9.5px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+label.fld{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:0 0 6px}
+select,input[type=text],input[type=number]{width:100%;font-family:var(--sans);font-size:14px;color:var(--ink);
+  background:var(--card);border:1px solid var(--line);border-radius:0;padding:10px 12px;outline:none}
+select:focus,input:focus{border-color:var(--ink)}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.seg{display:flex;border:1px solid var(--line);border-radius:0;overflow:hidden;background:var(--card)}
+.seg button{flex:1;border:0;background:none;color:var(--muted);padding:9px;font-family:var(--sans);font-size:11px;
+  cursor:pointer;font-weight:600;text-transform:uppercase;letter-spacing:.1em}
+.seg button.on{background:var(--ink);color:var(--paper)}
+.seg button:disabled{color:var(--faint);cursor:not-allowed;background:repeating-linear-gradient(45deg,transparent,transparent 4px,var(--line-2) 4px,var(--line-2) 5px)}
+.hint{font-size:11px;color:var(--muted);margin-top:7px;letter-spacing:.02em}
+.hint.warn{color:var(--warn)}
+
+.plot{display:flex;gap:8px;align-items:center;margin-bottom:7px}
+.plot .pn{font-size:11px;color:var(--muted);width:16px;flex:none;font-weight:600}
+.plot input{flex:2}.plot select{flex:1.4}
+.plot .rm{flex:none;width:32px;border:1px solid var(--line);background:var(--card);color:var(--cap);border-radius:0;cursor:pointer;font-size:15px}
+.addplot{margin-top:5px;background:none;border:1px dashed var(--line);color:var(--ink);border-radius:0;
+  padding:9px;width:100%;cursor:pointer;font-size:11px;text-transform:uppercase;letter-spacing:.12em}
+.addplot:hover{border-color:var(--ink)}
+.totline{margin-top:11px;font-size:12.5px;display:flex;justify-content:space-between;padding-top:11px;
+  border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.totline b{color:var(--brass);font-weight:600}
+
+.inc{display:flex;align-items:flex-start;gap:10px;padding:8px 0;font-size:13.5px;cursor:pointer}
+.inc input{margin-top:2px;accent-color:var(--ink)}
+.inc .iv{margin-left:auto;font-size:11px;color:var(--brass);white-space:nowrap;font-variant-numeric:tabular-nums}
+
+.calc-btn{margin-top:22px;width:100%;border:0;background:var(--ink);color:var(--paper);font-family:var(--sans);
+  font-weight:600;font-size:12px;padding:16px;cursor:pointer;border-radius:0;text-transform:uppercase;letter-spacing:.18em}
+.calc-btn:hover{background:var(--teal-2)}
+.errbox{margin-top:14px;color:var(--cap);font-size:12.5px;display:none;border:1px solid var(--cap);
+  background:var(--capbg);border-radius:0;padding:10px 12px}
+
+/* ---------- Report ---------- */
+.report{min-height:320px}
+.empty{padding:80px 34px;text-align:center;color:var(--muted)}
+.empty .big{font-size:18px;color:var(--ink);margin-bottom:10px;text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.empty svg{opacity:.4;margin-bottom:16px}
+
+.rep-head{padding:24px 28px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.rep-head .ttl{font-size:13px;text-transform:uppercase;letter-spacing:.16em;font-weight:600}
+.rep-sub{font-size:11px;color:var(--muted);letter-spacing:.06em;margin-top:3px}
+.rep-modemeta{font-size:12.5px;font-weight:600;color:var(--ink);margin-top:9px;letter-spacing:.01em}
+.rep-logo{margin-bottom:13px}
+.rep-logo .logo-svg{height:30px;color:var(--ink)}
+.siteoverview{display:flex;justify-content:center;padding:6px 0}
+.rep-head .meta{font-size:10.5px;color:var(--muted);text-align:right;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.rep-actions{display:flex;gap:8px;margin:0 0 16px}
+.rep-actions button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:0;
+  padding:8px 15px;cursor:pointer;font-family:var(--sans);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.12em}
+.rep-actions button:hover{border-color:var(--ink)}
+
+.headline{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border-bottom:1px solid var(--line)}
+.hl{background:var(--card);padding:20px}
+.hl .k{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.hl .v{font-size:32px;font-weight:600;color:var(--ink);line-height:1.05;margin-top:6px;font-variant-numeric:tabular-nums}
+.hl .v small{font-size:13px;color:var(--muted);font-weight:400}
+.hl.accent{background:#4d4842}
+.hl.accent .k{color:#c9c4ba}
+.hl.accent .v{color:#fff}
+.hl.accent .mono{color:var(--brass-2)!important}
+
+section.sec{padding:24px 28px;border-bottom:1px solid var(--line-2)}
+section.sec h2{font-size:11px;display:flex;align-items:center;gap:10px;margin-bottom:16px;text-transform:uppercase;letter-spacing:.16em;font-weight:600}
+section.sec h2:before{content:"";width:18px;height:1.5px;background:var(--brass);flex:none}
+
+table.kv{width:100%;border-collapse:collapse;font-size:13.5px}
+table.kv td{padding:9px 0;border-bottom:1px solid var(--line-2);vertical-align:top}
+table.kv td:first-child{color:var(--muted)}
+table.kv td:last-child{text-align:right;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}
+.badge{display:inline-block;font-size:9px;color:var(--muted);border:1px solid var(--line);border-radius:0;
+  padding:2px 7px;margin-left:8px;cursor:help;vertical-align:middle;white-space:nowrap;text-transform:uppercase;letter-spacing:.06em}
+.badge:hover{border-color:var(--ink);color:var(--ink)}
+.capped{color:var(--cap)!important}
+
+.floors{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+@media(max-width:560px){.floors{grid-template-columns:1fr}}
+.fc{border:0;border-radius:0;padding:16px;text-align:center;background:var(--card)}
+.fc .lab{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.fc .gn{font-size:27px;font-weight:600;color:var(--ink);margin:8px 0 2px;font-variant-numeric:tabular-nums}
+.fc .st{font-size:10.5px;color:var(--brass);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.fc .pl{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.4;font-variant-numeric:tabular-nums}
+.fc.mid{background:var(--paper-2);box-shadow:inset 0 2px 0 var(--brass)}
+
+.sbwrap{display:grid;grid-template-columns:1fr 200px;gap:22px;align-items:center}
+@media(max-width:560px){.sbwrap{grid-template-columns:1fr}}
+
+details.audit{padding:0 28px 22px}
+details.audit summary{cursor:pointer;font-size:11px;color:var(--muted);padding:14px 0;text-transform:uppercase;letter-spacing:.12em}
+details.audit summary:hover{color:var(--ink)}
+.auditlist{font-size:11.5px;color:var(--muted);line-height:1.85;background:var(--card);
+  border:1px solid var(--line);border-radius:0;padding:15px 17px;font-variant-numeric:tabular-nums}
+.auditlist .step-a{color:var(--ink);font-weight:600}
+.auditlist .num{color:var(--brass);font-weight:600}
+
+.disclaimer{margin-top:0;border:0;border-top:1px solid var(--line);border-radius:0;padding:24px 0 0;background:transparent;font-size:12px;color:var(--muted)}
+.disclaimer h3{font-size:11px;color:var(--ink);margin-bottom:9px;text-transform:uppercase;letter-spacing:.14em;font-weight:600}
+.foot{margin-top:26px;text-align:center;font-size:10.5px;color:var(--faint);letter-spacing:.08em;text-transform:uppercase}
+.refnote{padding:14px 28px;font-size:11px;color:var(--muted);border-top:1px solid var(--line-2);letter-spacing:.02em}
+.cta{text-align:center;margin:30px 0 6px;padding-top:20px;border-top:1px solid var(--line-2)}
+.cta-cap{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:9px}
+.cta-url{font-family:var(--mono);font-size:13px;color:var(--brass);border:1px solid var(--line);padding:9px 18px;display:inline-block;text-decoration:none}
+.cta-url:hover{border-color:var(--brass)}
+
+.shm{font-size:11px;border:1px solid var(--line);background:transparent;color:var(--ink);padding:6px 11px;border-radius:4px;text-decoration:none;cursor:pointer;display:inline-block}
+.shm:hover{border-color:var(--brass)}
+.sharebar{display:flex;flex-wrap:wrap;align-items:center;gap:7px;padding:14px 0 16px;margin-bottom:10px;border-bottom:1px solid var(--line-2)}
+.sharebar-h{width:100%;font-size:9.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:3px}
+.shm-icon{padding:8px 12px;display:inline-flex;align-items:center;justify-content:center;line-height:0;color:var(--ink)}
+.shm-icon svg{display:block}
+.shm-icon:hover{color:var(--brass);border-color:var(--brass)}
+@media(max-width:600px){
+  header.top{position:static}
+  .zonetoggle{padding:10px}
+  .zonetoggle a{min-width:0;font-size:11.5px;padding:10px 8px}
+  .grid{zoom:0.92}
+  .wrap{padding:0 8px 40px}
+  .rep-head{padding:16px 14px;flex-direction:column;align-items:flex-start;gap:8px}
+  .rep-head .meta{text-align:left}
+  .sec{padding:16px 14px}
+  .headline .hl .v{font-size:22px}
+  .headline .hl{padding:8px 10px}
+  .fc{padding:12px}
+  .fc .gn{font-size:21px}
+  table.kv{font-size:12.5px}
+  table.kv td{padding:8px 0}
+  table.kv td:last-child{white-space:normal;word-break:break-word}
+  .badge{margin-left:6px}
+  .siteoverview svg,.sec svg{max-width:100%;height:auto}
+  .report{overflow-x:hidden}
+  .rep-actions{flex-wrap:wrap}
+  .ttl{font-size:12px}
+}
+@media(max-width:430px){
+  .grid{zoom:0.85}
+  .headline{grid-template-columns:1fr 1fr}
+}
+@media(max-width:340px){
+  .headline{grid-template-columns:1fr}
+}
+@media print{
+  @page{size:A4 portrait;margin:7mm}
+  html,body{background:#fff}
+  body{font-size:8.8px;color:#000;line-height:1.3}
+  header.top,.inputs,.theme-btn,.rep-actions,details.audit,.foot,.coverage,.hero,.disclaimer,.rep-head{display:none!important}
+  .wrap{max-width:none;padding:0 0 30px}
+  .grid{display:block;margin:0;border:0}
+  .panel{box-shadow:none}
+  .report{background:#fff;zoom:0.9}
+  .print-only{display:block!important}
+  a{color:#000;border:0}
+  /* small, presentable header */
+  .print-head{padding:0 0 3px;margin-bottom:7px;border-bottom:1.2px solid #000;align-items:center}
+  .print-head .pl{font-weight:700}
+  .print-head .logo-svg{height:16px;color:#000}
+  .print-head .pr{font-size:6.5px;line-height:1.3}
+  .print-head .pr b{font-size:9px;display:inline-block;margin-bottom:2px;letter-spacing:.01em}
+  /* headline banner */
+  .headline{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid #000;margin-bottom:9px}
+  .headline .hl{padding:5px 8px;border-right:1px solid #ccc}
+  .headline .hl:last-child{border-right:0}
+  .headline .hl .k{font-size:7.4px}
+  .headline .hl .v{font-size:16px;margin-top:2px}
+  .hl.accent{background:#4d4842!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .hl.accent .k{color:#d2cdc3!important}.hl.accent .v{color:#fff!important}.hl.accent .mono{color:#e2bc7e!important}
+  /* two sections per row, equal visible gaps */
+  .rep-body{display:grid;grid-template-columns:1fr 1fr;column-gap:16px;row-gap:10px;align-items:start}
+  .sec-planning{grid-column:1;grid-row:1}.sec-unit{grid-column:2;grid-row:1}
+  .sec-far{grid-column:1;grid-row:2}.sec-floor{grid-column:2;grid-row:2}
+  .sec-ground{grid-column:1;grid-row:3}.sec-site{grid-column:2;grid-row:3}
+  .sec-setbacks{grid-column:1;grid-row:4}.sec-density{grid-column:2;grid-row:4}
+  section.sec{padding:7px 0 0;border:0;border-top:1px solid #d4d4d4;break-inside:avoid;page-break-inside:avoid}
+  section.sec h2{font-size:9px;margin-bottom:6px;letter-spacing:.1em}
+  section.sec h2:before{width:11px}
+  table.kv td{padding:1.8px 0;font-size:8.4px}
+  .badge{font-size:6.8px;padding:0 3px;margin-left:3px}
+  /* scenario cards */
+  .floors{gap:6px}
+  .fc{border:1px solid #c4c4c4;padding:6px 5px}
+  .fc.mid{box-shadow:none;border:1.5px solid #777;background:#fff}
+  .fc .lab{font-size:7.2px}
+  .fc .gn{font-size:16px;margin:2px 0 1px}
+  .fc .st{font-size:7px}
+  .fc .pl{font-size:7.2px;margin-top:3px;line-height:1.4}
+  .refnote{padding:3px 0;font-size:7.2px;border:0}
+  /* larger, readable site map (fills its half column) */
+  .siteoverview{padding:0;justify-content:center}
+  .siteoverview svg{max-width:325px!important}
+  .cta{margin:14px 0 0;padding-top:9px;border-top:1px solid #ccc;text-align:center}
+  .cta-cap{font-size:7px;margin-bottom:5px}
+  .cta-url{font-size:9px;color:#111;border-color:#999;padding:5px 12px}
+  /* fixed footer: basis above the line, brand + page below */
+  .print-foot{margin-top:14px;text-align:center;color:#555;background:#fff;padding:8px 8px 2px}
+  .print-foot .pf-basis{font-size:6.6px;color:#666;padding:0 0 3px;line-height:1.3}
+  .print-foot .pf-line{border-top:1px solid #bbb;padding-top:3px;font-size:7.5px;letter-spacing:.1em;text-transform:uppercase}
+}
+.print-foot{display:none}
+.print-only{display:none}
+.nonres .res-only{display:none!important}
+.print-head{padding:14px 28px;border-bottom:2px solid var(--ink);display:flex;justify-content:space-between;align-items:flex-start}
+.print-head .pl .logo-svg{height:30px}
+.print-head .pr{font-size:10px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+</style>
+
+
+<style>
+  .plotrow{display:flex;gap:8px;margin-bottom:7px;align-items:center}
+  .plotrow input{flex:1;min-width:0}
+  .plotrow select{flex:0 0 auto;max-width:112px}
+  .rmrow{flex:0 0 auto;width:36px;height:40px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:8px;cursor:pointer;font-size:17px;line-height:1}
+  .rmrow:hover{color:var(--ink);border-color:var(--ink)}
+  .subhd{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin:15px 0 5px}
+  .reftab-leg{font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:4px}
+  .reftab{width:100%;border-collapse:collapse;font-size:11px;font-variant-numeric:tabular-nums}
+  .reftab th{text-align:left;padding:6px 9px;border-bottom:1px solid var(--line);color:var(--muted);font-size:9px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;white-space:nowrap}
+  .reftab td{padding:6px 9px;border-bottom:1px solid var(--line-2,var(--line));color:var(--ink)}
+  .reftab th.c,.reftab td.c{text-align:center}
+  .reftab tr.sel-land td{background:color-mix(in srgb,var(--good) 14%,transparent);color:var(--good);font-weight:700}
+  .reftab tr.sel-road td{background:color-mix(in srgb,var(--teal) 16%,transparent);color:var(--teal);font-weight:700}
+  .reftag{font-size:8px;padding:1px 5px;border-radius:3px;margin-left:6px;letter-spacing:.04em;vertical-align:middle}
+  .tg-land{background:color-mix(in srgb,var(--good) 22%,transparent);color:var(--good)}
+  .tg-road{background:color-mix(in srgb,var(--teal) 24%,transparent);color:var(--teal)}
+  @media print{
+    /* one A4 page: hide the reference table + web CTA; keep Site Overview */
+    section.sec-farref,.cta{display:none!important}
+    .rep-body{column-gap:14px;row-gap:8px}
+    .sec-far{grid-column:1;grid-row:1}
+    .sec-setbacks{grid-column:2;grid-row:1}
+    .sec-ground{grid-column:1;grid-row:2}
+    .sec-floor{grid-column:2;grid-row:2}
+    .sec-comm{grid-column:1 / -1;grid-row:3}
+    .sec-site{grid-column:1 / -1;grid-row:4}
+    .sec-site .siteoverview{display:flex;justify-content:center}
+    .report{zoom:.82}
+    .siteoverview svg{max-width:248px!important}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <svg class="logo-svg" role="img" aria-label="Studio 16 Architects" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 289.24 84.06"><defs><style>.cls-1{fill:currentColor;}</style></defs><path class="cls-1" d="M222.8,386a5.49,5.49,0,0,0,1.94,4.61,8,8,0,0,0,5.09,1.52,8.09,8.09,0,0,0,3.37-.61,4.58,4.58,0,0,0,2-1.57,3.73,3.73,0,0,0,.63-2.05,3.22,3.22,0,0,0-2.37-3.48,29,29,0,0,0-4.63-1.43,46.75,46.75,0,0,1-5.13-1.5,7.76,7.76,0,0,1-3.29-2.3,6.4,6.4,0,0,1-1.38-4.34,7.35,7.35,0,0,1,1.42-4.58,8.47,8.47,0,0,1,3.77-2.8,13.18,13.18,0,0,1,5-.94,13.79,13.79,0,0,1,5.45,1,8.78,8.78,0,0,1,3.86,3.09,8.36,8.36,0,0,1,1.42,4.91h-4.81a5.53,5.53,0,0,0-.91-2.89A4.52,4.52,0,0,0,232,371a8.15,8.15,0,0,0-3-.52,7.29,7.29,0,0,0-3.63.89,3,3,0,0,0-1.59,2.82c0,1.85,1.14,3.07,3.4,3.66.12.05,1.38.38,3.77,1L235.3,380a7.94,7.94,0,0,1,2.95,1.73,7.36,7.36,0,0,1,1.79,2.6,7.89,7.89,0,0,1,.59,3,7.81,7.81,0,0,1-1.54,4.94,8.92,8.92,0,0,1-4.09,2.9,15.8,15.8,0,0,1-5.48.93,15.13,15.13,0,0,1-5.9-1.09,9.25,9.25,0,0,1-4.19-3.36,10.08,10.08,0,0,1-1.65-5.65Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M241.57,375H245v-6.15h4.45V375h4.06v3.32h-4.08v11a4.53,4.53,0,0,0,.39,2.24c.26.41.85.61,1.78.61a9.62,9.62,0,0,0,1.91-.15v3.47c-.32,0-.81,0-1.44.08s-1.13.08-1.47.08a10.32,10.32,0,0,1-2.82-.32,3.7,3.7,0,0,1-1.67-.95,3.5,3.5,0,0,1-.84-1.58,10.63,10.63,0,0,1-.27-2.35l0-12.09h-3.36Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M273.79,375v20.45h-4.35V392.6a6.64,6.64,0,0,1-2.56,2.44,6.5,6.5,0,0,1-3.36,1,10.14,10.14,0,0,1-3.38-.51A5.91,5.91,0,0,1,257.8,394a6.34,6.34,0,0,1-1.33-2.49A12.42,12.42,0,0,1,256,388V375h4.43v12.56a5.8,5.8,0,0,0,1,3.76,3.59,3.59,0,0,0,2.89,1.13,4.56,4.56,0,0,0,3.83-1.53,6.34,6.34,0,0,0,1.21-4.08V375Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M297.07,367.11v28.32h-4.33l0-2.77a5.34,5.34,0,0,1-2.52,2.51,8.51,8.51,0,0,1-3.77.83,9.23,9.23,0,0,1-5.23-1.43A8.6,8.6,0,0,1,278,390.7a14,14,0,0,1-1.08-5.64,13.68,13.68,0,0,1,.74-4.68,9.83,9.83,0,0,1,2-3.33,8.32,8.32,0,0,1,2.84-1.94,8.71,8.71,0,0,1,3.26-.63,10.06,10.06,0,0,1,4,.78,6.6,6.6,0,0,1,1.63,1,4.57,4.57,0,0,1,.87.95c.2.3.3.45.31.45V367.11Zm-15.6,18.36a8.41,8.41,0,0,0,1.41,4.91,4.73,4.73,0,0,0,4.16,2.05,4.9,4.9,0,0,0,3.1-1,6.15,6.15,0,0,0,2-2.7,9.66,9.66,0,0,0,.66-3.56,9.5,9.5,0,0,0-.65-3.5,6,6,0,0,0-1.93-2.63,4.9,4.9,0,0,0-3.07-1,4.7,4.7,0,0,0-4.28,2.13A9.65,9.65,0,0,0,281.47,385.47Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M301.37,371.47v-4.36h4.45v4.36Zm0,24V375h4.45v20.43Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M313.84,394.62a8.77,8.77,0,0,1-3.5-3.83,13.23,13.23,0,0,1,0-11.14,8.93,8.93,0,0,1,3.49-3.81,10.6,10.6,0,0,1,5.49-1.36,10.85,10.85,0,0,1,5.55,1.36,9.09,9.09,0,0,1,3.57,3.8,12.25,12.25,0,0,1,1.23,5.6,12,12,0,0,1-1.24,5.56,9.11,9.11,0,0,1-3.58,3.82,10.71,10.71,0,0,1-5.53,1.38A10.5,10.5,0,0,1,313.84,394.62Zm8.63-3.21a6.28,6.28,0,0,0,2-2.68,9.33,9.33,0,0,0,.66-3.49,9.45,9.45,0,0,0-.66-3.52,6.23,6.23,0,0,0-2-2.67,5,5,0,0,0-3.16-1,4.87,4.87,0,0,0-3.11,1,6.21,6.21,0,0,0-2,2.67,9.45,9.45,0,0,0-.66,3.52,9.33,9.33,0,0,0,.66,3.49,6.24,6.24,0,0,0,2,2.68,4.93,4.93,0,0,0,3.11,1A5,5,0,0,0,322.47,391.41Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M216,431.43l10.7-28.32H232l10.7,28.32h-5.31L234.91,424H223.64L221,431.43Zm9-11.21h8.48l-4.2-12.15Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M244,431.43V411h4.14l0,4q1-4.4,7.66-4.4v4.32c-.85-.1-1.46-.16-1.84-.16a5,5,0,0,0-2.83.83,5.39,5.39,0,0,0-2,2.42,8.71,8.71,0,0,0-.73,3.71l0,9.76Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M269.61,417.78a4,4,0,0,0-1.46-2.79,5.16,5.16,0,0,0-3.22-1,4.8,4.8,0,0,0-3.08,1,6.21,6.21,0,0,0-1.94,2.73,9.44,9.44,0,0,0-.69,3.59,9.17,9.17,0,0,0,.65,3.45,6,6,0,0,0,1.91,2.61,4.77,4.77,0,0,0,3,1,4.85,4.85,0,0,0,2.32-.55,4.39,4.39,0,0,0,1.66-1.6,6.06,6.06,0,0,0,.82-2.48h4.48a9.73,9.73,0,0,1-3,6.05,9.09,9.09,0,0,1-6.29,2.15,10,10,0,0,1-5.33-1.37,8.74,8.74,0,0,1-3.41-3.76,12.1,12.1,0,0,1-1.16-5.4,13.47,13.47,0,0,1,1.14-5.64,8.86,8.86,0,0,1,3.4-3.93,10,10,0,0,1,5.48-1.42,10.52,10.52,0,0,1,6.33,1.85,7.06,7.06,0,0,1,2.83,5.45Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M277,431.43V403.11h4.43l.08,10.59a5.89,5.89,0,0,1,2.43-2.33,7.33,7.33,0,0,1,3.6-.89,7.58,7.58,0,0,1,5.29,1.76,6.71,6.71,0,0,1,1.92,5.19v14H290.3V418.58a5.16,5.16,0,0,0-1.06-3.47,3.92,3.92,0,0,0-3-1.08,4.42,4.42,0,0,0-3.46,1.51,5.55,5.55,0,0,0-1.34,3.8v12.09Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M298.79,407.47v-4.36h4.46v4.36Zm0,24V411h4.46v20.43Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M305.32,411h3.38v-6.15h4.45V411h4.06v3.32h-4.08v11a4.53,4.53,0,0,0,.39,2.24c.26.41.85.61,1.78.61a9.62,9.62,0,0,0,1.91-.15v3.47c-.32,0-.81,0-1.44.08s-1.13.08-1.47.08a10.32,10.32,0,0,1-2.82-.32,3.7,3.7,0,0,1-1.67-.95,3.6,3.6,0,0,1-.84-1.58,10.63,10.63,0,0,1-.27-2.35l0-12.09h-3.36Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M322.74,422.35a7.68,7.68,0,0,0,.58,3,5.21,5.21,0,0,0,1.84,2.23,5.35,5.35,0,0,0,3,.82,4.73,4.73,0,0,0,5-3.4h4.26a8.47,8.47,0,0,1-3.3,5.1,9.65,9.65,0,0,1-5.92,1.87,10.15,10.15,0,0,1-5.36-1.37,8.74,8.74,0,0,1-3.43-3.81,12.74,12.74,0,0,1-1.17-5.58,12.14,12.14,0,0,1,1.2-5.39,9.57,9.57,0,0,1,3.45-3.92,9.89,9.89,0,0,1,10.23-.05,9.46,9.46,0,0,1,3.41,3.79,11.39,11.39,0,0,1,1.2,5.2,10.94,10.94,0,0,1-.08,1.48Zm10.41-3a5.94,5.94,0,0,0-1.52-3.77A4.62,4.62,0,0,0,328,414a4.93,4.93,0,0,0-3.71,1.51,5.8,5.8,0,0,0-1.56,3.82Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M353.7,417.78a4,4,0,0,0-1.47-2.79,5.14,5.14,0,0,0-3.22-1,4.8,4.8,0,0,0-3.08,1A6.29,6.29,0,0,0,344,417.8a9.44,9.44,0,0,0-.69,3.59,9.17,9.17,0,0,0,.65,3.45,6.13,6.13,0,0,0,1.91,2.61,5.17,5.17,0,0,0,5.35.43,4.41,4.41,0,0,0,1.67-1.6,6.37,6.37,0,0,0,.82-2.48h4.47a9.73,9.73,0,0,1-3,6.05,9.09,9.09,0,0,1-6.29,2.15,10.06,10.06,0,0,1-5.33-1.37,8.74,8.74,0,0,1-3.41-3.76,12.23,12.23,0,0,1-1.16-5.4,13.47,13.47,0,0,1,1.14-5.64,8.93,8.93,0,0,1,3.4-3.93,10,10,0,0,1,5.48-1.42,10.55,10.55,0,0,1,6.34,1.85,7.05,7.05,0,0,1,2.82,5.45Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M358.87,411h3.38v-6.15h4.45V411h4.07v3.32h-4.09v11a4.53,4.53,0,0,0,.39,2.24c.27.41.86.61,1.78.61a9.66,9.66,0,0,0,1.92-.15v3.47c-.33,0-.81,0-1.45.08s-1.13.08-1.46.08a10.45,10.45,0,0,1-2.83-.32,3.7,3.7,0,0,1-1.67-.95,3.6,3.6,0,0,1-.84-1.58,12,12,0,0,1-.27-2.35l0-12.09h-3.36Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M376.94,424.87a3.41,3.41,0,0,0,1.35,2.7,5.41,5.41,0,0,0,3.16.86q4.57,0,4.57-2.76a2.09,2.09,0,0,0-.65-1.36,4.44,4.44,0,0,0-1.42-.85,17.36,17.36,0,0,0-2.18-.6l-2.47-.55a18.64,18.64,0,0,1-3.36-1.05,5.44,5.44,0,0,1-2.28-1.81,5.22,5.22,0,0,1-.88-3.17,4.62,4.62,0,0,1,1.29-3.4A7.21,7.21,0,0,1,377.3,411a14.83,14.83,0,0,1,4-.54,12.73,12.73,0,0,1,3,.34,8.41,8.41,0,0,1,2.57,1.09,6.37,6.37,0,0,1,1.93,2,7.21,7.21,0,0,1,1,2.87h-4.69c-.34-1.81-1.72-2.72-4.16-2.72a7.18,7.18,0,0,0-2.52.44,1.57,1.57,0,0,0-1.17,1.55,1.73,1.73,0,0,0,.53,1.32,3.73,3.73,0,0,0,1.36.83,14.89,14.89,0,0,0,2.09.61l2.62.56a19.74,19.74,0,0,1,3.34,1.12,5.64,5.64,0,0,1,2.32,1.81,5,5,0,0,1,.9,3.07,5.56,5.56,0,0,1-1.32,3.82,7.66,7.66,0,0,1-3.4,2.16,13.87,13.87,0,0,1-4.36.68,12.15,12.15,0,0,1-4.59-.82,6.79,6.79,0,0,1-3.18-2.4,6.48,6.48,0,0,1-1.23-3.91Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M348,391.73h5.86V374.87c0-.65,0-1.34.06-2.06l-4.16,3.48a1.36,1.36,0,0,1-.53.3,1.63,1.63,0,0,1-.53.08,1.51,1.51,0,0,1-.73-.17,1.32,1.32,0,0,1-.49-.39L346,374l8.82-7.5h4.06v25.26H364v3.7H348Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M379.26,377.37a9.59,9.59,0,0,1,3.19.54,7.7,7.7,0,0,1,2.73,1.63,8.11,8.11,0,0,1,1.9,2.71,9.24,9.24,0,0,1,.72,3.78,9.59,9.59,0,0,1-.74,3.79,9.21,9.21,0,0,1-2.08,3.09,9.56,9.56,0,0,1-3.23,2.08,11.94,11.94,0,0,1-8.33,0,9.05,9.05,0,0,1-3.14-2.07,8.94,8.94,0,0,1-2-3.2,11.89,11.89,0,0,1-.69-4.15,11.69,11.69,0,0,1,.83-4.19,19.27,19.27,0,0,1,2.57-4.47l6.9-9.26a2.89,2.89,0,0,1,1.05-.82,3.65,3.65,0,0,1,1.59-.34h4.4L376.36,377c-.18.23-.36.44-.53.64l-.49.62a8.59,8.59,0,0,1,3.92-.9Zm-6.92,9a6.89,6.89,0,0,0,.33,2.19,4.56,4.56,0,0,0,1,1.69,4.46,4.46,0,0,0,1.61,1.09,5.87,5.87,0,0,0,2.22.39,5.66,5.66,0,0,0,2.17-.4,4.85,4.85,0,0,0,1.7-1.12,5,5,0,0,0,1.11-1.69,5.4,5.4,0,0,0,.4-2.11,6.07,6.07,0,0,0-.38-2.23,4.59,4.59,0,0,0-1.08-1.68,4.53,4.53,0,0,0-1.68-1.05,6.2,6.2,0,0,0-2.16-.36,5.66,5.66,0,0,0-2.14.4,5,5,0,0,0-1.65,1.11,5.05,5.05,0,0,0-1.06,1.68A6,6,0,0,0,372.34,386.35Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M216.4,359.43l4.25-11.25h2.11L227,359.43H224.9l-1-2.95h-4.48l-1,2.95ZM220,355h3.37l-1.67-4.83Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M227.78,359.43V348.18h5.3a4.09,4.09,0,0,1,2.74.8,3.34,3.34,0,0,1,.34,4.26,4,4,0,0,1-.75.6,1.89,1.89,0,0,1-.5.27,1.83,1.83,0,0,1,1.17.62,2.49,2.49,0,0,1,.51,1.75v.06c0,1.52.2,2.48.61,2.89h-2.12a3.34,3.34,0,0,1-.28-1.63,6.25,6.25,0,0,0-.19-1.74,1.61,1.61,0,0,0-.66-1,2.47,2.47,0,0,0-1.36-.31h-2.9v4.64Zm1.91-9.62v3.5h3.23a2,2,0,0,0,1.41-.46,1.73,1.73,0,0,0,.5-1.32,1.53,1.53,0,0,0-.52-1.35,2.39,2.39,0,0,0-1.42-.37Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M246.09,351.79a3.46,3.46,0,0,0-1-1.66,2.61,2.61,0,0,0-1.8-.6,2.93,2.93,0,0,0-1.88.61,3.69,3.69,0,0,0-1.18,1.6,5.68,5.68,0,0,0-.4,2.1,5.62,5.62,0,0,0,.4,2.08,3.78,3.78,0,0,0,1.18,1.59,3,3,0,0,0,1.88.6,2.71,2.71,0,0,0,1.44-.38,2.83,2.83,0,0,0,1-1.06,4.09,4.09,0,0,0,.44-1.5H248a5.21,5.21,0,0,1-.41,1.83,4.48,4.48,0,0,1-1,1.44,4.3,4.3,0,0,1-1.47.92,5.05,5.05,0,0,1-1.84.33,5.37,5.37,0,0,1-2.22-.45,4.94,4.94,0,0,1-1.7-1.26,5.74,5.74,0,0,1-1.08-1.88,7,7,0,0,1-.37-2.25,6.88,6.88,0,0,1,.38-2.29,5.66,5.66,0,0,1,1.07-1.89,5,5,0,0,1,1.7-1.28,5.31,5.31,0,0,1,2.22-.45,5.64,5.64,0,0,1,2.27.45,4.15,4.15,0,0,1,1.67,1.34,4,4,0,0,1,.75,2.06Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M249.62,359.43V348.18h1.94v4.48h5.08v-4.48h2v11.25h-2v-5.07h-5.08v5.07Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M260.77,359.43V348.18h1.91v11.25Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M263.83,349.91v-1.73h9v1.73h-3.54v9.52h-1.92v-9.52Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M274,359.43V348.18h8v1.73h-6.09v2.94h5.64v1.61h-5.64v3.29h6.18v1.68Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M291.2,351.79a3.45,3.45,0,0,0-1-1.66,2.62,2.62,0,0,0-1.81-.6,3,3,0,0,0-1.88.61,3.67,3.67,0,0,0-1.17,1.6,5.49,5.49,0,0,0-.4,2.1,5.42,5.42,0,0,0,.4,2.08,3.76,3.76,0,0,0,1.17,1.59,3,3,0,0,0,1.88.6,2.71,2.71,0,0,0,1.44-.38,2.68,2.68,0,0,0,1-1.06,3.91,3.91,0,0,0,.44-1.5h1.87a5,5,0,0,1-.41,1.83,4.3,4.3,0,0,1-1,1.44,4.25,4.25,0,0,1-1.48.92,5.05,5.05,0,0,1-1.84.33,5.29,5.29,0,0,1-2.21-.45A4.88,4.88,0,0,1,284.5,358a5.54,5.54,0,0,1-1.07-1.88,6.72,6.72,0,0,1-.37-2.25,6.87,6.87,0,0,1,.37-2.29,5.84,5.84,0,0,1,1.07-1.89,5,5,0,0,1,1.7-1.28,5.37,5.37,0,0,1,2.22-.45,5.61,5.61,0,0,1,2.27.45,4.11,4.11,0,0,1,1.68,1.34,3.86,3.86,0,0,1,.74,2.06Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M293.7,349.91v-1.73h9v1.73h-3.55v9.52h-1.92v-9.52Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M303.71,348.18h1.93v6.55a9.21,9.21,0,0,0,.07,1.27,2.66,2.66,0,0,0,.31,1,1.89,1.89,0,0,0,.78.75,3.26,3.26,0,0,0,1.45.27,2.75,2.75,0,0,0,1.75-.46,2,2,0,0,0,.72-1.14,7.91,7.91,0,0,0,.15-1.68v-6.55h2v7.23a4.52,4.52,0,0,1-.57,2.35,3.54,3.54,0,0,1-1.61,1.45,5.66,5.66,0,0,1-2.41.48,5.6,5.6,0,0,1-2.41-.48,3.48,3.48,0,0,1-1.57-1.44,4.66,4.66,0,0,1-.56-2.36Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M314.89,359.43V348.18h5.3a4.09,4.09,0,0,1,2.74.8,3.34,3.34,0,0,1,.34,4.26,3.72,3.72,0,0,1-.76.6,1.75,1.75,0,0,1-.49.27,1.83,1.83,0,0,1,1.17.62,2.49,2.49,0,0,1,.5,1.75v.06c0,1.52.21,2.48.62,2.89h-2.12a3.34,3.34,0,0,1-.28-1.63,6.25,6.25,0,0,0-.19-1.74,1.61,1.61,0,0,0-.66-1,2.47,2.47,0,0,0-1.36-.31h-2.9v4.64Zm1.91-9.62v3.5H320a2,2,0,0,0,1.41-.46,1.73,1.73,0,0,0,.5-1.32,1.53,1.53,0,0,0-.52-1.35,2.39,2.39,0,0,0-1.42-.37Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M325.71,359.43V348.18h8v1.73h-6.09v2.94h5.65v1.61h-5.65v3.29h6.18v1.68Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M340.84,355.68a2.18,2.18,0,0,0,.77,1.83,3.19,3.19,0,0,0,2,.6,3.25,3.25,0,0,0,1.34-.24,1.68,1.68,0,0,0,.78-.63,1.43,1.43,0,0,0,.25-.81,1.27,1.27,0,0,0-.94-1.38,10.58,10.58,0,0,0-1.84-.57,18,18,0,0,1-2-.6,3.11,3.11,0,0,1-1.31-.91,2.58,2.58,0,0,1-.55-1.73,2.93,2.93,0,0,1,.57-1.82,3.36,3.36,0,0,1,1.5-1.11,5.23,5.23,0,0,1,2-.37,5.42,5.42,0,0,1,2.17.41,3.58,3.58,0,0,1,1.53,1.23,3.3,3.3,0,0,1,.56,1.95h-1.91a2.21,2.21,0,0,0-.36-1.15,1.88,1.88,0,0,0-.84-.65,3.45,3.45,0,0,0-1.21-.2,3,3,0,0,0-1.45.35,1.21,1.21,0,0,0-.62,1.12c0,.74.45,1.22,1.35,1.45,0,0,.54.16,1.49.4l1.74.46A3,3,0,0,1,347,354a2.77,2.77,0,0,1,.71,1,3,3,0,0,1,.24,1.17,3.09,3.09,0,0,1-.62,2,3.54,3.54,0,0,1-1.62,1.15,6.2,6.2,0,0,1-2.18.37,6.07,6.07,0,0,1-2.35-.43,3.65,3.65,0,0,1-1.66-1.34,4,4,0,0,1-.66-2.24Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M349.55,359.43V348.18h1.91v11.25Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M353.58,359.43V348.18h2.74l3.05,8.83,3-8.83h2.72v11.25h-1.86v-8.68l-3.11,8.68h-1.61l-3.13-8.66v8.66Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M367.13,359.43V348.18H372a4.25,4.25,0,0,1,2.31.54,2.91,2.91,0,0,1,1.17,1.34,4.37,4.37,0,0,1,.31,1.63,4.26,4.26,0,0,1-.31,1.6,2.79,2.79,0,0,1-1.16,1.31,4.29,4.29,0,0,1-2.31.54h-3v4.29Zm1.9-9.62v3.69h2.88a2.13,2.13,0,0,0,1.36-.44,1.88,1.88,0,0,0-1.31-3.25Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M377.21,359.43V348.18h1.91v9.57h5.71v1.68Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M385.92,359.43V348.18h1.91v11.25Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M397.6,351.79a3.54,3.54,0,0,0-1-1.66,2.61,2.61,0,0,0-1.8-.6,2.93,2.93,0,0,0-1.88.61,3.61,3.61,0,0,0-1.18,1.6,5.49,5.49,0,0,0-.4,2.1,5.42,5.42,0,0,0,.4,2.08,3.7,3.7,0,0,0,1.18,1.59,3,3,0,0,0,1.88.6,2.71,2.71,0,0,0,1.44-.38,2.83,2.83,0,0,0,1-1.06,4.29,4.29,0,0,0,.44-1.5h1.87a5.21,5.21,0,0,1-.41,1.83,4.48,4.48,0,0,1-1,1.44,4.25,4.25,0,0,1-1.48.92,5,5,0,0,1-1.83.33,5.34,5.34,0,0,1-2.22-.45,4.94,4.94,0,0,1-1.7-1.26,5.74,5.74,0,0,1-1.08-1.88,7,7,0,0,1-.37-2.25,6.88,6.88,0,0,1,.38-2.29,5.5,5.5,0,0,1,1.07-1.89,4.9,4.9,0,0,1,1.7-1.28,5.31,5.31,0,0,1,2.22-.45,5.56,5.56,0,0,1,2.26.45,4.11,4.11,0,0,1,1.68,1.34,4,4,0,0,1,.75,2.06Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M401.16,359.43V348.18h1.91v11.25Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M404.22,349.91v-1.73h9v1.73h-3.55v9.52h-1.92v-9.52Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M417.28,355.05l-4.19-6.87h2.27l2.94,5,2.91-5h2.18l-4.17,6.87v4.38h-1.94Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M428,359.43V348.18h4.6a5.27,5.27,0,0,1,2.18.42,4,4,0,0,1,1.54,1.21,5.1,5.1,0,0,1,.89,1.79,8.34,8.34,0,0,1,.29,2.25,8.07,8.07,0,0,1-.29,2.2,5,5,0,0,1-.89,1.76,4,4,0,0,1-1.53,1.19,5.19,5.19,0,0,1-2.19.43Zm1.91-9.62v8h2a4.23,4.23,0,0,0,2.28-.52,2.66,2.66,0,0,0,1.13-1.39,6.1,6.1,0,0,0,.31-2.07,6.65,6.65,0,0,0-.31-2.13,2.57,2.57,0,0,0-1.14-1.4,4.31,4.31,0,0,0-2.27-.51Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M439.05,359.43V348.18H441v11.25Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M445.64,359.43l-3.7-11.25h2l2.86,8.92,2.81-8.92h2l-3.8,11.25Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M452.59,359.43V348.18h8v1.73H454.5v2.94h5.64v1.61H454.5v3.29h6.18v1.68Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M462.21,359.43V348.18h5.29a4.12,4.12,0,0,1,2.75.8,3.32,3.32,0,0,1,.33,4.26,3.66,3.66,0,0,1-.75.6,1.89,1.89,0,0,1-.5.27,1.88,1.88,0,0,1,1.18.62,2.54,2.54,0,0,1,.5,1.75v.06c0,1.52.2,2.48.61,2.89H469.5a3.46,3.46,0,0,1-.28-1.63,6.72,6.72,0,0,0-.18-1.74,1.7,1.7,0,0,0-.66-1,2.5,2.5,0,0,0-1.37-.31h-2.89v4.64Zm1.91-9.62v3.5h3.23a2,2,0,0,0,1.41-.46,1.73,1.73,0,0,0,.5-1.32,1.55,1.55,0,0,0-.52-1.35,2.4,2.4,0,0,0-1.43-.37Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M474.3,355.68a2.19,2.19,0,0,0,.78,1.83,3.17,3.17,0,0,0,2,.6,3.28,3.28,0,0,0,1.34-.24,1.79,1.79,0,0,0,.78-.63,1.5,1.5,0,0,0,.24-.81,1.27,1.27,0,0,0-.93-1.38,11.2,11.2,0,0,0-1.84-.57,17.68,17.68,0,0,1-2.05-.6,3.08,3.08,0,0,1-1.3-.91,2.53,2.53,0,0,1-.55-1.73,2.93,2.93,0,0,1,.57-1.82,3.28,3.28,0,0,1,1.49-1.11,5.24,5.24,0,0,1,2-.37,5.4,5.4,0,0,1,2.16.41,3.55,3.55,0,0,1,1.54,1.23,3.37,3.37,0,0,1,.56,1.95h-1.91a2.21,2.21,0,0,0-.36-1.15,1.88,1.88,0,0,0-.84-.65,3.51,3.51,0,0,0-1.22-.2,3,3,0,0,0-1.44.35,1.2,1.2,0,0,0-.63,1.12c0,.74.45,1.22,1.35,1.45,0,0,.55.16,1.5.4l1.73.46a3,3,0,0,1,1.17.69,2.92,2.92,0,0,1,.72,1,3.21,3.21,0,0,1,.23,1.17,3.09,3.09,0,0,1-.61,2,3.52,3.52,0,0,1-1.63,1.15,6.2,6.2,0,0,1-2.18.37,6,6,0,0,1-2.34-.43,3.73,3.73,0,0,1-1.67-1.34,4.06,4.06,0,0,1-.65-2.24Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M483,359.43V348.18h1.91v11.25Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M486.07,349.91v-1.73h9v1.73h-3.55v9.52h-1.92v-9.52Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M499.13,355.05,495,348.18h2.26l3,5,2.9-5h2.18l-4.17,6.87v4.38h-1.94Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M505.16,431.93h-64v-64h64Zm-63-1h62v-62h-62Z" transform="translate(-216 -347.94)"/><rect class="cls-1" x="233.54" y="28.37" width="7.87" height="47.25"/><rect class="cls-1" x="249.29" y="28.37" width="31.5" height="7.88"/><rect class="cls-1" x="249.29" y="44.12" width="31.5" height="31.5"/></svg>
+    </div>
+    <div class="contact">
+      <div><b>Call</b><a href="tel:+8801717222907">+880-1717-222-907</a></div>
+      <div><b>Email</b><a href="mailto:info.s16a@gmail.com">info.s16a@gmail.com</a></div>
+      <div><b>Web</b>studio16architectsbd.com</div>
+    </div>
+    <button class="theme-btn" id="themeBtn" title="Toggle light / dark" aria-label="Toggle theme">◐</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Studio 16 Architects · Outside RAJUK</div>
+    <h1>FAR Calculator · Bidhimala 2008</h1>
+    <div class="sub">Floor Area Ratio · Ground Coverage · Setbacks — following the Dhaka Imarat Nirman Bidhimala 2008. Applicable to all areas <b>outside</b> RAJUK / DAP jurisdiction.</div>
+    <div class="sub2">Basis: Dhaka Imarat Nirman Bidhimala 2008 (SRO, 29 June 2008)</div>
+    <div class="coverage">
+      <span class="chip yes">CDA</span><span class="chip yes">KDA</span><span class="chip yes">RDA</span>
+      <span class="chip yes">All Pourashava / Municipal areas</span><span class="chip yes">City Corporations &amp; Upazila (outside RAJUK)</span>
+      <span class="chip">Not for RAJUK / DAP areas</span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="panel inputs">
+      <div class="step">
+        <div class="lbl"><span class="n">1</span><span class="t">Occupancy Type</span><span class="ref">Bidhimala 2008 · §51</span></div>
+        <label class="fld" for="occ">Building / use category</label>
+        <select id="occ"></select>
+      </div>
+
+      <div class="step">
+        <div class="lbl"><span class="n">2</span><span class="t">Land Area</span><span class="ref">1 katha = 720 ft²</span></div>
+        <div id="plots"></div>
+        <button class="addplot" id="addPlot">+ add plot (amalgamation)</button>
+        <div class="totline"><span>Total land area</span><b id="totLand">— katha</b></div>
+      </div>
+
+      <div class="step">
+        <div class="lbl"><span class="n">3</span><span class="t">Access Road Width</span><span class="ref">§51(9)–(12)</span></div>
+        <label class="fld" for="roadFt">Road width (feet)</label>
+        <input type="number" id="roadFt" value="30" min="0" step="0.5">
+        <div class="hint" id="roadHint"></div>
+        <label class="inc" id="lblWiden" style="display:flex;margin-top:11px"><input type="checkbox" id="applyWidening"><span>Apply road-widening surrender (§54(4))</span></label>
+        <div class="hint" id="widenNote" style="margin-top:5px">If the road is under 6&nbsp;m, land surrendered to widen it to 6&nbsp;m earns a FAR bonus (max&nbsp;+0.20).</div>
+      </div>
+
+      <button class="calc-btn" id="calcBtn">Calculate Development Potential →</button>
+      <div class="err" id="err" style="display:none"></div>
+    </div>
+
+    <div class="panel report" id="report">
+      <div class="empty">
+        <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>
+        <div class="big">Your planning analysis appears here</div>
+        <div>Complete the steps on the left and press <b>Calculate</b>. Every result shows its legal source and a transparent formula trail.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <h3>Disclaimer</h3>
+    This calculator is a professional reference tool based on the Dhaka Imarat Nirman Bidhimala 2008 (SRO, 29 June 2008), applicable to areas outside RAJUK / DAP jurisdiction (CDA, KDA, RDA, Pourashava and other municipal areas). Results are indicative only. Users must verify all calculations with the relevant authority (CDA / KDA / RDA / Pourashava / City Corporation) before official submission. Final approval depends on that authority's review of the specific application, local land-use conditions and the applicable master plan. Studio 16 Architects accepts no liability for any design, planning, approval, development or investment decision made solely on the basis of this calculator.
+  </div>
+  <div class="foot">© 2026 Studio 16 Architects · Registered with RAJUK · CDA · DCBA · IAB · Self-contained build — no external dependencies</div>
+  <div class="print-foot print-only">
+    <div class="pf-basis">Basis: Dhaka Imarat Nirman Bidhimala 2008 (SRO, 29 June 2008) — indicative only, verify with the relevant authority (CDA / KDA / RDA / Pourashava) before submission</div>
+    <div class="pf-line">Studio 16 Architects · FAR Calculator · Bidhimala 2008 &nbsp;·&nbsp; Page 01 of 01</div>
+  </div>
+</div>
+
+<script>
+
+/* ============================================================
+   OUTSIDE-RAJUK FAR CALCULATOR — Bidhimala 2008
+   Engine ported VERBATIM from the working Studio 16 calculator.
+   Self-contained vanilla build (no React / no CDN).
+   ============================================================ */
+const SQFT_PER_KATHA = 720;
+const SQM_PER_SQFT = 0.0929;
+// ── OCCUPANCY TYPES ─────────────────────────────────────────────────────
+const OCC_GROUPS = [
+    { group: "A — Residential", items: [
+            { id: "A1", label: "A1 — Single Family Residential (এককালীন আবাসিক)" },
+            { id: "A2", label: "A2 — Two-Family Residential (দ্বি-পরিবার আবাসিক)" },
+            { id: "A3", label: "A3 — Multi-Family Residential (বহু-পরিবার আবাসিক)" },
+            { id: "A4", label: "A4 — Other Residential (অন্যান্য আবাসিক)" },
+            { id: "A5", label: "A5 — Hotel / Motel (হোটেল/মোটেল)" },
+        ] },
+    { group: "B — Educational", items: [
+            { id: "B1", label: "B1 — School / College (বিদ্যালয়/কলেজ)" },
+            { id: "B2", label: "B2 — University (বিশ্ববিদ্যালয়)" },
+        ] },
+    { group: "C — Institutional", items: [
+            { id: "C", label: "C (C1–C4) — Institutional (প্রতিষ্ঠান)" },
+        ] },
+    { group: "D — Health", items: [
+            { id: "D", label: "D (D1–D2) — Hospital / Health (হাসপাতাল/স্বাস্থ্যসেবা)" },
+        ] },
+    { group: "E — Business / Office", items: [
+            { id: "E", label: "E (E1–E6) — Business / Office (ব্যবসা/অফিস)" },
+        ] },
+    { group: "F — Mercantile", items: [
+            { id: "F1", label: "F1 — Retail Shop (খুচরা দোকান)" },
+            { id: "F25", label: "F2–F5 — Wholesale / Market / Mall (পাইকারি/বাজার/মার্কেট)" },
+        ] },
+    { group: "G–K — Industrial / Storage / Hazardous", items: [
+            { id: "GJHK", label: "G, H, J, K — Industrial, Storage, Hazardous, Assembly" },
+        ] },
+];
+const ALL_TYPES = OCC_GROUPS.flatMap(g => g.items);
+// ── FAR TABLES — SEPARATED BY LAND SIZE AND ROAD WIDTH ─────────────────
+// Per Bidhimala 2008 §51: FAR = min(landFAR, roadFAR), then +bonus §51(11)
+// cap at NEXT LAND SIZE SLAB (not next road tier)
+// LAND SIZE FAR — indexed by [maxSqm, FAR, MGC%]
+const LAND_A14 = [[134, 3.15, 67.5], [201, 3.35, 65.0], [268, 3.50, 62.5], [335, 3.50, 62.5],
+    [402, 3.75, 60.0], [469, 3.75, 60.0], [536, 4.00, 60.0], [603, 4.00, 60.0], [670, 4.25, 57.5],
+    [804, 4.50, 57.5], [938, 4.75, 55.0], [1072, 5.00, 52.5], [1206, 5.25, 52.5], [1340, 5.25, 50.0],
+    [Infinity, 5.50, 50.0]];
+const LAND_A5 = [[134, 2.50, 67.5], [201, 2.75, 65.0], [268, 3.00, 62.5], [335, 3.25, 62.5],
+    [402, 3.50, 60.0], [469, 3.75, 60.0], [536, 4.50, 57.5], [603, 5.50, 57.5], [670, 6.00, 55.0],
+    [804, 6.50, 55.0], [938, 7.00, 52.5], [1072, 7.50, 52.5], [1206, 8.00, 50.0], [1340, 8.50, 50.0],
+    [Infinity, 9.50, 50.0]];
+const LAND_B1 = [[335, null, null], [402, 2.50, 60.0], [469, 2.50, 60.0], [536, 2.50, 60.0],
+    [603, 2.75, 60.0], [670, 2.75, 60.0], [804, 3.00, 57.0], [938, 3.00, 55.0], [1072, 3.25, 53.0],
+    [1206, 3.25, 50.0], [1340, 3.50, 50.0], [Infinity, 4.00, 50.0]];
+const LAND_B2 = [[335, null, null], [402, 2.00, 50.0], [469, 2.00, 50.0], [536, 2.00, 50.0],
+    [603, 2.25, 50.0], [670, 2.25, 50.0], [804, 2.50, 50.0], [938, 2.50, 50.0], [1072, 2.75, 50.0],
+    [1206, 2.75, 50.0], [1340, 3.00, 50.0], [Infinity, 3.50, 50.0]];
+const LAND_CD = [[335, null, null], [402, 3.25, 60.0], [469, 3.25, 60.0], [536, 3.25, 60.0],
+    [603, 3.50, 57.5], [670, 3.50, 57.5], [804, 3.75, 55.0], [938, 4.00, 55.0], [1072, 4.25, 52.5],
+    [1206, 4.50, 50.0], [1340, 4.75, 50.0], [Infinity, 5.00, 50.0]];
+const LAND_E = [[134, 2.00, 65.0], [201, 2.00, 65.0], [268, 2.25, 60.0], [335, 2.25, 60.0],
+    [402, 2.50, 57.5], [469, 2.50, 57.5], [536, 2.75, 55.0], [603, 2.75, 55.0], [670, 3.00, 52.5],
+    [804, 3.25, 50.0], [938, 3.50, 50.0], [1072, 3.75, 50.0], [1206, 4.00, 50.0], [1340, 4.25, 50.0],
+    [Infinity, 5.50, 50.0]];
+const LAND_F1 = [[134, 2.50, 67.5], [201, 3.00, 65.0], [268, 3.00, 65.0], [335, 3.50, 62.5],
+    [402, 3.50, 62.5], [469, 3.75, 60.0], [536, 4.50, 57.5], [603, 5.50, 57.5], [670, 6.00, 55.0],
+    [804, 6.50, 55.0], [938, 7.00, 52.5], [1072, 7.50, 52.5], [1206, 8.00, 50.0], [1340, 8.50, 50.0],
+    [Infinity, 9.50, 50.0]];
+const LAND_F25 = [[134, 2.25, 65.0], [201, 2.50, 62.5], [268, 2.50, 62.5], [335, 3.00, 60.0],
+    [402, 3.00, 60.0], [469, 3.25, 57.5], [536, 3.25, 57.5], [603, 3.25, 57.5], [670, 3.50, 55.0],
+    [804, 3.75, 52.5], [938, 4.00, 52.5], [1072, 4.25, 50.0], [1206, 4.50, 50.0], [1340, 4.75, 50.0],
+    [Infinity, 5.50, 50.0]];
+const LAND_GJHK = [[134, 2.00, 65.0], [201, 2.00, 65.0], [268, 2.25, 65.0], [335, 2.25, 65.0],
+    [402, 2.50, 65.0], [469, 2.50, 65.0], [536, 2.75, 65.0], [603, 2.75, 65.0], [670, 2.75, 65.0],
+    [804, 3.00, 62.5], [938, 3.25, 62.5], [1072, 3.50, 60.0], [1206, 3.75, 60.0], [1340, 4.00, 60.0],
+    [Infinity, 4.25, 60.0]];
+// ROAD WIDTH FAR — [tierM, maxFAR, MGC%, nextTierFirstFAR]
+// maxFAR = highest FAR shown in the table column for that road width
+// nextTierFirstFAR = the LOWEST (first) FAR shown in the NEXT road tier column
+//   This is the cap for §51(11) road bonus — cannot exceed the entry of the next tier
+const ROAD_A14 = [[6.0, 4.25, 57.5, 4.50], [9.0, 5.25, 50.0, 5.50], [12.0, 5.50, 50.0, 6.00], [18.0, 6.00, 50.0, 6.50], [24.0, 6.50, 50.0, null]];
+const ROAD_A5 = [[6.0, 6.00, 55.0, 6.50], [9.0, 8.50, 50.0, 9.50], [12.0, 9.50, 50.0, null], [18.0, null, 50.0, null], [24.0, null, 50.0, null]];
+const ROAD_B1 = [[6.0, 2.75, 60.0, 3.00], [9.0, 3.50, 50.0, 4.00], [12.0, 4.00, 50.0, 4.50], [18.0, 4.50, 50.0, 5.50], [24.0, 5.50, 50.0, null]];
+const ROAD_B2 = [[6.0, 2.25, 50.0, 2.50], [9.0, 3.00, 50.0, 3.50], [12.0, 3.50, 50.0, 4.00], [18.0, 4.00, 50.0, 4.50], [24.0, 4.50, 50.0, null]];
+const ROAD_CD = [[6.0, 3.50, 57.5, 3.50], [9.0, 4.75, 50.0, 5.00], [12.0, 5.00, 50.0, null], [18.0, null, 50.0, null], [24.0, null, 50.0, null]];
+const ROAD_E = [[6.0, 2.25, 60.0, 2.00], [9.0, 3.00, 52.5, 5.50], [12.0, 5.50, 50.0, 6.50], [18.0, 6.50, 50.0, 7.00], [24.0, 7.00, 50.0, null]];
+const ROAD_F1 = [[6.0, 3.75, 60.0, 2.50], [9.0, 8.50, 50.0, 9.50], [12.0, 9.50, 50.0, null], [18.0, null, 50.0, null], [24.0, null, 50.0, null]];
+const ROAD_F25 = [[6.0, 3.25, 57.5, 2.25], [9.0, 4.75, 50.0, 5.50], [12.0, 5.50, 50.0, 6.50], [18.0, 6.50, 50.0, null], [24.0, null, 50.0, null]];
+const ROAD_GJHK = [[6.0, 2.75, 65.0, 2.00], [9.0, 4.00, 60.0, 4.25], [12.0, 4.25, 60.0, 4.50], [18.0, 4.50, 60.0, 5.00], [24.0, 5.00, 60.0, null]];
+function getLandTable(occType) {
+    if (occType === "A1" || occType === "A2" || occType === "A3" || occType === "A4")
+        return LAND_A14;
+    if (occType === "A5")
+        return LAND_A5;
+    if (occType === "B1")
+        return LAND_B1;
+    if (occType === "B2")
+        return LAND_B2;
+    if (occType === "C" || occType === "D")
+        return LAND_CD;
+    if (occType === "E")
+        return LAND_E;
+    if (occType === "F1")
+        return LAND_F1;
+    if (occType === "F25")
+        return LAND_F25;
+    return LAND_GJHK;
+}
+function getRoadTable(occType) {
+    if (occType === "A1" || occType === "A2" || occType === "A3" || occType === "A4")
+        return ROAD_A14;
+    if (occType === "A5")
+        return ROAD_A5;
+    if (occType === "B1")
+        return ROAD_B1;
+    if (occType === "B2")
+        return ROAD_B2;
+    if (occType === "C" || occType === "D")
+        return ROAD_CD;
+    if (occType === "E")
+        return ROAD_E;
+    if (occType === "F1")
+        return ROAD_F1;
+    if (occType === "F25")
+        return ROAD_F25;
+    return ROAD_GJHK;
+}
+// ── FAR LOOKUP FUNCTION ─────────────────────────────────────────────────
+// §51(15): Final FAR = min(landFAR, roadFAR) + road bonus §51(11)
+// §51(11): +0.05 per 0.30m above road tier, cap = next LAND SIZE slab FAR
+// §51(12): Road > 24m → use 24m road tier values
+// §51(9):  Road 3.65-5.99m → FAR=3.00, MGC=65%
+// §51(10): Road 2.50-3.64m → FAR=2.00, MGC=65%
+function lookupFAR(occType, sqm, roadM_input) {
+    const roadM = round2(Math.min(roadM_input, 24.0)); // §51(12)
+    // Special rules for very narrow roads
+    if (roadM_input < 2.50)
+        return { far: null, mgc: null, roadBonus: 0, note: "Road < 2.5m — not permissible" };
+    if (roadM < 3.65)
+        return { far: 2.00, baseFAR: 2.00, mgc: 65.0, landFAR: 2.00, roadFAR: 2.00,
+            roadBonus: 0, note: "§51(10): road 2.50–3.64m", tierM: 2.50 };
+    if (roadM < 6.0)
+        return { far: 3.00, baseFAR: 3.00, mgc: 65.0, landFAR: 3.00, roadFAR: 3.00,
+            roadBonus: 0, note: "§51(9): road 3.65–5.99m", tierM: 3.65 };
+
+    const landTbl = getLandTable(occType);
+    const roadTbl = getRoadTable(occType);
+    // Road FAR: highest road tier <= roadM
+    const roadTiers = roadTbl.filter(r => r[0] <= roadM);
+    if (!roadTiers.length)
+        return { far: null, mgc: null, roadBonus: 0, note: "Road too narrow" };
+    const roadRow = roadTiers[roadTiers.length - 1];
+    const tierM = roadRow[0];
+    const roadFAR = roadRow[1]; // can be null (NR)
+    const minRoadForSize = 6.0;
+    // §51: Road tier >= 18m → FAR taken DIRECTLY from road table, land size irrelevant
+    // For any plot size, road 18m/24m gives a fixed FAR regardless of plot area
+    if (tierM >= 18.0) {
+        if (roadFAR === null) {
+            // NR tier — fall back to land size FAR
+            const landRow = landTbl.find(r => sqm <= r[0]);
+            if (!landRow) return { far: null, mgc: null, roadBonus: 0, note: "Plot size lookup error" };
+            const mgc = landRow[2];
+            return { far: landRow[1], baseFAR: landRow[1], mgc, landFAR: landRow[1], roadFAR: null,
+                isNR: true, tierM, roadBonus: 0,
+                note: "NR road tier: FAR limited by land size only. For parking-based FAR see Table 4 §56" };
+        }
+        // Road >= 18m: roadFAR is the approved FAR directly — no land lookup needed
+        const mgc = roadRow[2];
+        return { far: roadFAR, baseFAR: roadFAR, mgc, landFAR: null, roadFAR,
+            isNR: false, tierM, roadBonus: 0,
+            note: `Road ≥ 18m — FAR ${roadFAR} directly from road tier (§51, land size not applicable)` };
+    }
+    // Road tier < 18m: use min(landFAR, roadFAR) + §51(11) road bonus
+    const landRow = landTbl.find(r => sqm <= r[0]);
+    if (!landRow)
+        return { far: null, mgc: null, roadBonus: 0, note: "Plot size lookup error" };
+    const landFAR = landRow[1];
+    const mgc = landRow[2];
+    const landIdx = landTbl.indexOf(landRow);
+    if (landFAR === null)
+        return { far: null, mgc, roadBonus: 0, note: "Minimum plot size not met for this occupancy type" };
+    // §51(15): baseFAR = min(land, road)
+    const isNR = false;
+    const baseFAR = round2(Math.min(landFAR, roadFAR));
+    // Next land slab with STRICTLY HIGHER FAR (for §51(11) bonus cap)
+    const nextLandFAR = (() => {
+        for (let i = landIdx + 1; i < landTbl.length; i++) {
+            if (landTbl[i][1] !== null && landTbl[i][1] > landFAR)
+                return landTbl[i][1];
+        }
+        return null; // no higher slab — don't cap bonus with current landFAR
+    })();
+    const nextRoadFirstFAR = roadRow[3]; // 4th element = nextTierFirstFAR
+    // §51(11) ceiling: depends on which constraint is binding
+    let effectiveCeil;
+    if (landFAR < roadFAR) {
+        // Land limits — bonus brings FAR toward roadFAR, capped by next land slab
+        const candidates = [roadFAR, ...(nextLandFAR !== null ? [nextLandFAR] : [])];
+        effectiveCeil = Math.min(...candidates);
+    } else {
+        // Road limits or tied — next road tier drives bonus cap, also capped by next land slab
+        const candidates = [nextRoadFirstFAR, nextLandFAR].filter(f => f !== null && f !== undefined);
+        effectiveCeil = candidates.length > 0 ? Math.min(...candidates) : baseFAR + 99;
+    }
+    let roadBonus = 0, bonusNote = "";
+    if (roadM > 6.0 + 0.05) {
+        const raw = round2((roadM - 6.0) / 0.30 * 0.05);
+        const cap = round2(effectiveCeil - baseFAR);
+        roadBonus = round2(Math.min(raw, Math.max(cap, 0)));
+        bonusNote = `§51(11): +(${raw}) raw (from 6m base), cap=${effectiveCeil}`;
+    }
+    return { far: round2(baseFAR + roadBonus), baseFAR, mgc, landFAR, roadFAR,
+        isNR, tierM, roadBonus, bonusNote, minRoadForSize, nextLandFAR };
+}
+function round2(v) { return +v.toFixed(2); }
+// Legacy wrapper (kept for compatibility)
+function getFARTable(occType) { return getLandTable(occType); }
+// ── SETBACKS (§56 Bidhimala 2008) ──────────────────────────────────────
+// ── SETBACKS — Bidhimala 2008 §56 Chart 02 ──────────────────────────────
+// Plot boundary → building setback (NOT building-to-building gap)
+// Building-to-building gap on same site: side-by-side 2m, front-back 2.5m
+//
+// NR mode (road ≥ 18m → Non-Restricted FAR):
+//   Front: 1.5m | Rear: 3.0m | Each side: 3.0m
+//
+// Normal FAR (road < 18m):
+//   Front: always 1.5m
+//   Rear:  plot > 4k → 2.0m | 3k ≤ plot ≤ 4k → 1.5m | plot < 3k → 1.0m
+//   Side:  plot > 20k → 1.5m | 4k < plot ≤ 20k → 1.25m | plot ≤ 4k → 1.0m
+//
+// katha thresholds: 3k = 3×720 sqft = 2160 sqft, 4k = 2880 sqft, 20k = 14400 sqft
+function getSetbacks(sqft, isNR) {
+    if (isNR) {
+        return { front: 1.5, side: 3.0, rear: 3.0,
+            b2bSide: 2.0, b2bFrontBack: 2.5,
+            ref: "Bidhimala 2008 §56 Chart-02 (NR — road ≥ 18m)" };
+    }
+    // Rear: based on plot size
+    const rear = sqft > 4 * 720 ? 2.0 : sqft >= 3 * 720 ? 1.5 : 1.0;
+    // Side: based on plot size
+    const side = sqft > 20 * 720 ? 1.5 : sqft > 4 * 720 ? 1.25 : 1.0;
+    return { front: 1.5, side, rear,
+        b2bSide: 2.0, b2bFrontBack: 2.5,
+        ref: "Bidhimala 2008 §56 Chart-02" };
+}
+// ── OPEN SPACE RULE (§47) ───────────────────────────────────────────────
+// 50% of any floor exceeding FAR must remain open
+// Mandatory open space = (100 - MGC)% of plot
+// Contiguous open space requirement: same as general rule
+
+
+/* ---- helpers ---- */
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const fmt=(n,d=2)=>Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmt0=n=>Math.round(n).toLocaleString('en-US');
+function badge(t){return ' <span class="badge">'+t+'</span>';}
+let EMPTY_HTML='';
+
+/* ---- sharing (same mechanism as the 2025 calculator) ---- */
+const SHARE_URL="";
+const SHARE_TXT="Outside-RAJUK FAR Calculator (Bidhimala 2008) — free FAR, ground-coverage & setback calculator for CDA / KDA / RDA / Pourashava areas by Studio 16 Architects";
+const STANDALONE_URL="";  /* set to your hosted (non-Wix) URL to enable mobile print */
+const SHARE_LINKS=(function(){var u=encodeURIComponent(SHARE_URL),t=encodeURIComponent(SHARE_TXT);return{wa:"https://wa.me/?text="+t+"%20"+u,fb:"https://www.facebook.com/sharer/sharer.php?u="+u,x:"https://twitter.com/intent/tweet?text="+t+"&url="+u,li:"https://www.linkedin.com/sharing/share-offsite/?url="+u};})();
+function copyShareLink(ev){try{navigator.clipboard.writeText(SHARE_URL);}catch(e){}var b=ev&&(ev.currentTarget||ev.target);if(b){var t=b.textContent;b.textContent="Copied!";setTimeout(function(){b.textContent=t;},1400);}}
+function inIframe(){try{return window.self!==window.top;}catch(e){return true;}}
+function doPrint(){var rep=document.getElementById("report");var w=null;var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent||"")||(navigator.platform==="MacIntel"&&(navigator.maxTouchPoints||0)>1);try{if(rep){var css=Array.prototype.map.call(document.querySelectorAll("style"),function(s){return s.textContent;}).join(String.fromCharCode(10));var foot=document.querySelector(".print-foot");var footHTML=foot?foot.outerHTML:"";var banner=isIOS?'<div class="printbanner" style="position:sticky;top:0;z-index:9;background:#1A1916;color:#F4F2EB;padding:11px 14px;font:600 13px -apple-system,Helvetica,Arial,sans-serif;text-align:center">To save as PDF: tap the Share button, then <b>Print</b>.</div>':"";var auto=isIOS?"":'<scr'+'ipt>setTimeout(function(){try{window.focus();window.print();}catch(e){}},450);</scr'+'ipt>';w=window.open("","_blank");if(w){w.document.open();w.document.write('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FAR Calculation · Bidhimala 2008</title><style>'+css+'</style><style>@media print{.printbanner{display:none!important}}</style></head><body>'+banner+'<div class="wrap"><div class="report" id="report">'+rep.innerHTML+'</div>'+footHTML+'</div>'+auto+'</body></html>');w.document.close();return;}}}catch(e){}try{if(!inIframe())window.print();}catch(e){}if(!w&&inIframe())printHint();}
+function printHint(){var box=document.getElementById("reportShareBox");if(!box)return;box.innerHTML='<div class="hint" style="line-height:1.55">'+(STANDALONE_URL?('To save a PDF on mobile, open the full (non-embedded) calculator: <a class="shm" href="'+STANDALONE_URL+'" target="_blank" rel="noopener">Open full calculator ↗</a>'):'On mobile the embedded calculator cannot open the print dialog. Open the calculator on its own page (hosted outside Wix) to save a PDF.')+'</div>';box.style.display="block";}
+function toggleTheme(){const h=document.documentElement;h.dataset.theme=h.dataset.theme==='dark'?'light':'dark';$("#themeBtn").textContent=h.dataset.theme==='dark'?'◑':'◐';}
+
+/* ---- plot rows (amalgamation) ---- */
+let plots=[{v:'',u:'katha'}];
+function plotKatha(p){const v=parseFloat(p.v)||0;if(p.u==='katha')return v;if(p.u==='sqft')return v/SQFT_PER_KATHA;if(p.u==='sqm')return v/SQFT_PER_KATHA/SQM_PER_SQFT;return 0;}
+function totalKatha(){return plots.reduce((a,p)=>a+plotKatha(p),0);}
+function totLand(){const k=totalKatha();const el=$("#totLand");if(el)el.textContent=k>0?(fmt(k,2)+' katha · '+fmt0(k*SQFT_PER_KATHA)+' ft²'):'— katha';}
+function renderPlots(){
+  const c=$("#plots");
+  c.innerHTML=plots.map((p,i)=>'<div class="plotrow" data-i="'+i+'">'
+    +'<input type="number" class="pv" data-i="'+i+'" value="'+p.v+'" min="0" step="0.01" placeholder="'+(plots.length>1?('plot '+(i+1)):'area')+'">'
+    +'<select class="pu" data-i="'+i+'">'
+      +'<option value="katha"'+(p.u==='katha'?' selected':'')+'>katha</option>'
+      +'<option value="sqft"'+(p.u==='sqft'?' selected':'')+'>sq ft</option>'
+      +'<option value="sqm"'+(p.u==='sqm'?' selected':'')+'>sq m</option>'
+    +'</select>'
+    +(plots.length>1?'<button type="button" class="rmrow" data-i="'+i+'" title="remove">×</button>':'')
+  +'</div>').join('');
+  $$(".pv").forEach(el=>el.addEventListener('input',e=>{plots[+e.target.dataset.i].v=e.target.value;totLand();}));
+  $$(".pu").forEach(el=>el.addEventListener('change',e=>{plots[+e.target.dataset.i].u=e.target.value;totLand();}));
+  $$(".rmrow").forEach(el=>el.addEventListener('click',e=>{plots.splice(+e.currentTarget.dataset.i,1);renderPlots();totLand();}));
+  totLand();
+}
+function roadHint(){const ft=parseFloat($("#roadFt").value);$("#roadHint").textContent=ft>0?(fmt(ft,1)+' ft · '+fmt(ft*0.3048,2)+' m'):'';}
+
+/* ---- COMPUTE — verbatim port of the 2008 calculate() ---- */
+function computeB08(occType, katha, roadFtV, applyWidening, plotMode, plotSizes){
+  const sqft=katha*SQFT_PER_KATHA, sqm=sqft*SQM_PER_SQFT;
+  const roadM=parseFloat(roadFtV)*0.3048;
+  if(!sqft||!roadM||!occType) return {error:"Please fill in all required fields."};
+  let wideningBonus=0, wideningNote="";
+  let effectiveSqm=sqm, effectiveSqft=sqft, effectiveKatha=katha;
+  if(roadM<6.0 && applyWidening){
+    const deficit=+(6.0-roadM).toFixed(3);
+    const perSide=+(deficit/2).toFixed(3);
+    const steps=Math.floor(perSide/0.30);
+    wideningBonus=+Math.min(steps*0.05,0.20).toFixed(2);
+    const frontage=Math.sqrt(sqm);
+    const surrenderSqm=+(perSide*frontage).toFixed(1);
+    effectiveSqm=+(sqm-surrenderSqm).toFixed(1);
+    effectiveSqft=+(sqft-surrenderSqm/SQM_PER_SQFT).toFixed(0);
+    effectiveKatha=+(effectiveSqft/SQFT_PER_KATHA).toFixed(2);
+    wideningNote="\u00a754(4): surrender "+perSide+"m each side = "+surrenderSqm+" sqm \u00b7 FAR +"+wideningBonus;
+  }
+  if(roadM<1.83 && !applyWidening) return {error:"Minimum road width is 6 ft (1.83 m) per Bidhimala 2008 \u00a751."};
+  const lookup=lookupFAR(occType, effectiveSqm, (applyWidening&&roadM<6.0)?6.0:roadM);
+  if(!lookup) return {error:"No FAR data for this combination."};
+  if(lookup.note==="Road too narrow") return {error:"Road too narrow for this plot size. Minimum: "+(lookup.minRoadForSize).toFixed(1)+" m."};
+  const farBase=lookup.far, baseFAR=lookup.baseFAR, mgc=lookup.mgc, roadBonus=lookup.roadBonus, isNR=!!lookup.isNR;
+  if(farBase===null) return {error: lookup.note || "Not permissible for this plot / road combination."};
+  const far=+(farBase+wideningBonus).toFixed(2);
+  const openSpacePct=+(100-mgc).toFixed(1);
+  const gcSqft=+(effectiveSqft*(mgc/100)).toFixed(0);
+  const gcSqm=+(effectiveSqm*(mgc/100)).toFixed(1);
+  const openSqft=+(effectiveSqft*(openSpacePct/100)).toFixed(0);
+  const floorArea=+(effectiveSqft*far).toFixed(0);
+  const farFloors=(gcSqft>0)?Math.ceil(floorArea/gcSqft):null;
+  const totStoreys=farFloors?farFloors+1:null;
+  const htM=totStoreys?+(totStoreys*3.2).toFixed(1):null;
+  const setbacks=getSetbacks(effectiveSqft, roadM>=18.0);
+  function makeScenario(coveragePct,label){
+    const gcArea=+(sqft*(coveragePct/100)).toFixed(0);
+    const farFlrs=(gcArea>0)?Math.ceil(floorArea/gcArea):0;
+    const totFlrs=farFlrs+1;
+    return {label,coveragePct,gcArea,farFlrs,totFlrs,htM:+(totFlrs*3.2).toFixed(1),
+            setbacks:getSetbacks(gcArea>0?sqft:effectiveSqft, roadM>=18.0)};
+  }
+  const minCov=mgc*0.6, midCov=mgc*0.8;
+  const scenarios=[
+    makeScenario(+minCov.toFixed(1),"Min Coverage ("+minCov.toFixed(1)+"%)"),
+    makeScenario(+midCov.toFixed(1),"Mid Coverage ("+midCov.toFixed(1)+"%)"),
+    makeScenario(mgc,"Max Coverage ("+mgc+"%)")
+  ];
+  const isResidential=["A1","A2","A3","A4","A5"].indexOf(occType)>=0;
+  const floorAreaSqm=floorArea?+(floorArea*SQM_PER_SQFT).toFixed(0):0;
+  const needsCommunitySpace=isResidential && floorAreaSqm>3000;
+  const communitySpaceSqm=needsCommunitySpace?+(floorAreaSqm*0.04).toFixed(0):0;
+  const communitySpaceSqft=needsCommunitySpace?+(communitySpaceSqm/SQM_PER_SQFT).toFixed(0):0;
+  const needsPlaySpace=isResidential && sqm>=1300;
+  const playSpaceSqm=needsPlaySpace?+(sqm*0.10).toFixed(0):0;
+  const playSpaceSqft=needsPlaySpace?+(sqft*0.10).toFixed(0):0;
+  /* ---- audit trail (formulas & sources) ---- */
+  const audit=[];
+  audit.push(`Land area: ${fmt(katha,2)} katha = ${fmt0(sqft)} ft² = ${fmt(sqm,1)} m² (1 katha = 720 ft²; 1 ft² = 0.0929 m²).`);
+  audit.push(`Road width: ${roadFtV} ft = ${fmt(roadM,2)} m (× 0.3048). §51(12) caps the FAR road tier at 24 m.`);
+  if(wideningNote) audit.push(`${wideningNote} — effective plot ${fmt0(effectiveSqft)} ft² (${fmt(effectiveSqm,1)} m²).`);
+  if(lookup.tierM===2.5) audit.push(`§51(10): road 2.50–3.64 m → FAR 2.00, MGC 65%.`);
+  else if(lookup.tierM===3.65) audit.push(`§51(9): road 3.65–5.99 m → FAR 3.00, MGC 65%.`);
+  else if(isNR) audit.push(`§51: road ≥ 18 m falls on a non-restricted (NR) tier → FAR limited by land size = ${fmt(baseFAR)}; MGC and setbacks govern.`);
+  else if(lookup.landFAR===null && lookup.roadFAR!=null) audit.push(`§51: road ≥ 18 m → FAR taken directly from the road-width table = ${fmt(lookup.roadFAR)} (land size not applicable).`);
+  else { audit.push(`§51(15): base FAR = min(land-size FAR ${fmt(lookup.landFAR)}, road-tier FAR ${fmt(lookup.roadFAR)} at ${fmt(lookup.tierM,1)} m) = ${fmt(baseFAR)}.`);
+         if(roadBonus>0) audit.push(`§51(11) road bonus: +0.05 FAR per 0.30 m of road above 6 m = +${fmt(roadBonus)} (capped by the next land slab / road tier).`); }
+  if(wideningBonus>0) audit.push(`§54(4) widening bonus +${fmt(wideningBonus)} added → approved FAR ${fmt(far)}.`);
+  audit.push(`MGC = ${fmt(mgc,1)}% (§51 table). Mandatory open space = 100 − MGC = ${fmt(openSpacePct,1)}% = ${fmt0(openSqft)} ft² (§47).`);
+  audit.push(`Ground coverage = ${fmt0(effectiveSqft)} ft² × ${fmt(mgc,1)}% = ${fmt0(gcSqft)} ft² (${fmt(gcSqm,1)} m²).`);
+  audit.push(`Buildable floor area = ${fmt0(effectiveSqft)} ft² × FAR ${fmt(far)} = ${fmt0(floorArea)} ft² (${fmt0(floorAreaSqm)} m²).`);
+  audit.push(`Floors = ⌈floor area ÷ coverage plate⌉ = ⌈${fmt0(floorArea)} ÷ ${fmt0(gcSqft)}⌉ = ${farFloors} → G+${farFloors} · ${totStoreys} storied · ≈ ${fmt(htM,1)} m (3.2 m floor-to-floor).`);
+  audit.push(`§56 Chart-02 setbacks${roadM>=18.0?' (road ≥ 18 m)':''}: front ${fmt(setbacks.front,1)} m · side ${fmt(setbacks.side,2)} m · rear ${fmt(setbacks.rear,1)} m. Building-to-building: side ${fmt(setbacks.b2bSide,1)} m · front↔back ${fmt(setbacks.b2bFrontBack,1)} m.`);
+  if(needsCommunitySpace) audit.push(`§46(P): residential with floor area ${fmt0(floorAreaSqm)} m² > 3,000 m² → community space 4% = ${fmt0(communitySpaceSqft)} ft² (${fmt0(communitySpaceSqm)} m², FAR-excluded).`);
+  if(needsPlaySpace) audit.push(`§46(P)(2): residential site ${fmt0(sqm)} m² ≥ 1,300 m² → play / recreation 10% = ${fmt0(playSpaceSqft)} ft² (FAR-excluded).`);
+  return {ok:true, occType, sqm:+sqm.toFixed(1), sqft:+sqft.toFixed(0), katha:+katha.toFixed(2),
+    roadFt:roadFtV, roadM:+roadM.toFixed(2), far, baseFAR, mgc, roadBonus, isNR,
+    openSpacePct, gcSqft, gcSqm, openSqft, floorArea, farFloors, totStoreys, htM, setbacks, scenarios,
+    plotMode, plotSizes, floorAreaSqm, audit,
+    isResidential, needsCommunitySpace, communitySpaceSqm, communitySpaceSqft,
+    needsPlaySpace, playSpaceSqm, playSpaceSqft,
+    bonusNote:lookup.bonusNote||"", wideningBonus, wideningNote,
+    effectiveSqm:+effectiveSqm.toFixed(1), effectiveSqft:+Number(effectiveSqft).toFixed(0),
+    lookupNote:lookup.note||""};
+}
+
+/* ---- Site Overview diagram (adapted from the 2025 calculator) ---- */
+function setbackSVG(r){
+  const sb=r.setbacks;
+  const footprint=r.gcSqft, floors=r.farFloors, build=r.floorArea;
+  const far=r.isNR?'NR':fmt(r.far), road=r.roadFt;
+  const occLabel=(ALL_TYPES.find(o=>o.id===r.occType)||{}).label||r.occType;
+  const occShort=occLabel.replace(/\([^)]*\)/g,'').replace(/^[A-Za-z0-9]+\s*[—-]\s*/,'').trim();
+  const modeLabel=(r.plotMode==='multi')?'Amalgamated':'Single Building';
+  const land=`${fmt(r.katha)} katha · ${fmt0(r.sqft)} ft²`;
+  const mut='fill:var(--muted)', ink='fill:var(--ink)';
+  return `<svg viewBox="0 0 300 250" width="100%" style="max-width:340px;border:1px solid var(--line);background:var(--paper-2)">
+    <rect x="30" y="24" width="240" height="196" style="fill:none;stroke:var(--line)" stroke-dasharray="5 4"/>
+    <rect x="66" y="56" width="168" height="142" style="fill:color-mix(in srgb,var(--ink) 8%,transparent);stroke:var(--ink)"/>
+    <text x="150" y="44" text-anchor="middle" font-size="10" style="${mut}">Rear ${fmt(sb.rear,1)} m</text>
+    <text x="150" y="212" text-anchor="middle" font-size="10" style="${mut}">Front ${fmt(sb.front,1)} m</text>
+    <text x="46" y="128" text-anchor="middle" font-size="10" style="${mut}" transform="rotate(-90 46 128)">Side ${fmt(sb.side,2)} m</text>
+    <text x="254" y="128" text-anchor="middle" font-size="10" style="${mut}" transform="rotate(90 254 128)">Side ${fmt(sb.side,2)} m</text>
+    <text x="150" y="75" text-anchor="middle" font-size="8.5" font-weight="600" style="${ink}">${occShort}</text>
+    <text x="150" y="89" text-anchor="middle" font-size="8" style="${mut}">${modeLabel}</text>
+    <line x1="82" y1="97" x2="218" y2="97" style="stroke:var(--line)"/>
+    <text x="150" y="125" text-anchor="middle" font-size="23" font-weight="700" style="${ink}">G+${floors}</text>
+    <text x="150" y="143" text-anchor="middle" font-size="10" style="${ink}">Approved FAR ${far}</text>
+    <text x="150" y="159" text-anchor="middle" font-size="9.5" style="${ink}">Build ${fmt0(build)} ft²</text>
+    <text x="150" y="173" text-anchor="middle" font-size="8.5" style="${mut}">Footprint ${fmt0(footprint)} ft²</text>
+    <text x="150" y="189" text-anchor="middle" font-size="8.5" style="${ink}">Land ${land}</text>
+    <rect x="85" y="230" width="130" height="16" style="fill:color-mix(in srgb,var(--brass) 32%,transparent)"/>
+    <text x="150" y="241" text-anchor="middle" font-size="9" font-weight="600" style="${ink}">ROAD · ${fmt0(road)} ft</text>
+  </svg>`;
+}
+
+/* ---- FAR Reference Table (ported from the previous 2008 calculator) ---- */
+function farReferenceTable(r){
+  const landTbl=getLandTable(r.occType), roadTbl=getRoadTable(r.occType);
+  const sqm=r.effectiveSqm;
+  const roadM=round2(Math.min(r.roadM,24.0));
+  const selLandIdx=landTbl.findIndex(x=>sqm<=x[0]);
+  const roadTiers=roadTbl.filter(x=>x[0]<=roadM);
+  const selRoad=roadTiers.length?roadTiers[roadTiers.length-1]:roadTbl[0];
+  const kOf=v=>Math.round(v/(720*SQM_PER_SQFT));
+  const bandLabel=i=>{const up=landTbl[i][0], lo=i===0?0:landTbl[i-1][0];
+    if(up===Infinity) return '&gt; '+lo+' m² (&gt;'+kOf(lo)+'k)';
+    if(i===0) return '≤ '+up+' m² (≤'+kOf(up)+'k)';
+    return lo+'–'+up+' m² ('+kOf(lo)+'–'+kOf(up)+'k)';};
+  const roadLabels=["6 m (19.7 ft)","9 m (29.5 ft)","12 m (39.4 ft)","18 m (59.1 ft)","24 m (78.7 ft)"];
+  const landRows=landTbl.map((row,i)=>{
+    const sel=i===selLandIdx;
+    return '<tr class="'+(sel?'sel-land':'')+'"><td>'+(sel?'▸ ':'')+bandLabel(i)+(sel?' <span class="reftag tg-land">YOUR PLOT</span>':'')
+      +'</td><td class="c">'+(row[1]===null?'N/A':fmt(row[1]))+'</td><td class="c">'+(row[2]===null?'N/A':fmt(row[2],1)+'%')+'</td></tr>';
+  }).join('');
+  const roadRows=roadTbl.map((row,i)=>{
+    const sel=row[0]===selRoad[0];
+    return '<tr class="'+(sel?'sel-road':'')+'"><td>'+(sel?'▸ ':'')+roadLabels[i]+(sel?' <span class="reftag tg-road">YOUR ROAD</span>':'')
+      +'</td><td class="c">'+(row[1]===null?'NR':fmt(row[1]))+'</td><td class="c">'+fmt(row[2],1)+'%</td>'
+      +'<td class="c" style="color:var(--muted)">'+(row[3]===null?'—':fmt(row[3]))+'</td></tr>';
+  }).join('');
+  const explain = r.roadM>=18.0
+    ? '<b>§51 — road ≥ 18 m:</b> FAR is taken directly from the road-width table; land size is not applicable. '+(r.isNR?'This NR tier has no FAR ceiling from the road table, so FAR is limited by land size and the open-space / setback rules govern.':'Road FAR '+fmt(selRoad[1])+' → approved FAR '+(r.isNR?'NR':fmt(r.far))+'.')
+    : '<b>§51(15):</b> base FAR = min(land FAR, road FAR) = '+fmt(r.baseFAR)+(r.roadBonus>0?(' &nbsp;+&nbsp; §51(11) road bonus +'+fmt(r.roadBonus)+' → '+fmt(r.far)):'')+'.';
+  return '<div class="subhd">① Land-size FAR</div>'
+    +'<div style="overflow-x:auto"><table class="reftab"><thead><tr><th>Plot size</th><th class="c">Land FAR</th><th class="c">MGC %</th></tr></thead><tbody>'+landRows+'</tbody></table></div>'
+    +'<div class="subhd">② Road-width FAR</div>'
+    +'<div style="overflow-x:auto"><table class="reftab"><thead><tr><th>Road tier</th><th class="c">Max FAR</th><th class="c">MGC %</th><th class="c">Next tier first</th></tr></thead><tbody>'+roadRows+'</tbody></table></div>'
+    +'<div class="refnote" style="padding-left:0;margin-top:10px">'+explain+'</div>';
+}
+
+/* ---- REPORT (2025 design) ---- */
+function renderReport(r){
+  const now=new Date();
+  const ref="S16A-"+now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+"-"+Math.floor(Math.random()*9000+1000);
+  const occLabel=(ALL_TYPES.find(o=>o.id===r.occType)||{}).label||r.occType;
+  const tfaSqm=+(r.floorArea*SQM_PER_SQFT).toFixed(0);
+  const logo=((document.querySelector('header .logo-svg')||{}).outerHTML)||'<b style="font-size:15px">Studio 16 Architects</b>';
+  const amal=(r.plotMode==="multi"&&r.plotSizes.length>1)?(" · amalgamated "+r.plotSizes.map(k=>(+k).toFixed(2)).join(" + ")+" katha"):"";
+  const wid=(r.effectiveSqft!==r.sqft);
+
+  let h=`
+  <div class="print-only print-head">
+    <div class="pl">${logo}</div>
+    <div class="pr"><b>FAR Calculation · Bidhimala 2008</b><br>Ref ${ref} · ${now.toLocaleString()}<br>+880-1717-222-907 · studio16architectsbd.com</div>
+  </div>
+  <div class="rep-head">
+    <div>
+      <div class="rep-actions"><button onclick="doPrint()">⬇ Download / Print</button></div>
+      <div id="reportShareBox" style="display:none;margin:8px 0 14px"></div>
+      <div class="ttl">FAR Calculation · Bidhimala 2008</div>
+      <div class="rep-sub">Outside RAJUK — CDA / KDA / RDA / Pourashava areas</div>
+    </div>
+    <div class="meta">Ref ${ref}<br>${now.toLocaleDateString()} ${now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
+  </div>
+
+  <div class="headline">
+    <div class="hl accent"><div class="k">Approved FAR</div><div class="v">${r.isNR?'NR':fmt(r.far)}</div>
+      <div class="mono" style="font-size:10px">${r.isNR?'non-restricted':'§51'}</div></div>
+    <div class="hl"><div class="k">Max Ground Coverage</div><div class="v">${fmt(r.mgc,1)}<small> %</small></div>
+      <div class="mono" style="font-size:10px;color:var(--muted)">open ${fmt(r.openSpacePct,1)}%</div></div>
+    <div class="hl"><div class="k">Buildable Floor Area</div><div class="v">${fmt0(r.floorArea)}<small> ft²</small></div>
+      <div class="mono" style="font-size:10px;color:var(--muted)">${fmt0(tfaSqm)} m²</div></div>
+    <div class="hl"><div class="k">Building · max cover</div><div class="v">G+${r.farFloors}</div>
+      <div class="mono" style="font-size:10px;color:var(--muted)">${r.totStoreys} storied · ≈${fmt(r.htM,1)} m</div></div>
+  </div>
+
+  <div class="rep-body">
+  <section class="sec sec-far"><h2>FAR Determination · Bidhimala 2008 §51</h2>
+    <table class="kv">
+      <tr><td>Building / use category</td><td>${occLabel}</td></tr>
+      <tr><td>Plot size</td><td>${fmt(r.katha,2)} katha · ${fmt0(r.sqft)} ft² · ${fmt(r.sqm,1)} m²${amal}</td></tr>
+      <tr><td>Road width</td><td>${r.roadFt} ft · ${fmt(r.roadM,2)} m</td></tr>
+      ${wid?`<tr><td>Effective plot after surrender</td><td>${fmt0(r.effectiveSqft)} ft² · ${fmt(r.effectiveSqm,1)} m²${badge('§54(4)')}</td></tr>`:''}
+      ${r.roadBonus>0?`<tr><td>Road-width bonus</td><td>+${fmt(r.roadBonus)} FAR${badge('§51(11)')}</td></tr>`:''}
+      ${r.wideningBonus>0?`<tr><td>Road-widening bonus</td><td>+${fmt(r.wideningBonus)} FAR${badge('§54(4)')}</td></tr>`:''}
+      <tr><td>Base FAR</td><td>${fmt(r.baseFAR)}${badge('§51 table')}</td></tr>
+      <tr><td><b>Approved FAR</b></td><td><b>${r.isNR?'NR (Non-Restricted)':fmt(r.far)}</b></td></tr>
+      <tr><td>Max ground coverage (MGC)</td><td>${fmt(r.mgc,1)}%</td></tr>
+      <tr><td>Mandatory open space</td><td>${fmt(r.openSpacePct,1)}% · ${fmt0(r.openSqft)} ft²</td></tr>
+    </table>
+    ${r.isNR?`<div class="refnote" style="padding-left:0">NR road tier — FAR limited by land size; for parking-based FAR see Table 4 §56.</div>`:''}
+    ${r.wideningNote?`<div class="refnote" style="padding-left:0">${r.wideningNote}</div>`:''}
+  </section>
+
+  <section class="sec sec-ground"><h2>Ground Coverage &amp; Open Space</h2>
+    <table class="kv">
+      <tr><td>Max ground coverage (MGC)</td><td>${fmt(r.mgc,1)}% · ${fmt0(r.gcSqft)} ft² · ${fmt(r.gcSqm,1)} m²</td></tr>
+      <tr><td>Mandatory open space</td><td>${fmt(r.openSpacePct,1)}% · ${fmt0(r.openSqft)} ft²${badge('§47')}</td></tr>
+    </table>
+  </section>
+
+  <section class="sec sec-setbacks"><h2>Setbacks · Bidhimala 2008 §56 Chart-02</h2>
+    <div style="font-size:10.5px;color:var(--muted);margin-bottom:10px">${r.roadM>=18.0?'Road ≥ 18 m — wide-road setbacks':'Plot boundary → building'}</div>
+    <div class="floors" style="grid-template-columns:repeat(3,1fr)">
+      <div class="fc"><div class="lab">Front</div><div class="gn">${fmt(r.setbacks.front,1)}<small> m</small></div></div>
+      <div class="fc"><div class="lab">Each side</div><div class="gn">${fmt(r.setbacks.side,2)}<small> m</small></div></div>
+      <div class="fc"><div class="lab">Rear</div><div class="gn">${fmt(r.setbacks.rear,1)}<small> m</small></div></div>
+    </div>
+    <table class="kv" style="margin-top:13px">
+      <tr><td>Building-to-building gap · side by side</td><td>${fmt(r.setbacks.b2bSide,1)} m</td></tr>
+      <tr><td>Building-to-building gap · front ↔ back</td><td>${fmt(r.setbacks.b2bFrontBack,1)} m</td></tr>
+    </table>
+  </section>
+
+  <section class="sec sec-floor"><h2>Floor Analysis · three coverage scenarios</h2>
+    <div class="floors">${r.scenarios.map((sc,i)=>`
+      <div class="fc ${i===1?'mid':''}"><div class="lab">${sc.label}</div>
+        <div class="gn">G+${sc.farFlrs}</div><div class="st">${sc.totFlrs} storied</div>
+        <div class="pl">${fmt0(sc.gcArea)} ft² plate<br>≈ ${fmt(sc.htM,1)} m tall</div></div>`).join('')}
+    </div>
+    <table class="kv" style="margin-top:13px">
+      <tr><td>Total floor area</td><td>${fmt0(r.floorArea)} ft² · ${fmt0(tfaSqm)} m²</td></tr>
+      <tr><td>Estimated building</td><td>G+${r.farFloors} · ${r.totStoreys} storied · ≈ ${fmt(r.htM,1)} m</td></tr>
+    </table>
+    <div class="refnote" style="padding-left:0">G = ground floor (parking, FAR-excluded). Heights approximate at 3.2 m floor-to-floor. Front/side/green verandahs, balconies, terraces, ducts and other permissible features may be added per Bidhimala 2008 beyond the FAR-based area shown.</div>
+  </section>
+
+  ${(r.needsCommunitySpace||r.needsPlaySpace)?`
+  <section class="sec sec-comm"><h2>Community &amp; Recreation Space · §46(P)</h2>
+    <table class="kv">
+      ${r.needsCommunitySpace?`<tr><td>Community space (floor area &gt; 3,000 m²)</td><td>min 4% · ${fmt0(r.communitySpaceSqft)} ft² (${fmt0(r.communitySpaceSqm)} m²)</td></tr>`:''}
+      ${r.needsPlaySpace?`<tr><td>Play / recreation (site ≥ 1,300 m²)</td><td>min 10% · ${fmt0(r.playSpaceSqft)} ft² (FAR-excluded)</td></tr>`:''}
+    </table>
+  </section>`:''}
+
+  <section class="sec sec-site"><h2>Site Overview</h2>
+    <div class="siteoverview">${setbackSVG(r)}</div>
+  </section>
+
+  <section class="sec sec-farref"><h2>FAR Reference Table · §51 · সারণি-৩</h2>
+    <div class="reftab-leg">Your selected rows are highlighted — <b style="color:var(--good)">Land FAR</b> in green, <b style="color:var(--teal)">Road FAR</b> in teal. Base FAR is the lower of the two, plus any §51(11) road-width bonus.</div>
+    ${farReferenceTable(r)}
+  </section>
+  </div>
+
+  <details class="audit"><summary>▸ Audit trail — formulas &amp; sources (${r.audit.length} steps)</summary>
+    <div class="auditlist">${r.audit.map((a,i)=>`<div><span class="step-a">${String(i+1).padStart(2,'0')}.</span> ${a}</div>`).join('')}</div>
+  </details>
+
+  `;
+  let _sn=0; h=h.replace(/<h2>/g, ()=>'<h2>'+(++_sn)+'.&nbsp; ');
+  $("#report").innerHTML=h;
+  try{$("#report").scrollIntoView({behavior:'smooth',block:'start'});}catch(e){}
+}
+
+function showErr(msg){const e=$("#err");e.textContent=msg;e.style.display='block';if(EMPTY_HTML)$("#report").innerHTML=EMPTY_HTML;}
+
+function calculate(){
+  $("#err").style.display='none';
+  const occ=$("#occ").value;
+  const sizes=plots.map(plotKatha).filter(k=>k>0);
+  const katha=totalKatha();
+  const roadFtV=parseFloat($("#roadFt").value);
+  const widen=$("#applyWidening").checked;
+  if(!katha){ showErr("Please enter the land area."); return; }
+  if(!roadFtV){ showErr("Please enter the access road width (in feet)."); return; }
+  const r=computeB08(occ, katha, roadFtV, widen, sizes.length>1?'multi':'single', sizes.length?sizes:[katha]);
+  if(r.error){ showErr(r.error); return; }
+  renderReport(r);
+}
+
+/* ---- build ---- */
+function buildUI(){
+  const occ=$("#occ");
+  OCC_GROUPS.forEach(g=>{const og=document.createElement('optgroup');og.label=g.group;
+    g.items.forEach(it=>og.appendChild(new Option(it.label,it.id)));occ.appendChild(og);});
+  occ.value="A3";
+  renderPlots();
+  $("#addPlot").addEventListener('click',()=>{if(plots.length>=10)return;plots.push({v:'',u:'katha'});renderPlots();});
+  $("#roadFt").addEventListener('input',roadHint);
+  $("#calcBtn").addEventListener('click',calculate);
+  const tb=$("#themeBtn"); if(tb) tb.addEventListener('click',toggleTheme);
+  const _scb=$("#shareCalc"); if(_scb) _scb.innerHTML=`<span class="sharebar-h">Share the calculator</span><a class="shm shm-icon" href="${SHARE_LINKS.wa}" target="_blank" rel="noopener" aria-label="Share on WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.149-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg></a><a class="shm shm-icon" href="${SHARE_LINKS.fb}" target="_blank" rel="noopener" aria-label="Share on Facebook" title="Facebook"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a><a class="shm shm-icon" href="${SHARE_LINKS.x}" target="_blank" rel="noopener" aria-label="Share on X" title="X"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a class="shm shm-icon" href="${SHARE_LINKS.li}" target="_blank" rel="noopener" aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>`;
+  EMPTY_HTML=$("#report").innerHTML;
+  roadHint();
+}
+buildUI();
+
+</script>
+</body></html>
