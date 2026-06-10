@@ -331,7 +331,7 @@
         if(!window.confirm("Email this proposal to "+to+"?")) return;
         setEmailing(true);
         try{
-          const res=await fetch(SUPABASE_URL+"/functions/v1/proposal-email",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+SUPABASE_ANON_KEY},body:JSON.stringify({secret:"s16a-mail-9Fk2",to,subject:(e.subject||"Proposal from Studio 16 Architects"),html:proposalEmailHTML(e),client:(e.clientName||"")})});
+          const res=await fetch(SUPABASE_URL+"/functions/v1/rapid-handler",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+SUPABASE_ANON_KEY},body:JSON.stringify({secret:"s16a-mail-9Fk2",to,subject:(e.subject||"Proposal from Studio 16 Architects"),html:proposalEmailHTML(e),client:(e.clientName||"")})});
           const jx=await res.json().catch(()=>({}));
           if(res.ok&&jx.ok){ alert("Proposal emailed to "+to+" (a copy went to "+STUDIO.email+")."); } else { alert("Email failed: "+(jx.error||("HTTP "+res.status))+". Make sure the proposal-email function is deployed."); }
         }catch(err){ alert("Email failed: "+(err&&err.message||err)); }
