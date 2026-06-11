@@ -571,6 +571,10 @@
                 <div className="flex flex-wrap items-stretch gap-x-6 gap-y-2 pt-3">{LEAD_STATUS.map(([k,l])=><Stat key={k} n={leads.filter(x=>x.status===k).length} l={l} tone={k==="new"?"red":undefined} />)}</div>
                 <div className="flex flex-wrap items-center gap-1 pt-3">{[["leads","Lead"],["proposals","Proposal"]].map(([k,l])=>{ const active=k==="leads"?salesTab==="leads":salesTab!=="leads"; return <button key={k} onClick={()=>setSalesTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${active?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>; })}</div>
               </>)}
+              {area==="finance" && has("finance") && (<>
+                <div className="flex flex-wrap items-stretch gap-x-6 gap-y-2 pt-3">{(()=>{ const billed=receivables.reduce((s,x)=>s+x.amount,0); const received=receivables.reduce((s,x)=>s+x.paidAmount,0); const overdue=receivables.filter(x=>x.dueDate&&x.dueDate<dayStr()&&x.paidAmount<x.amount).reduce((s,x)=>s+(x.amount-x.paidAmount),0); return (<><Stat n={money(billed)} l="Billed" /><Stat n={money(received)} l="Received" /><Stat n={money(billed-received)} l="Outstanding" /><Stat n={money(overdue)} l="Overdue" tone="red" /></>); })()}</div>
+                <div className="flex flex-wrap items-center gap-1 pt-3">{[["receivables","Receivables"],["expenditure","Expenditure"],...(isAdmin?[["investments","Investments"]]:[])].map(([k,l])=><button key={k} onClick={()=>setFinTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${finTab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
+              </>)}
             </div>
           </header>
 
@@ -1091,7 +1095,7 @@
             </>)}
 
             {area==="finance" && has("finance") && (<>
-              <div className="mb-3 flex flex-wrap gap-1">{[["receivables","Receivables"],["expenditure","Expenditure"],...(isAdmin?[["investments","Investments"]]:[])].map(([k,l])=><button key={k} onClick={()=>setFinTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${finTab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
+              
               {finTab==="receivables" && (()=>{ const billed=receivables.reduce((s,x)=>s+x.amount,0); const received=receivables.reduce((s,x)=>s+x.paidAmount,0); const overdue=receivables.filter(x=>x.dueDate&&x.dueDate<dayStr()&&x.paidAmount<x.amount).reduce((s,x)=>s+(x.amount-x.paidAmount),0); const projOpts=projects.map(p=>({value:p.id,label:(p.code?p.code+" ":"")+(p.nickname||p.client||p.location||"Project")})); const byProj={}; receivables.forEach(x=>{ (byProj[x.projectId]=byProj[x.projectId]||[]).push(x); }); const projsWithItems=projects.filter(p=>byProj[p.id]&&byProj[p.id].length); return (<>
               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-base font-semibold">Receivables</h2>
