@@ -172,6 +172,7 @@
 
       useEffect(()=>{ if(!db) return; db.auth.getSession().then(({data})=>setSession(data.session)); const {data:sub}=db.auth.onAuthStateChange((_e,s)=>setSession(s)); return ()=>sub.subscription.unsubscribe(); },[]);
       useEffect(()=>{ if(session) load(true); },[session]);
+      useEffect(()=>{ if(!db||!proposals.length) return; const today=new Date().toISOString().slice(0,10); const exp=p=>{ if(!p.date) return false; const d=new Date(p.date); d.setDate(d.getDate()+(Number(p.validDays)||30)); return d.toISOString().slice(0,10)<today; }; const due=proposals.filter(p=>p.status==="sent"&&exp(p)); if(!due.length) return; (async()=>{ for(const p of due){ await db.from("proposals").update({status:"expired"}).eq("id",p.id); } refresh(); })(); },[proposals]);
 
       async function load(initial){
         if(initial) setLoading(true); setErr("");
@@ -305,15 +306,16 @@
       function newProposal(lead){ setPropNewOpen(false); setPropEdit(proposalSeed(lead)); }
       function proposalEmailHTML(p){
         const esc=v=>String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-        const name=esc((p.clientName||"").trim()||"Client");
+        const name=esc((p.clientName||"").trim()||"Client"); const addr=esc((((p.projectInfo||[]).find(r=>/address|location/i.test(r.label||""))||{}).value||"").trim());
         const lbl="padding:1px 12px 1px 0;font-weight:600;vertical-align:top;white-space:nowrap";
         return `<div style="font-family:Arial,Helvetica,sans-serif;color:#18181b;font-size:14px;line-height:1.6;max-width:640px">
           <p>Dear ${name},</p>
-          <p>Greetings from Studio 16 Architects. Thank you for reaching out to us! We appreciate your interest in Studio 16 Architects. In reference to your interest, we are glad to submit our proposal for your project. We have prepared a proposal &mdash; please see the attached PDF file. It contains our detailed proposal of Design Consultancy Service for your project. Thank you. Looking forward to hearing from you soon.</p>
+          <p>Greetings from Studio 16 Architects. Thank you for reaching out to us! We appreciate your interest in Studio 16 Architects. In reference to your interest, we are glad to submit our proposal for your project${addr?(" at "+addr):""}. We have prepared a proposal &mdash; please see the attached PDF file. It contains our detailed proposal of Design Consultancy Service for your project. Thank you. Looking forward to hearing from you soon.</p>
           <p style="margin:16px 0 2px">With Best Regards,</p>
           <p style="margin:0;font-weight:700">Ar. Jewel Barua</p>
           <p style="margin:0;color:#3f3f46">Architect, Founder and Managing Partner, Studio 16 Architects.<br>Member of Institute of Architects Bangladesh (MIAB),<br>B.Arch (AUST), RAJUK, CDA, DCBA &amp; ECPS Registered<br><a href="https://www.studio16architectsbd.com" style="color:#2563eb;text-decoration:none">www.studio16architectsbd.com</a></p>
-          <table style="margin-top:16px;border-collapse:collapse;font-size:13px;color:#3f3f46">
+          <div style="margin-top:22px"><img src="https://workspace.studio16architectsbd.com/s16a-logo.png" alt="Studio 16 Architects" height="44" style="display:block;border:0" /></div>
+          <table style="margin-top:14px;border-collapse:collapse;font-size:13px;color:#3f3f46">
             <tr><td style="${lbl}">address</td><td>FLOOR: A7, HOUSE: 08, ROAD: 12, BLOCK: J, BARIDHARA, DHAKA-1212.</td></tr>
             <tr><td style="${lbl}">contact</td><td><a href="tel:+8801717222907" style="color:#2563eb;text-decoration:none">+880 1717-222907</a></td></tr>
             <tr><td style="${lbl}">email</td><td><a href="mailto:info.s16a@gmail.com" style="color:#2563eb;text-decoration:none">info.s16a@gmail.com</a></td></tr>
@@ -333,7 +335,7 @@
           const attachments=[{filename:pdfFile.name||"proposal.pdf",contentB64:b64,mime:pdfFile.type||"application/pdf"}];
           const res=await fetch(SUPABASE_URL+"/functions/v1/rapid-handler",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+SUPABASE_ANON_KEY},body:JSON.stringify({secret:"s16a-mail-9Fk2",to,subject:(e.subject||"Proposal from Studio 16 Architects"),html:proposalEmailHTML(e),client:(e.clientName||""),attachments})});
           const jx=await res.json().catch(()=>({}));
-          if(res.ok&&jx.ok){ alert("Proposal emailed to "+to+" with the PDF attached (a copy went to "+STUDIO.email+")."); setPdfFile(null); } else { alert("Email failed: "+(jx.error||("HTTP "+res.status))+"."); }
+          if(res.ok&&jx.ok){ if(e.status!=="accepted"&&e.status!=="declined"){ try{ await db.from("proposals").update({status:"sent"}).eq("id",e.id); if(e.leadId) await db.from("leads").update({status:"proposal"}).eq("id",e.leadId); setPropEdit({...e,status:"sent"}); await refresh(); }catch(_e){} } setPdfFile(null); alert("Proposal emailed to "+to+" with the PDF attached (a copy went to "+STUDIO.email+"). Status set to Sent."); } else { alert("Email failed: "+(jx.error||("HTTP "+res.status))+"."); }
         }catch(err){ alert("Email failed: "+(err&&err.message||err)); }
         setEmailing(false);
       }
