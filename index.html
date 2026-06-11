@@ -365,7 +365,7 @@
         const e=invForm; if(!e) return;
         if(!(e.name||"").trim()){ alert("Name is required."); return; }
         const n=v=>(v===""||v==null)?null:Number(v);
-        const row={company_id:cid(),category:e.category||"business",business:(e.name||"").trim(),name:(e.name||"").trim(),address:(e.address||"").trim(),biz_type:(e.bizType||"").trim(),type:(e.bizType||"").trim(),committed:Number(e.committed||0),amount:Number(e.committed||0),share_pct:n(e.sharePct),interest_rate:n(e.interestRate),maturity_date:e.maturityDate||null,emi_amount:n(e.emiAmount),instalment_count:n(e.instalmentCount),next_due:e.nextDue||null,date:e.date||dayStr(),status:e.status||"active",note:(e.note||"").trim()};
+        const row={company_id:cid(),category:e.category||"business",business:(e.name||"").trim(),address:(e.address||"").trim(),biz_type:(e.bizType||"").trim(),type:(e.bizType||"").trim(),committed:Number(e.committed||0),amount:Number(e.committed||0),share_pct:n(e.sharePct),interest_rate:n(e.interestRate),maturity_date:e.maturityDate||null,emi_amount:n(e.emiAmount),instalment_count:n(e.instalmentCount),next_due:e.nextDue||null,date:e.date||dayStr(),status:e.status||"active",note:(e.note||"").trim()};
         if(e.id){ if(fail((await db.from("investments").update(row).eq("id",e.id)).error)) return; }
         else { row.recorded_by=session.user.id; row.sort_order=investments.length; if(fail((await db.from("investments").insert(row)).error)) return; }
         setInvForm(null); await refresh();
