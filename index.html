@@ -87,7 +87,10 @@
     const INV_STATUS = [["active","Active"],["exited","Exited"],["writeoff","Written off"]];
     const INV_TONE = { active:"bg-emerald-50 text-emerald-700 border-emerald-200", exited:"bg-zinc-100 text-zinc-500 border-zinc-300", writeoff:"bg-red-50 text-red-600 border-red-200" };
     const INV_LABEL = Object.fromEntries(INV_STATUS);
-    const mapInv = r=>({id:r.id,business:r.business||"",type:r.type||"",amount:Number(r.amount||0),returned:Number(r.returned||0),date:r.date,status:r.status||"active",note:r.note||"",recordedBy:r.recorded_by,sortOrder:r.sort_order});
+    const mapInv = r=>({id:r.id,category:r.category||"business",name:r.name||r.business||"",business:r.business||r.name||"",address:r.address||"",bizType:r.biz_type||r.type||"",type:r.type||r.biz_type||"",committed:Number(r.committed!=null?r.committed:(r.amount||0)),amount:Number(r.amount||0),sharePct:r.share_pct==null?"":Number(r.share_pct),interestRate:r.interest_rate==null?"":Number(r.interest_rate),maturityDate:r.maturity_date||"",emiAmount:r.emi_amount==null?"":Number(r.emi_amount),instalmentCount:r.instalment_count==null?"":Number(r.instalment_count),nextDue:r.next_due||"",date:r.date,status:r.status||"active",note:r.note||"",returned:Number(r.returned||0),recordedBy:r.recorded_by,sortOrder:r.sort_order});
+    const mapInvTxn = r=>({id:r.id,investmentId:r.investment_id,date:r.txn_date,amount:Number(r.amount||0),direction:r.direction||"out",mode:r.mode||"",note:r.note||"",recordedBy:r.recorded_by});
+    const INV_CATEGORIES = [["business","Business / Partnership"],["bond","Fixed Deposit / Bond"],["property","Property"],["loan","Loan"],["other","Other"]];
+    const INV_MODES = [["cash","Cash"],["bank","Bank"],["bkash","bKash"],["cheque","Cheque"],["other","Other"]];
     const SITE_STATUS = [["not_started","Not started"],["ongoing","In progress"],["done","Done"],["delayed","Delayed"]];
     const SITE_LABEL = Object.fromEntries(SITE_STATUS);
     const SITE_TONE = { not_started:"bg-zinc-100 text-zinc-500 border-zinc-300", ongoing:"bg-emerald-50 text-emerald-700 border-emerald-200", done:"bg-blue-50 text-blue-600 border-blue-200", delayed:"bg-red-50 text-red-600 border-red-200" };
@@ -163,7 +166,7 @@
       const [boardCfg,setBoardCfg]=useState(false); const [addBoardOpen,setAddBoardOpen]=useState(false); const [nb,setNb]=useState({name:"",desc:"",leadId:""});
       const [showAddP,setShowAddP]=useState(false); const [np,setNp]=useState({raw:"",code:"",nickname:"",client:"",location:"",size:"",address:"",priority:"medium",status:"live",lead:"__none"});
       const [addTaskFor,setAddTaskFor]=useState(null); const [td,setTd]=useState({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:"__none"});
-      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("design"); const [myCheckin,setMyCheckin]=useState(null); const [leads,setLeads]=useState([]); const [showAddLead,setShowAddLead]=useState(false); const [nl,setNl]=useState({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); const [leadEdit,setLeadEdit]=useState(null); const [convFor,setConvFor]=useState(null); const [convDraft,setConvDraft]=useState({code:"",priority:"medium"}); const [receivables,setReceivables]=useState([]); const [showAddRcv,setShowAddRcv]=useState(false); const [nr,setNr]=useState({projectId:"",title:"",amount:"",dueDate:""}); const [rcvEdit,setRcvEdit]=useState(null); const [finTab,setFinTab]=useState("receivables"); const [expenses,setExpenses]=useState([]); const [showAddExp,setShowAddExp]=useState(false); const [ne,setNe]=useState({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:""}); const [expEdit,setExpEdit]=useState(null); const [expMonth,setExpMonth]=useState(dayStr().slice(0,7)); const [conTab,setConTab]=useState("site"); const [vendors,setVendors]=useState([]); const [bills,setBills]=useState([]); const [showAddVendor,setShowAddVendor]=useState(false); const [nvend,setNvend]=useState({name:"",type:"Material supplier",phone:"",note:""}); const [vendorEdit,setVendorEdit]=useState(null); const [showAddBill,setShowAddBill]=useState(false); const [nbill,setNbill]=useState({projectId:"",vendorId:"",category:"Materials",title:"",amount:"",date:dayStr(),dueDate:""}); const [billEdit,setBillEdit]=useState(null); const [siteTasks,setSiteTasks]=useState([]); const [showAddSite,setShowAddSite]=useState(false); const [ns,setNs]=useState({projectId:"",title:"",startDate:"",endDate:"",status:"not_started",progress:"0"}); const [siteEdit,setSiteEdit]=useState(null); const [salesTab,setSalesTab]=useState("leads"); const [salesQ,setSalesQ]=useState(""); const [emailing,setEmailing]=useState(false); const [pdfFile,setPdfFile]=useState(null); const [farSaving,setFarSaving]=useState(false); const farRef=React.useRef(null); const [catalog,setCatalog]=useState([]); const [showAddScope,setShowAddScope]=useState(false); const [nsc,setNsc]=useState({code:"",name:"",detail:""}); const [scopeEdit,setScopeEdit]=useState(null); const [tcs,setTcs]=useState([]); const [showAddTc,setShowAddTc]=useState(false); const [ntc,setNtc]=useState({title:"",body:""}); const [tcEdit,setTcEdit]=useState(null); const [resTab,setResTab]=useState("2025"); const [investments,setInvestments]=useState([]); const [showAddInv,setShowAddInv]=useState(false); const [ni,setNi]=useState({business:"",type:"Equity stake",amount:"",date:dayStr(),status:"active"}); const [invEdit,setInvEdit]=useState(null); const [proposals,setProposals]=useState([]); const [propEdit,setPropEdit]=useState(null); const [propNewOpen,setPropNewOpen]=useState(false); const [acceptDraft,setAcceptDraft]=useState(null);
+      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("design"); const [myCheckin,setMyCheckin]=useState(null); const [leads,setLeads]=useState([]); const [showAddLead,setShowAddLead]=useState(false); const [nl,setNl]=useState({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); const [leadEdit,setLeadEdit]=useState(null); const [convFor,setConvFor]=useState(null); const [convDraft,setConvDraft]=useState({code:"",priority:"medium"}); const [receivables,setReceivables]=useState([]); const [showAddRcv,setShowAddRcv]=useState(false); const [nr,setNr]=useState({projectId:"",title:"",amount:"",dueDate:""}); const [rcvEdit,setRcvEdit]=useState(null); const [finTab,setFinTab]=useState("receivables"); const [expenses,setExpenses]=useState([]); const [showAddExp,setShowAddExp]=useState(false); const [ne,setNe]=useState({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:""}); const [expEdit,setExpEdit]=useState(null); const [expMonth,setExpMonth]=useState(dayStr().slice(0,7)); const [conTab,setConTab]=useState("site"); const [vendors,setVendors]=useState([]); const [bills,setBills]=useState([]); const [showAddVendor,setShowAddVendor]=useState(false); const [nvend,setNvend]=useState({name:"",type:"Material supplier",phone:"",note:""}); const [vendorEdit,setVendorEdit]=useState(null); const [showAddBill,setShowAddBill]=useState(false); const [nbill,setNbill]=useState({projectId:"",vendorId:"",category:"Materials",title:"",amount:"",date:dayStr(),dueDate:""}); const [billEdit,setBillEdit]=useState(null); const [siteTasks,setSiteTasks]=useState([]); const [showAddSite,setShowAddSite]=useState(false); const [ns,setNs]=useState({projectId:"",title:"",startDate:"",endDate:"",status:"not_started",progress:"0"}); const [siteEdit,setSiteEdit]=useState(null); const [salesTab,setSalesTab]=useState("leads"); const [salesQ,setSalesQ]=useState(""); const [emailing,setEmailing]=useState(false); const [pdfFile,setPdfFile]=useState(null); const [farSaving,setFarSaving]=useState(false); const farRef=React.useRef(null); const [catalog,setCatalog]=useState([]); const [showAddScope,setShowAddScope]=useState(false); const [nsc,setNsc]=useState({code:"",name:"",detail:""}); const [scopeEdit,setScopeEdit]=useState(null); const [tcs,setTcs]=useState([]); const [showAddTc,setShowAddTc]=useState(false); const [ntc,setNtc]=useState({title:"",body:""}); const [tcEdit,setTcEdit]=useState(null); const [resTab,setResTab]=useState("2025"); const [investments,setInvestments]=useState([]); const [showAddInv,setShowAddInv]=useState(false); const [ni,setNi]=useState({business:"",type:"Equity stake",amount:"",date:dayStr(),status:"active"}); const [invEdit,setInvEdit]=useState(null); const [invTxns,setInvTxns]=useState([]); const [invSel,setInvSel]=useState(null); const [invForm,setInvForm]=useState(null); const [invTxnForm,setInvTxnForm]=useState(null); const [proposals,setProposals]=useState([]); const [propEdit,setPropEdit]=useState(null); const [propNewOpen,setPropNewOpen]=useState(false); const [acceptDraft,setAcceptDraft]=useState(null);
 
       const realAdmin = profile?.role==="admin";
       const isAdmin = realAdmin && viewAs==="admin";
@@ -204,7 +207,7 @@
           if(!ex.error) setExpenses((ex.data||[]).map(mapExp));
           if(!vn.error) setVendors((vn.data||[]).map(mapVendor));
           if(!cb.error) setBills((cb.data||[]).map(mapBill));
-          if(!iv.error) setInvestments((iv.data||[]).map(mapInv));
+          if(!iv.error) setInvestments((iv.data||[]).map(mapInv)); try{ const itx=await db.from("investment_txns").select("*"); if(!itx.error) setInvTxns((itx.data||[]).map(mapInvTxn)); }catch(_e){}
           if(!st.error) setSiteTasks((st.data||[]).map(mapSite));
           if(!sc.error) setCatalog((sc.data||[]).map(mapScope));
           if(!tc.error) setTcs((tc.data||[]).map(mapTc));
@@ -358,6 +361,24 @@
         }catch(err){ alert("Could not save FAR calculation: "+(err&&err.message||err)); }
         setFarSaving(false);
       }
+      async function saveInvestment(){
+        const e=invForm; if(!e) return;
+        if(!(e.name||"").trim()){ alert("Name is required."); return; }
+        const n=v=>(v===""||v==null)?null:Number(v);
+        const row={company_id:cid(),category:e.category||"business",business:(e.name||"").trim(),name:(e.name||"").trim(),address:(e.address||"").trim(),biz_type:(e.bizType||"").trim(),type:(e.bizType||"").trim(),committed:Number(e.committed||0),amount:Number(e.committed||0),share_pct:n(e.sharePct),interest_rate:n(e.interestRate),maturity_date:e.maturityDate||null,emi_amount:n(e.emiAmount),instalment_count:n(e.instalmentCount),next_due:e.nextDue||null,date:e.date||dayStr(),status:e.status||"active",note:(e.note||"").trim()};
+        if(e.id){ if(fail((await db.from("investments").update(row).eq("id",e.id)).error)) return; }
+        else { row.recorded_by=session.user.id; row.sort_order=investments.length; if(fail((await db.from("investments").insert(row)).error)) return; }
+        setInvForm(null); await refresh();
+      }
+      async function removeInvestment(id){ if(!window.confirm("Delete this investment and all its transactions?")) return; if(fail((await db.from("investments").delete().eq("id",id)).error)) return; setInvSel(null); setInvForm(null); await refresh(); }
+      async function saveInvTxn(){
+        const e=invTxnForm; if(!e) return;
+        if(!(Number(e.amount)>0)){ alert("Enter an amount greater than 0."); return; }
+        const row={company_id:cid(),investment_id:e.investmentId,txn_date:e.date||dayStr(),amount:Number(e.amount||0),direction:e.direction||"out",mode:e.mode||"",note:(e.note||"").trim(),recorded_by:session.user.id};
+        if(fail((await db.from("investment_txns").insert(row)).error)) return;
+        setInvTxnForm(null); await refresh();
+      }
+      async function removeInvTxn(id){ if(!window.confirm("Delete this transaction?")) return; if(fail((await db.from("investment_txns").delete().eq("id",id)).error)) return; await refresh(); }
       function propToRow(e){ const num=v=>Number(v||0); const lt=r=>num(r.qty)*num(r.rate); const services=(e.items||[]).filter(it=>it.on&&it.sumOn!==false).reduce((s,it)=>s+lt(it),0)+(e.customLines||[]).filter(r=>r.sumOn!==false).reduce((s,r)=>s+lt(r),0); const vat=e.vat||{on:false,pct:15}; const tax=e.tax||{on:false,pct:10}; const vatV=vat.on?Math.round(services*num(vat.pct)/100):0; const taxV=tax.on?Math.round((services+vatV)*num(tax.pct)/100):0; const grand=services+vatV+taxV; const row={company_id:cid(),lead_id:e.leadId||null,ref_no:(e.refNo||"").trim(),proposal_date:e.date||null,status:e.status,doc_type:e.docType||"design",client_name:(e.clientName||"").trim(),client_phone:(e.clientPhone||"").trim(),client_email:(e.clientEmail||"").trim(),client_address:(e.clientAddress||"").trim(),subject:(e.subject||"").trim(),intro:(e.intro||"").trim(),valid_days:num(e.validDays)||30,far_basis:(e.farBasis||"").trim(),project_info:e.projectInfo||[],required_services:e.requiredServices||[],programs:e.programs||[],items:e.items||[],custom_lines:e.customLines||[],vat,tax,payments:e.payments||[],payment_note:(e.paymentNote!=null?e.paymentNote:""),deliverables:e.deliverables||[],value_note:(e.valueNote!=null?e.valueNote:""),deliver_note:(e.deliverNote!=null?e.deliverNote:""),terms:e.terms||[],conclusion:(e.conclusion!=null?e.conclusion:""),subtotal:services,total:grand,notes:(e.notes||"").trim()}; return row; }
       async function saveProposal(){ const e=propEdit; const row=propToRow(e); if(e.id){ if(fail((await db.from("proposals").update(row).eq("id",e.id)).error)) return; } else { row.sort_order=proposals.length; if(fail((await db.from("proposals").insert(row)).error)) return; } { const ls={draft:"reviewing",sent:"proposal",accepted:"won",declined:"lost"}[e.status]; if(e.leadId&&ls) await db.from("leads").update({status:ls}).eq("id",e.leadId); } setPropEdit(null); await refresh(); }
       async function deleteProposal(id){ if(!window.confirm("Delete this proposal?")) return; if(fail((await db.from("proposals").delete().eq("id",id)).error)) return; setPropEdit(null); await refresh(); }
@@ -1211,64 +1232,131 @@
               ); })}</div>
               {!monthExp.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No expenses recorded for {monthName(expMonth)}.</div>}
             </>); })()}
-            {finTab==="investments" && isAdmin && (()=>{ const invested=investments.reduce((s,x)=>s+x.amount,0); const returned=investments.reduce((s,x)=>s+x.returned,0); const byBiz={}; investments.forEach(x=>{ const k=x.business||"—"; (byBiz[k]=byBiz[k]||[]).push(x); }); const bizes=Object.entries(byBiz).sort((a,b)=>b[1].reduce((s,x)=>s+x.amount,0)-a[1].reduce((s,x)=>s+x.amount,0)); return (<>
-              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <h2 className="text-base font-semibold">Investments</h2>
-                <button onClick={()=>setShowAddInv(s=>!s)} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add investment</button>
-              </div>
-              <div className="mb-4 flex flex-wrap gap-x-6 gap-y-2"><Stat n={money(invested)} l="Invested" /><Stat n={money(returned)} l="Returned" /><Stat n={money(invested-returned)} l="Net deployed" tone={invested-returned>0?undefined:undefined} /></div>
-              {showAddInv && (
-                <div className="mb-4 rounded-lg border border-zinc-300 bg-white p-3">
-                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                    <div className="col-span-2 sm:col-span-1"><Lbl>Business / venture</Lbl><Input value={ni.business} onChange={e=>setNi({...ni,business:e.target.value})} placeholder="e.g. Land project, Restaurant…" /></div>
-                    <div><Lbl>Type</Lbl><Select value={ni.type} onChange={v=>setNi({...ni,type:v})} options={INV_TYPES.map(t=>({value:t,label:t}))} className="w-full" /></div>
-                    <div><Lbl>Amount (৳)</Lbl><Input value={ni.amount} onChange={e=>setNi({...ni,amount:e.target.value})} /></div>
-                    <div><Lbl>Date</Lbl><input type="date" value={ni.date} onChange={e=>setNi({...ni,date:e.target.value})} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
-                    <div><Lbl>Status</Lbl><Select value={ni.status} onChange={v=>setNi({...ni,status:v})} options={INV_STATUS.map(([v,l])=>({value:v,label:l}))} className="w-full" /></div>
-                  </div>
-                  <div className="mt-3 flex gap-2"><button onClick={addInv} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Add</button><button onClick={()=>setShowAddInv(false)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600">Cancel</button></div>
+            {finTab==="investments" && isAdmin && (()=>{
+              const INP="mt-1 w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900";
+              const catL=Object.fromEntries(INV_CATEGORIES);
+              const modeL=Object.fromEntries(INV_MODES);
+              const sums=inv=>{ const t=invTxns.filter(x=>x.investmentId===inv.id); const paid=t.filter(x=>x.direction==="out").reduce((a,x)=>a+x.amount,0); const recv=t.filter(x=>x.direction==="in").reduce((a,x)=>a+x.amount,0); return {paid,recv,remaining:Math.max(0,Number(inv.committed||0)-paid),txns:t.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||""))}; };
+              const sel=invSel?investments.find(x=>x.id===invSel):null;
+              const F=(k,v)=>setInvForm(p=>({...p,[k]:v}));
+              const isBiz=invForm&&invForm.category==="business";
+              const isBond=invForm&&invForm.category==="bond";
+              const isInstal=invForm&&(invForm.category==="property"||invForm.category==="loan");
+              return (<>
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="text-base font-semibold">Investments</h2>
+                  {!sel && <button onClick={()=>setInvForm({id:null,category:"business",name:"",address:"",bizType:"",committed:"",sharePct:"",interestRate:"",maturityDate:"",emiAmount:"",instalmentCount:"",nextDue:"",date:dayStr(),status:"active",note:""})} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add investment</button>}
                 </div>
-              )}
-              {bizes.map(([biz,its])=>{ const inv=its.reduce((s,x)=>s+x.amount,0),ret=its.reduce((s,x)=>s+x.returned,0); return (
-                <section key={biz} className="mb-4">
-                  <div className="mb-1.5 flex flex-wrap items-baseline gap-2">
-                    <span className="text-[13px] font-semibold">{biz}</span>
-                    <span className="mono ml-auto text-[11px] text-zinc-500">in {money(inv)} · back {money(ret)} · <span className="font-semibold text-zinc-700">net {money(inv-ret)}</span></span>
+
+                {invForm && (
+                  <div className="mb-4 rounded-lg border border-zinc-300 bg-white p-4">
+                    <div className="mb-3 text-[13px] font-semibold">{invForm.id?"Edit investment":"New investment"}</div>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <div className="text-[12px]"><Lbl>Category</Lbl><select value={invForm.category} onChange={e=>F("category",e.target.value)} className={INP}>{INV_CATEGORIES.map(([k,l])=><option key={k} value={k}>{l}</option>)}</select></div>
+                      <div className="text-[12px]"><Lbl>Name</Lbl><input value={invForm.name} onChange={e=>F("name",e.target.value)} placeholder="Business / bond / property / loan name" className={INP} /></div>
+                      {(isBiz||invForm.category==="property") && <div className="text-[12px]"><Lbl>Address</Lbl><input value={invForm.address} onChange={e=>F("address",e.target.value)} className={INP} /></div>}
+                      {isBiz && <div className="text-[12px]"><Lbl>Business type</Lbl><input value={invForm.bizType} onChange={e=>F("bizType",e.target.value)} placeholder="e.g. Restaurant, Real estate" className={INP} /></div>}
+                      {isBiz && <div className="text-[12px]"><Lbl>Your share %</Lbl><input type="number" value={invForm.sharePct} onChange={e=>F("sharePct",e.target.value)} className={INP} /></div>}
+                      <div className="text-[12px]"><Lbl>Committed amount (৳)</Lbl><input type="number" value={invForm.committed} onChange={e=>F("committed",e.target.value)} className={INP} /></div>
+                      {isBond && <div className="text-[12px]"><Lbl>Interest rate %</Lbl><input type="number" value={invForm.interestRate} onChange={e=>F("interestRate",e.target.value)} className={INP} /></div>}
+                      {isBond && <div className="text-[12px]"><Lbl>Maturity date</Lbl><input type="date" value={invForm.maturityDate} onChange={e=>F("maturityDate",e.target.value)} className={INP} /></div>}
+                      {isInstal && <div className="text-[12px]"><Lbl>Instalment amount (৳)</Lbl><input type="number" value={invForm.emiAmount} onChange={e=>F("emiAmount",e.target.value)} className={INP} /></div>}
+                      {isInstal && <div className="text-[12px]"><Lbl>No. of instalments</Lbl><input type="number" value={invForm.instalmentCount} onChange={e=>F("instalmentCount",e.target.value)} className={INP} /></div>}
+                      {(isInstal||isBiz) && <div className="text-[12px]"><Lbl>Next payment due</Lbl><input type="date" value={invForm.nextDue} onChange={e=>F("nextDue",e.target.value)} className={INP} /></div>}
+                      <div className="text-[12px]"><Lbl>Start date</Lbl><input type="date" value={invForm.date} onChange={e=>F("date",e.target.value)} className={INP} /></div>
+                      <div className="text-[12px]"><Lbl>Status</Lbl><select value={invForm.status} onChange={e=>F("status",e.target.value)} className={INP}><option value="active">Active</option><option value="completed">Completed</option><option value="exited">Exited</option></select></div>
+                    </div>
+                    <div className="mt-3 text-[12px]"><Lbl>Note</Lbl><input value={invForm.note} onChange={e=>F("note",e.target.value)} className={INP} /></div>
+                    <div className="mt-3 flex gap-2">
+                      <button onClick={saveInvestment} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">{invForm.id?"Save changes":"Add investment"}</button>
+                      <button onClick={()=>setInvForm(null)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600 hover:bg-zinc-50">Cancel</button>
+                    </div>
                   </div>
-                  <div className="space-y-1.5">{its.map(it=>{ const ed=invEdit&&invEdit.id===it.id; return (
-                    <div key={it.id} className="rounded-lg border border-zinc-200 bg-white">
-                      <div className="flex items-center gap-2 px-3 py-2">
-                        <button onClick={()=>setInvEdit(ed?null:{...it,amount:String(it.amount),returned:String(it.returned),date:it.date||dayStr()})} className="flex min-w-0 flex-1 items-center gap-2 text-left">
-                          <span className="text-[11px] text-zinc-400">{ed?"▾":"▸"}</span>
-                          {it.type&&<span className="shrink-0 rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] text-zinc-600">{it.type}</span>}
-                          <span className="mono text-[10px] text-zinc-400">{it.date||""}</span>
-                          {it.returned>0&&<span className="mono text-[10px] text-emerald-600">back {money(it.returned)}</span>}
-                        </button>
-                        <span className="mono text-[12px] font-semibold">{money(it.amount)}</span>
-                        <span className={`mono shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase ${INV_TONE[it.status]}`}>{INV_LABEL[it.status]}</span>
+                )}
+
+                {sel ? (()=>{ const sm=sums(sel); return (
+                  <div>
+                    <button onClick={()=>{setInvSel(null);setInvTxnForm(null);}} className="mb-3 text-[12px] text-zinc-500 hover:text-zinc-800">← All investments</button>
+                    <div className="rounded-lg border border-zinc-300 bg-white p-4">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div>
+                          <div className="mono text-[10px] font-semibold uppercase tracking-wider text-zinc-400">{catL[sel.category]||sel.category}</div>
+                          <div className="text-base font-semibold">{sel.name||"\u2014"}{sel.status!=="active"&&<span className="mono ml-2 rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] uppercase text-zinc-400">{sel.status}</span>}</div>
+                          {sel.address && <div className="text-[12px] text-zinc-500">{sel.address}</div>}
+                          {(sel.bizType||sel.sharePct!=="") && <div className="text-[11px] text-zinc-400">{sel.bizType}{sel.sharePct!==""?(sel.bizType?" \u00b7 ":"")+sel.sharePct+"% share":""}</div>}
+                        </div>
+                        <div className="flex gap-2">
+                          <button onClick={()=>setInvForm({...sel})} className="rounded-md border border-zinc-300 px-2.5 py-1 text-[11px] text-zinc-600 hover:bg-zinc-50">Edit</button>
+                          <button onClick={()=>removeInvestment(sel.id)} className="rounded-md border border-red-200 px-2.5 py-1 text-[11px] text-red-500 hover:bg-red-50">Delete</button>
+                        </div>
                       </div>
-                      {ed && <div className="border-t border-zinc-100 p-3">
-                        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                          <div className="col-span-2 sm:col-span-1"><Lbl>Business / venture</Lbl><Input value={invEdit.business} onChange={e=>setInvEdit({...invEdit,business:e.target.value})} /></div>
-                          <div><Lbl>Type</Lbl><Select value={invEdit.type} onChange={v=>setInvEdit({...invEdit,type:v})} options={INV_TYPES.map(t=>({value:t,label:t}))} className="w-full" /></div>
-                          <div><Lbl>Amount in (৳)</Lbl><Input value={invEdit.amount} onChange={e=>setInvEdit({...invEdit,amount:e.target.value})} /></div>
-                          <div><Lbl>Returned (৳)</Lbl><Input value={invEdit.returned} onChange={e=>setInvEdit({...invEdit,returned:e.target.value})} /></div>
-                          <div><Lbl>Date</Lbl><input type="date" value={invEdit.date} onChange={e=>setInvEdit({...invEdit,date:e.target.value})} className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /></div>
-                          <div><Lbl>Status</Lbl><Select value={invEdit.status} onChange={v=>setInvEdit({...invEdit,status:v})} options={INV_STATUS.map(([v,l])=>({value:v,label:l}))} className="w-full" /></div>
-                          <div className="col-span-2 sm:col-span-3"><Lbl>Note</Lbl><Input value={invEdit.note} onChange={e=>setInvEdit({...invEdit,note:e.target.value})} /></div>
-                        </div>
-                        <div className="mt-3 flex flex-wrap items-center gap-2">
-                          <button onClick={saveInv} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Save</button>
-                          <button onClick={()=>setInvEdit(null)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600">Cancel</button>
-                          <button onClick={()=>deleteInv(it.id)} className="ml-auto rounded-md border border-zinc-200 px-3 py-1.5 text-[11px] text-zinc-400 hover:border-red-300 hover:text-red-500">Delete</button>
-                        </div>
+                      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        <div><div className="mono text-[14px] font-semibold">{money(sel.committed)}</div><div className="mono text-[9px] uppercase tracking-wider text-zinc-400">Committed</div></div>
+                        <div><div className="mono text-[14px] font-semibold">{money(sm.paid)}</div><div className="mono text-[9px] uppercase tracking-wider text-zinc-400">Paid</div></div>
+                        <div><div className={`mono text-[14px] font-semibold ${sm.remaining>0?"text-amber-600":"text-emerald-600"}`}>{money(sm.remaining)}</div><div className="mono text-[9px] uppercase tracking-wider text-zinc-400">Remaining</div></div>
+                        <div><div className="mono text-[14px] font-semibold text-emerald-600">{money(sm.recv)}</div><div className="mono text-[9px] uppercase tracking-wider text-zinc-400">Received</div></div>
+                      </div>
+                      {(sel.nextDue||sel.maturityDate||sel.interestRate!==""||sel.emiAmount!=="") && <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 border-t border-zinc-100 pt-2 text-[11px] text-zinc-500">
+                        {sel.nextDue && <span className={sel.nextDue<dayStr()?"font-semibold text-red-500":""}>Next due: {sel.nextDue}</span>}
+                        {sel.emiAmount!=="" && <span>Instalment: {money(sel.emiAmount)}{sel.instalmentCount!==""?" \u00d7 "+sel.instalmentCount:""}</span>}
+                        {sel.maturityDate && <span>Maturity: {sel.maturityDate}</span>}
+                        {sel.interestRate!=="" && <span>Rate: {sel.interestRate}%</span>}
                       </div>}
                     </div>
-                  ); })}</div>
-                </section>
-              ); })}
-              {!investments.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No investments recorded. Track profit moved into your other ventures here.</div>}
-            </>); })()}
+
+                    <div className="mt-4 flex items-center justify-between">
+                      <h3 className="text-[13px] font-semibold">Transactions</h3>
+                      <button onClick={()=>setInvTxnForm({investmentId:sel.id,date:dayStr(),amount:"",direction:"out",mode:"bank",note:""})} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add transaction</button>
+                    </div>
+                    {invTxnForm && invTxnForm.investmentId===sel.id && (
+                      <div className="mt-2 rounded-lg border border-zinc-300 bg-white p-3">
+                        <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+                          <div className="text-[12px]"><Lbl>Date</Lbl><input type="date" value={invTxnForm.date} onChange={e=>setInvTxnForm(p=>({...p,date:e.target.value}))} className={INP} /></div>
+                          <div className="text-[12px]"><Lbl>Amount (৳)</Lbl><input type="number" value={invTxnForm.amount} onChange={e=>setInvTxnForm(p=>({...p,amount:e.target.value}))} className={INP} /></div>
+                          <div className="text-[12px]"><Lbl>Direction</Lbl><select value={invTxnForm.direction} onChange={e=>setInvTxnForm(p=>({...p,direction:e.target.value}))} className={INP}><option value="out">Paid out</option><option value="in">Received</option></select></div>
+                          <div className="text-[12px]"><Lbl>Mode</Lbl><select value={invTxnForm.mode} onChange={e=>setInvTxnForm(p=>({...p,mode:e.target.value}))} className={INP}>{INV_MODES.map(([k,l])=><option key={k} value={k}>{l}</option>)}</select></div>
+                          <div className="text-[12px]"><Lbl>Note</Lbl><input value={invTxnForm.note} onChange={e=>setInvTxnForm(p=>({...p,note:e.target.value}))} className={INP} /></div>
+                        </div>
+                        <div className="mt-2 flex gap-2">
+                          <button onClick={saveInvTxn} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">Add</button>
+                          <button onClick={()=>setInvTxnForm(null)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600 hover:bg-zinc-50">Cancel</button>
+                        </div>
+                      </div>
+                    )}
+                    <div className="mt-2 space-y-1.5">
+                      {sm.txns.map(t=>(
+                        <div key={t.id} className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[12px]">
+                          <span className="mono text-zinc-400">{t.date}</span>
+                          <span className={`mono rounded px-1.5 py-0.5 text-[9px] font-bold uppercase ${t.direction==="in"?"bg-emerald-50 text-emerald-600":"bg-zinc-100 text-zinc-500"}`}>{t.direction==="in"?"Received":"Paid"}</span>
+                          <span className="text-zinc-500">{modeL[t.mode]||t.mode}</span>
+                          {t.note && <span className="truncate text-zinc-400">{t.note}</span>}
+                          <span className={`mono ml-auto font-semibold ${t.direction==="in"?"text-emerald-600":"text-zinc-800"}`}>{t.direction==="in"?"+":"\u2212"}{money(t.amount)}</span>
+                          <button onClick={()=>removeInvTxn(t.id)} className="text-zinc-300 hover:text-red-500">×</button>
+                        </div>
+                      ))}
+                      {!sm.txns.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-8 text-center text-[12px] text-zinc-400">No transactions yet.</div>}
+                    </div>
+                  </div>
+                ); })() : (()=>{
+                  const byCat={}; investments.forEach(x=>{ const k=x.category||"other"; (byCat[k]=byCat[k]||[]).push(x); });
+                  const order=INV_CATEGORIES.map(c=>c[0]).filter(k=>byCat[k]&&byCat[k].length);
+                  if(!investments.length) return <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No investments yet — add your first one.</div>;
+                  return (<div className="space-y-5">{order.map(k=>(
+                    <section key={k}>
+                      <div className="mb-2 flex items-center gap-2"><span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">{catL[k]}</span><span className="mono text-[10px] text-zinc-400">{byCat[k].length}</span><div className="ml-1 h-px flex-1 bg-zinc-200" /></div>
+                      <div className="space-y-1.5">{byCat[k].map(inv=>{ const sm=sums(inv); return (
+                        <button key={inv.id} onClick={()=>setInvSel(inv.id)} className="flex w-full flex-wrap items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-left hover:border-zinc-300">
+                          <div className="min-w-[140px] flex-1"><div className="text-[13px] font-medium">{inv.name||"\u2014"}{inv.status!=="active"&&<span className="mono ml-2 rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] uppercase text-zinc-400">{inv.status}</span>}</div>{(inv.bizType||inv.address)&&<div className="truncate text-[11px] text-zinc-400">{inv.bizType||inv.address}</div>}</div>
+                          <div className="text-right"><div className="mono text-[12px] font-semibold">{money(inv.committed)}</div><div className="mono text-[9px] uppercase text-zinc-400">Committed</div></div>
+                          <div className="text-right"><div className={`mono text-[12px] font-semibold ${sm.remaining>0?"text-amber-600":"text-emerald-600"}`}>{money(sm.remaining)}</div><div className="mono text-[9px] uppercase text-zinc-400">Remaining</div></div>
+                          <div className="text-right"><div className="mono text-[12px] font-semibold text-emerald-600">{money(sm.recv)}</div><div className="mono text-[9px] uppercase text-zinc-400">Received</div></div>
+                          {inv.nextDue&&<span className={`mono shrink-0 rounded px-1.5 py-0.5 text-[9px] ${inv.nextDue<dayStr()?"bg-red-50 text-red-500":"bg-zinc-100 text-zinc-400"}`}>due {inv.nextDue}</span>}
+                        </button>
+                      ); })}</div>
+                    </section>
+                  ))}</div>);
+                })()}
+              </>); })()}
             </>)}
 
             {area==="construction" && has("construction") && (<>
