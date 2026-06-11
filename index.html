@@ -526,12 +526,15 @@
         citems.forEach(x=>{ cno++; const amt=(x.sumOn!==false&&num(x.rate))?tk(lt(x)):(x.sumOn===false?"Excluded":"Included"); crows+='<tr><td class="c">'+cno+'</td><td><b>['+esc(x.code)+'] '+esc(x.name)+'</b></td><td class="c">'+esc(x.qty)+'</td><td class="c">'+esc(x.unit)+'</td><td class="r">'+(num(x.rate)?tk(x.rate):"—")+'</td><td class="r">'+amt+'</td></tr>'; });
         if(!crows){ codes.forEach(c=>{ cno++; crows+='<tr><td class="c">'+cno+'</td><td><b>['+esc(c)+']</b></td><td class="c"></td><td class="c"></td><td class="r"></td><td class="r">Included</td></tr>'; }); }
         const valCovered=crows?'<div class="sec"><h2>Value of Work Covered by this Bill</h2><table class="val"><thead><tr><td class="c">No</td><td>Description</td><td class="c">Qty</td><td class="c">Unit</td><td class="r">Rate</td><td class="r">Amount</td></tr></thead><tbody>'+crows+'</tbody></table><div class="notewrap" style="margin-top:4px">Please see the Payment History for full details.</div></div>':"";
-        const idx=insts.findIndex(r=>r.id===it.id); const prev=insts.slice(0,idx<0?0:idx);
-        let arrRows=""; let arrears=0;
-        prev.forEach(r=>{ const out=Math.max(0,num(r.amount)-num(r.paidAmount)); if(out>0){ arrears+=out; arrRows+='<tr><td>'+esc(r.title)+' &mdash; previous balance</td><td class="r">'+tk(out)+'</td></tr>'; } });
-        const curDue=Math.max(0,num(it.amount)-num(it.paidAmount));
-        const totalPay=arrears+curDue;
-        const currentBill='<div class="sec"><h2>Current Bill</h2><table class="val"><tbody>'+arrRows+'<tr><td>'+esc(it.title)+' (current bill)'+(it.covers?' &middot; covers '+esc(codeList(it.covers)):"")+'</td><td class="r"><b>'+tk(it.amount)+'</b></td></tr>'+(num(it.paidAmount)?'<tr><td>Less: received against this bill</td><td class="r">&minus;'+tk(it.paidAmount)+'</td></tr>':'')+'<tr class="tot"><td>Total payable now</td><td class="r">'+tk(totalPay)+'</td></tr></tbody></table><div class="inword"><b>In word:</b> Taka '+inWords(Math.round(totalPay))+' Only</div></div>';
+        const idx=insts.findIndex(r=>r.id===it.id);
+        const billedBefore=insts.slice(0,idx<0?0:idx).reduce((a,r)=>a+num(r.amount),0);
+        const received=insts.reduce((a,r)=>a+num(r.paidAmount),0);
+        const prevNet=billedBefore-received;
+        const balanceDue=prevNet+num(it.amount);
+        const totalPay=Math.max(0,balanceDue);
+        const credit=balanceDue<0?(-balanceDue):0;
+        const fmtSigned=v=>v<0?("("+tk(-v)+" advance)"):tk(v);
+        const currentBill='<div class="sec"><h2>Current Bill</h2><table class="val"><tbody>'+(prevNet!==0?'<tr><td>Previous balance (earlier bills less payments received)</td><td class="r">'+fmtSigned(prevNet)+'</td></tr>':'')+'<tr><td>'+esc(it.title)+' (current bill)'+(it.covers?' &middot; covers '+esc(codeList(it.covers)):"")+'</td><td class="r"><b>'+tk(it.amount)+'</b></td></tr><tr class="tot"><td>Total payable now</td><td class="r">'+tk(totalPay)+'</td></tr>'+(credit>0?'<tr class="sub"><td>Advance carried forward</td><td class="r">'+tk(credit)+'</td></tr>':'')+'</tbody></table><div class="inword"><b>In word:</b> Taka '+inWords(Math.round(totalPay))+' Only</div></div>';
         const paymentInfo='<div class="sec"><h2>Payment Information</h2><div class="notewrap">Make your cheque payable to: “Studio 16 Architects”, or settle by bank transfer to the account below, quoting bill reference <b>'+esc(it.billRef||"")+'</b>.</div><table class="kv"><tbody><tr><td class="k">Account Name</td><td>'+esc(BANK.name)+'</td></tr><tr><td class="k">Bank</td><td>'+esc(BANK.bank)+'</td></tr><tr><td class="k">Branch</td><td>'+esc(BANK.branch)+'</td></tr><tr><td class="k">Account Number</td><td>'+esc(BANK.acc)+'</td></tr><tr><td class="k">Routing Number</td><td>'+esc(BANK.routing)+'</td></tr>'+(BANK.swift?'<tr><td class="k">SWIFT</td><td>'+esc(BANK.swift)+'</td></tr>':"")+'</tbody></table></div>';
         let vrows=""; let vno=0;
         (prop?(prop.items||[]).filter(x=>x.on):[]).forEach(x=>{ vno++; const amt=(x.sumOn!==false&&num(x.rate))?tk(lt(x)):(x.sumOn===false?"Excluded":"Included"); vrows+='<tr><td class="c">'+vno+'</td><td><b>['+esc(x.code)+'] '+esc(x.name)+'</b></td><td class="c">'+esc(x.qty)+'</td><td class="c">'+esc(x.unit)+'</td><td class="r">'+(num(x.rate)?tk(x.rate):"—")+'</td><td class="r">'+amt+'</td></tr>'; });
