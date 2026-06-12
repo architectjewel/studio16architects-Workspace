@@ -176,7 +176,7 @@
       const [boardCfg,setBoardCfg]=useState(false); const [addBoardOpen,setAddBoardOpen]=useState(false); const [nb,setNb]=useState({name:"",desc:"",leadId:""});
       const [showAddP,setShowAddP]=useState(false); const [np,setNp]=useState({raw:"",code:"",nickname:"",client:"",location:"",size:"",address:"",priority:"medium",status:"live",lead:"__none"});
       const [addTaskFor,setAddTaskFor]=useState(null); const [td,setTd]=useState({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:"__none"});
-      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [viewKeys,setViewKeys]=useState(["design"]); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("design"); const [myCheckin,setMyCheckin]=useState(null); const [leads,setLeads]=useState([]); const [showAddLead,setShowAddLead]=useState(false); const [nl,setNl]=useState({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); const [leadEdit,setLeadEdit]=useState(null); const [convFor,setConvFor]=useState(null); const [convDraft,setConvDraft]=useState({code:"",priority:"medium"}); const [receivables,setReceivables]=useState([]); const [showAddRcv,setShowAddRcv]=useState(false); const [rcvProj,setRcvProj]=useState([]); const [rcvPickOpen,setRcvPickOpen]=useState(false); const [reportMonth,setReportMonth]=useState("all"); const [reportYr,setReportYr]=useState("all"); const [nr,setNr]=useState({projectId:"",title:"",amount:"",dueDate:""}); const [rcvEdit,setRcvEdit]=useState(null); const [finTab,setFinTab]=useState("overview"); const [expenses,setExpenses]=useState([]); const [showAddExp,setShowAddExp]=useState(false); const [ne,setNe]=useState({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:""}); const [expEdit,setExpEdit]=useState(null); const [expMonth,setExpMonth]=useState(dayStr().slice(0,7)); const [conTab,setConTab]=useState("site"); const [vendors,setVendors]=useState([]); const [bills,setBills]=useState([]); const [showAddVendor,setShowAddVendor]=useState(false); const [nvend,setNvend]=useState({name:"",type:"Material supplier",phone:"",note:""}); const [vendorEdit,setVendorEdit]=useState(null); const [showAddBill,setShowAddBill]=useState(false); const [nbill,setNbill]=useState({projectId:"",vendorId:"",category:"Materials",title:"",amount:"",date:dayStr(),dueDate:""}); const [billEdit,setBillEdit]=useState(null); const [siteTasks,setSiteTasks]=useState([]); const [showAddSite,setShowAddSite]=useState(false); const [ns,setNs]=useState({projectId:"",title:"",startDate:"",endDate:"",status:"not_started",progress:"0"}); const [siteEdit,setSiteEdit]=useState(null); const [salesTab,setSalesTab]=useState("leads"); const [salesQ,setSalesQ]=useState(""); const [emailing,setEmailing]=useState(false); const [pdfFile,setPdfFile]=useState(null); const [billEmailFor,setBillEmailFor]=useState(null); const [billPdf,setBillPdf]=useState(null); const [receiptEmailFor,setReceiptEmailFor]=useState(null); const [receiptPdf,setReceiptPdf]=useState(null); const [payments,setPayments]=useState([]); const [payForm,setPayForm]=useState({amount:"",date:"",payMode:"",txnRef:"",bankName:"",chequeNo:"",chequeDate:"",fromAcct:"",txnDate:"",note:""}); const [farSaving,setFarSaving]=useState(false); const farRef=React.useRef(null); const [catalog,setCatalog]=useState([]); const [showAddScope,setShowAddScope]=useState(false); const [nsc,setNsc]=useState({code:"",name:"",detail:""}); const [scopeEdit,setScopeEdit]=useState(null); const [tcs,setTcs]=useState([]); const [showAddTc,setShowAddTc]=useState(false); const [ntc,setNtc]=useState({title:"",body:""}); const [tcEdit,setTcEdit]=useState(null); const [resTab,setResTab]=useState("2025"); const [investments,setInvestments]=useState([]); const [showAddInv,setShowAddInv]=useState(false); const [ni,setNi]=useState({business:"",type:"Equity stake",amount:"",date:dayStr(),status:"active"}); const [invEdit,setInvEdit]=useState(null); const [invTxns,setInvTxns]=useState([]); const [invSel,setInvSel]=useState(null); const [invForm,setInvForm]=useState(null); const [invTxnForm,setInvTxnForm]=useState(null); const [invGroupBy,setInvGroupBy]=useState("category"); const [invPick,setInvPick]=useState([]); const [proposals,setProposals]=useState([]); const [propEdit,setPropEdit]=useState(null); const [propNewOpen,setPropNewOpen]=useState(false); const [acceptDraft,setAcceptDraft]=useState(null);
+      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [viewKeys,setViewKeys]=useState(["design"]); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("design"); const [myCheckin,setMyCheckin]=useState(null); const [leads,setLeads]=useState([]); const [showAddLead,setShowAddLead]=useState(false); const [nl,setNl]=useState({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); const [leadEdit,setLeadEdit]=useState(null); const [convFor,setConvFor]=useState(null); const [convDraft,setConvDraft]=useState({code:"",priority:"medium"}); const [receivables,setReceivables]=useState([]); const [showAddRcv,setShowAddRcv]=useState(false); const [rcvProj,setRcvProj]=useState([]); const [rcvPickOpen,setRcvPickOpen]=useState(false); const [reportMonth,setReportMonth]=useState("all"); const [reportYr,setReportYr]=useState("all"); const [nr,setNr]=useState({projectId:"",title:"",amount:"",dueDate:""}); const [rcvEdit,setRcvEdit]=useState(null); const [finTab,setFinTab]=useState("overview"); const [finPeriod,setFinPeriod]=useState("all"); const [expenses,setExpenses]=useState([]); const [showAddExp,setShowAddExp]=useState(false); const [ne,setNe]=useState({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:""}); const [expEdit,setExpEdit]=useState(null); const [expMonth,setExpMonth]=useState(dayStr().slice(0,7)); const [conTab,setConTab]=useState("site"); const [vendors,setVendors]=useState([]); const [bills,setBills]=useState([]); const [showAddVendor,setShowAddVendor]=useState(false); const [nvend,setNvend]=useState({name:"",type:"Material supplier",phone:"",note:""}); const [vendorEdit,setVendorEdit]=useState(null); const [showAddBill,setShowAddBill]=useState(false); const [nbill,setNbill]=useState({projectId:"",vendorId:"",category:"Materials",title:"",amount:"",date:dayStr(),dueDate:""}); const [billEdit,setBillEdit]=useState(null); const [siteTasks,setSiteTasks]=useState([]); const [showAddSite,setShowAddSite]=useState(false); const [ns,setNs]=useState({projectId:"",title:"",startDate:"",endDate:"",status:"not_started",progress:"0"}); const [siteEdit,setSiteEdit]=useState(null); const [salesTab,setSalesTab]=useState("overview"); const [salesPeriod,setSalesPeriod]=useState("all"); const [salesQ,setSalesQ]=useState(""); const [emailing,setEmailing]=useState(false); const [pdfFile,setPdfFile]=useState(null); const [billEmailFor,setBillEmailFor]=useState(null); const [billPdf,setBillPdf]=useState(null); const [receiptEmailFor,setReceiptEmailFor]=useState(null); const [receiptPdf,setReceiptPdf]=useState(null); const [payments,setPayments]=useState([]); const [payForm,setPayForm]=useState({amount:"",date:"",payMode:"",txnRef:"",bankName:"",chequeNo:"",chequeDate:"",fromAcct:"",txnDate:"",note:""}); const [farSaving,setFarSaving]=useState(false); const farRef=React.useRef(null); const [catalog,setCatalog]=useState([]); const [showAddScope,setShowAddScope]=useState(false); const [nsc,setNsc]=useState({code:"",name:"",detail:""}); const [scopeEdit,setScopeEdit]=useState(null); const [tcs,setTcs]=useState([]); const [showAddTc,setShowAddTc]=useState(false); const [ntc,setNtc]=useState({title:"",body:""}); const [tcEdit,setTcEdit]=useState(null); const [resTab,setResTab]=useState("2025"); const [investments,setInvestments]=useState([]); const [showAddInv,setShowAddInv]=useState(false); const [ni,setNi]=useState({business:"",type:"Equity stake",amount:"",date:dayStr(),status:"active"}); const [invEdit,setInvEdit]=useState(null); const [invTxns,setInvTxns]=useState([]); const [invSel,setInvSel]=useState(null); const [invForm,setInvForm]=useState(null); const [invTxnForm,setInvTxnForm]=useState(null); const [invGroupBy,setInvGroupBy]=useState("category"); const [invPick,setInvPick]=useState([]); const [proposals,setProposals]=useState([]); const [propEdit,setPropEdit]=useState(null); const [propNewOpen,setPropNewOpen]=useState(false); const [acceptDraft,setAcceptDraft]=useState(null);
 
       const realAdmin = profile?.role==="admin";
       const isAdmin = realAdmin && viewAs==="admin";
@@ -950,7 +950,7 @@ function printProposal(p){
               </>)}
               {area==="sales" && has("sales") && (<>
                 <div className="flex flex-wrap items-stretch gap-x-6 gap-y-2 pt-3">{LEAD_STATUS.map(([k,l])=><Stat key={k} n={leads.filter(x=>x.status===k).length} l={l} tone={k==="new"?"red":undefined} />)}</div>
-                <div className="flex flex-wrap items-center gap-1 pt-3">{[["leads","Lead"],["proposals","Proposal"]].map(([k,l])=>{ const active=k==="leads"?salesTab==="leads":salesTab!=="leads"; return <button key={k} onClick={()=>setSalesTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${active?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>; })}</div>
+                <div className="flex flex-wrap items-center gap-1 pt-3">{[["overview","Overview"],["leads","Lead"],["proposals","Proposal"]].map(([k,l])=>{ const active=k==="proposals"?(salesTab!=="leads"&&salesTab!=="overview"):salesTab===k; return <button key={k} onClick={()=>setSalesTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${active?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>; })}</div>
               </>)}
               {area==="finance" && has("finance") && (<>
                 <div className="flex flex-wrap items-stretch gap-x-6 gap-y-2 pt-3">{(()=>{ const billed=receivables.reduce((s,x)=>s+x.amount,0); const received=receivables.reduce((s,x)=>s+x.paidAmount,0); const overdue=receivables.filter(x=>x.dueDate&&x.dueDate<dayStr()&&x.paidAmount<x.amount).reduce((s,x)=>s+(x.amount-x.paidAmount),0); return (<><Stat n={money(billed)} l="Billed" /><Stat n={money(received)} l="Received" /><Stat n={money(billed-received)} l="Outstanding" /><Stat n={money(overdue)} l="Overdue" tone="red" /></>); })()}</div>
@@ -1247,8 +1247,50 @@ function printProposal(p){
             </>)}
 
             {area==="sales" && has("sales") && (<>
-              {salesTab!=="leads" && <div className="mb-3 flex flex-wrap gap-1">{[["proposals","Proposals"],["catalog","Scope catalogue"],["terms","Terms"]].map(([k,l])=><button key={k} onClick={()=>setSalesTab(k)} className={`rounded-md px-2.5 py-1 text-[11px] font-medium ${salesTab===k?"bg-zinc-800 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}<button onClick={()=>window.open("/far-calculator-2025-resource.html","_blank")} className="rounded-md border border-zinc-300 px-2.5 py-1 text-[11px] font-medium text-zinc-600 hover:bg-zinc-50">FAR 2025 ↗</button><button onClick={()=>window.open("/far-calculator-2008-resource.html","_blank")} className="rounded-md border border-zinc-300 px-2.5 py-1 text-[11px] font-medium text-zinc-600 hover:bg-zinc-50">FAR 2008 ↗</button></div>}
-              {salesTab==="leads" && (<>
+              {salesTab!=="leads" && salesTab!=="overview" && <div className="mb-3 flex flex-wrap gap-1">{[["proposals","Proposals"],["catalog","Scope catalogue"],["terms","Terms"]].map(([k,l])=><button key={k} onClick={()=>setSalesTab(k)} className={`rounded-md px-2.5 py-1 text-[11px] font-medium ${salesTab===k?"bg-zinc-800 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}<button onClick={()=>window.open("/far-calculator-2025-resource.html","_blank")} className="rounded-md border border-zinc-300 px-2.5 py-1 text-[11px] font-medium text-zinc-600 hover:bg-zinc-50">FAR 2025 ↗</button><button onClick={()=>window.open("/far-calculator-2008-resource.html","_blank")} className="rounded-md border border-zinc-300 px-2.5 py-1 text-[11px] font-medium text-zinc-600 hover:bg-zinc-50">FAR 2008 ↗</button></div>}
+              {salesTab==="overview" && (()=>{
+                const lt=r=>Number(r.qty||0)*Number(r.rate||0);
+                const grand=p=>{ const sv=(p.items||[]).filter(x=>x.on&&x.sumOn!==false).reduce((s,x)=>s+lt(x),0)+(p.customLines||[]).filter(r=>r.sumOn!==false).reduce((s,r)=>s+lt(r),0); const vv=(p.vat&&p.vat.on)?Math.round(sv*Number(p.vat.pct||0)/100):0; const tv=(p.tax&&p.tax.on)?Math.round((sv+vv)*Number(p.tax.pct||0)/100):0; return sv+vv+tv; };
+                const thisM=dayStr().slice(0,7), thisY=dayStr().slice(0,4);
+                const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+                const inP=d=>{ if(salesPeriod==="all")return true; const ds=String(d||""); if(!ds)return false; return salesPeriod==="month"?ds.slice(0,7)===thisM:ds.slice(0,4)===thisY; };
+                const plabel=salesPeriod==="all"?"All time":(salesPeriod==="year"?thisY:(MON[Number(thisM.slice(5,7))-1]+" "+thisY));
+                const props=proposals.filter(p=>inP(p.date));
+                const lds=leads.filter(l=>inP(l.createdAt));
+                const byStat=k=>props.filter(p=>p.status===k);
+                const valOf=arr=>arr.reduce((s,p)=>s+grand(p),0);
+                const accepted=byStat("accepted"), sent=byStat("sent"), draft=byStat("draft"), declined=byStat("declined"), expired=byStat("expired");
+                const wonVal=valOf(accepted), pipeVal=valOf(sent);
+                const decided=accepted.length+declined.length+expired.length;
+                const winRate=decided?Math.round(accepted.length/decided*100):0;
+                const STAT_ROWS=[["draft","Draft",draft],["sent","Sent",sent],["accepted","Accepted",accepted],["declined","Declined",declined],["expired","Expired",expired]];
+                const Card=({l,v,tone,sub})=>(<div className="rounded-lg border border-zinc-200 bg-white p-4"><div className="text-[11px] uppercase tracking-wide text-zinc-400">{l}</div><div className={`mono mt-1 text-xl font-semibold ${tone==="emerald"?"text-emerald-600":tone==="amber"?"text-amber-600":tone==="red"?"text-red-600":"text-zinc-900"}`}>{v}</div>{sub&&<div className="mt-1 text-[11px] text-zinc-400">{sub}</div>}</div>);
+                const Mini=({l,v,tone})=>(<div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[10px] uppercase tracking-wide text-zinc-400">{l}</div><div className={`mono mt-0.5 text-[15px] font-semibold ${tone==="emerald"?"text-emerald-600":tone==="red"?"text-red-600":"text-zinc-900"}`}>{v}</div></div>);
+                return (<div className="pt-1">
+                  <div className="mb-4 inline-flex rounded-md border border-zinc-200 bg-white p-0.5">{[["month","This month"],["year","This year"],["all","All time"]].map(([k,l])=>(<button key={k} onClick={()=>setSalesPeriod(k)} className={`rounded px-3 py-1 text-[12px] font-medium ${salesPeriod===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>))}</div>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <Card l="Won value" v={money(wonVal)} tone="emerald" sub={accepted.length+" accepted · "+plabel} />
+                    <Card l="Open pipeline" v={money(pipeVal)} tone="amber" sub={sent.length+" awaiting decision"} />
+                    <Card l="Win rate" v={winRate+"%"} sub={decided?(accepted.length+" of "+decided+" decided"):"no decisions yet"} />
+                  </div>
+                  <div className="mt-5 rounded-lg border border-zinc-200 bg-white p-4">
+                    <div className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-zinc-500">Proposals by status</div>
+                    <table className="w-full"><tbody>
+                    {STAT_ROWS.map(([k,l,arr])=>(<tr key={k} className="border-b border-zinc-100 last:border-0"><td className="py-1.5 text-[13px] text-zinc-600">{l}</td><td className="py-1.5 text-right text-[13px] text-zinc-500">{arr.length}</td><td className="mono py-1.5 text-right text-[13px] text-zinc-900">{money(valOf(arr))}</td></tr>))}
+                    <tr className="border-t border-zinc-200 font-semibold"><td className="py-2 text-[13px] text-zinc-700">Total</td><td className="py-2 text-right text-[13px] text-zinc-600">{props.length}</td><td className="mono py-2 text-right text-[13px] text-zinc-900">{money(valOf(props))}</td></tr>
+                    </tbody></table>
+                  </div>
+                  <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <Mini l="Leads" v={lds.length} sub="" />
+                    <Mini l="New" v={lds.filter(l=>l.status==="new").length} tone="red" />
+                    <Mini l="Won" v={lds.filter(l=>l.status==="won").length} tone="emerald" />
+                    <Mini l="Lost" v={lds.filter(l=>l.status==="lost").length} />
+                  </div>
+                  <div className="mt-3 text-[11px] text-zinc-400">Proposals and leads counted by their date within {plabel==="All time"?"all time":plabel}. Value uses each proposal's grand total (services + VAT + tax).</div>
+                </div>);
+              })()}
+              
+{salesTab==="leads" && (<>
               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-base font-semibold">Lead <span className="mono text-[11px] text-zinc-400">{leads.length} total</span></h2>
                 <div className="flex flex-wrap items-center gap-2"><input value={salesQ} onChange={e=>setSalesQ(e.target.value)} placeholder="Search name / email / phone" className="w-48 rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] outline-none focus:border-zinc-900" /><button onClick={()=>setShowAddLead(s=>!s)} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add lead</button></div>
@@ -1478,20 +1520,27 @@ function printProposal(p){
             {area==="finance" && has("finance") && (<>
               
               {finTab==="overview" && (()=>{
-                const recClient=receivables.reduce((s,x)=>s+Number(x.paidAmount||0),0);
+                const thisM=dayStr().slice(0,7), thisY=dayStr().slice(0,4);
+                const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+                const inP=d=>{ if(finPeriod==="all")return true; const ds=String(d||""); if(!ds)return false; return finPeriod==="month"?ds.slice(0,7)===thisM:ds.slice(0,4)===thisY; };
+                const plabel=finPeriod==="all"?"all time":(finPeriod==="year"?thisY:(MON[Number(thisM.slice(5,7))-1]+" "+thisY));
+                const recClient=payments.filter(x=>inP(x.date)).reduce((s,x)=>s+Number(x.amount||0),0);
+                const invRet=invTxns.filter(x=>x.direction==="in"&&inP(x.date)).reduce((s,x)=>s+Number(x.amount||0),0);
+                const invCap=invTxns.filter(x=>x.direction==="out"&&inP(x.date)).reduce((s,x)=>s+Number(x.amount||0),0);
+                const expTotal=expenses.filter(x=>inP(x.date)).reduce((s,x)=>s+Number(x.amount||0),0);
+                const moneyIn=recClient+invRet;
+                const moneyOut=expTotal+invCap;
+                const net=moneyIn-moneyOut;
+                const invT=invTotals(investments);
                 const outstanding=receivables.reduce((s,x)=>x.billed?s+Math.max(0,Number(x.amount||0)-Number(x.paidAmount||0)):s,0);
                 const yetBill=receivables.reduce((s,x)=>!x.billed?s+Number(x.amount||0):s,0);
-                const invT=invTotals(investments);
-                const expTotal=expenses.reduce((s,x)=>s+Number(x.amount||0),0);
-                const moneyIn=recClient+invT.rec;
-                const moneyOut=expTotal+invT.p;
-                const net=moneyIn-moneyOut;
-                const catMap={}; expenses.forEach(x=>{const k=x.category||"Other"; catMap[k]=(catMap[k]||0)+Number(x.amount||0);});
+                const catMap={}; expenses.filter(x=>inP(x.date)).forEach(x=>{const k=x.category||"Other"; catMap[k]=(catMap[k]||0)+Number(x.amount||0);});
                 const cats=Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
                 const Card=({l,v,tone,sub})=>(<div className="rounded-lg border border-zinc-200 bg-white p-4"><div className="text-[11px] uppercase tracking-wide text-zinc-400">{l}</div><div className={`mono mt-1 text-xl font-semibold ${tone==="emerald"?"text-emerald-600":tone==="red"?"text-red-600":"text-zinc-900"}`}>{v}</div>{sub&&<div className="mt-1 text-[11px] text-zinc-400">{sub}</div>}</div>);
                 const Row=({l,v,bold})=>(<div className={`flex items-center justify-between py-1.5 ${bold?"mt-1 border-t border-zinc-200 pt-2 font-semibold":""}`}><span className="text-[13px] text-zinc-600">{l}</span><span className={`mono text-[13px] ${bold?"text-zinc-900":"text-zinc-700"}`}>{v}</span></div>);
                 const Mini=({l,v,tone})=>(<div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[10px] uppercase tracking-wide text-zinc-400">{l}</div><div className={`mono mt-0.5 text-[15px] font-semibold ${tone==="emerald"?"text-emerald-600":tone==="red"?"text-red-600":tone==="amber"?"text-amber-600":"text-zinc-900"}`}>{v}</div></div>);
                 return (<div className="pt-1">
+                  <div className="mb-4 inline-flex rounded-md border border-zinc-200 bg-white p-0.5">{[["month","This month"],["year","This year"],["all","All time"]].map(([k,l])=>(<button key={k} onClick={()=>setFinPeriod(k)} className={`rounded px-3 py-1 text-[12px] font-medium ${finPeriod===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>))}</div>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                     <Card l="Money in" v={money(moneyIn)} tone="emerald" sub="client receipts + investment returns" />
                     <Card l="Money out" v={money(moneyOut)} tone="zinc" sub="expenses + capital invested" />
@@ -1501,17 +1550,17 @@ function printProposal(p){
                     <div className="rounded-lg border border-zinc-200 bg-white p-4">
                       <div className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-zinc-500">Where money came from</div>
                       <Row l="Client receipts" v={money(recClient)} />
-                      <Row l="Investment returns" v={money(invT.rec)} />
+                      <Row l="Investment returns" v={money(invRet)} />
                       <Row l="Total in" v={money(moneyIn)} bold />
                     </div>
                     <div className="rounded-lg border border-zinc-200 bg-white p-4">
                       <div className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-zinc-500">Where money went</div>
                       <Row l="Operating expenses" v={money(expTotal)} />
-                      <Row l="Capital invested" v={money(invT.p)} />
+                      <Row l="Capital invested" v={money(invCap)} />
                       <Row l="Total out" v={money(moneyOut)} bold />
                     </div>
                   </div>
-                  <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <div className="mt-5 mb-1 text-[11px] font-semibold uppercase tracking-wide text-zinc-400">Standing position · all-time</div><div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                     <Mini l="To collect" v={money(outstanding)} tone="amber" />
                     <Mini l="Yet to bill" v={money(yetBill)} />
                     <Mini l="Investment profit" v={money(invT.np)} tone={invT.np>=0?"emerald":"red"} />
@@ -1521,7 +1570,7 @@ function printProposal(p){
                     <div className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-zinc-500">Expenses by category</div>
                     {cats.map(([k,v])=>(<div key={k} className="flex items-center justify-between border-b border-zinc-100 py-1.5 last:border-0"><span className="text-[13px] text-zinc-600">{k}</span><span className="mono text-[13px] text-zinc-900">{money(v)}</span></div>))}
                   </div>}
-                  <div className="mt-3 text-[11px] text-zinc-400">All-time totals across the firm. A month-by-month view can be added next.</div>
+                  <div className="mt-3 text-[11px] text-zinc-400">Flows (money in / out) are for {plabel}; the standing position tiles are all-time balances.</div>
                 </div>);
               })()}
               
