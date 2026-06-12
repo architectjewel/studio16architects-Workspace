@@ -690,7 +690,7 @@ function printExpenditure(){
         const yr=expMonth.slice(0,4);
         const sc=profitScope;
         const inScope=d=>{ const ds=(d||""); if(sc==="all")return true; if(sc==="year")return ds.slice(0,4)===yr; return ds.startsWith(expMonth); };
-        const scopeLabel=sc==="all"?"All time":sc==="year"?yr:monthName(expMonth);
+        const scopeLabel=sc==="all"?"All time":sc==="year"?yr:monthName(expMonth); const incomeAll=payments.filter(x=>inScope(x.date)).reduce((s,x)=>s+Number(x.amount||0),0); const costAll=expenses.filter(e=>inScope(e.date)).reduce((s,e)=>s+Number(e.amount||0),0); const profitAll=incomeAll-costAll; const kpis='<div class="kpis"><div class="kpi"><div class="l">Income</div><div class="v">'+tk(incomeAll)+'</div></div><div class="kpi"><div class="l">Cost</div><div class="v">'+tk(costAll)+'</div></div><div class="kpi"><div class="l">Profit</div><div class="v '+(profitAll>=0?"pos":"neg")+'">'+tk(profitAll)+'</div></div></div>';
         const pname=p=>(p.code?p.code+" ":"")+(p.nickname||p.client||p.location||"Project");
         const now=new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"});
         const qr=location.origin+"/s16a-qr.svg";
@@ -711,7 +711,7 @@ function printExpenditure(){
           +'<div class="run-foot">Studio 16 Architects \u00b7 Baridhara, Dhaka \u00b7 '+esc(STUDIO.web)+'</div>'
           +lh
           +'<div class="contact">'+esc(STUDIO.address)+'<br>Phone: '+esc(STUDIO.phone)+' \u00b7 '+esc(STUDIO.email)+'</div>'
-          +'<div class="doctitle">Profit Report</div><div class="scope">'+esc(scopeLabel)+' \u00b7 generated '+now+'</div>'
+          +'<div class="doctitle">Profit Statement</div><div class="scope">'+esc(scopeLabel)+' \u00b7 generated '+now+'</div>'+kpis
           +'<div class="sec"><table><thead>'+head+'</thead><tbody>'+rows+'</tbody></table></div>'
           +(sc==="all"?'<div class="sec" style="font-size:8.5px;color:#a1a1aa">Profit = fee \u2212 absorbed costs. Billable (reimbursable) costs are excluded as pass-through.</div>':'<div class="sec" style="font-size:8.5px;color:#a1a1aa">Period view: income received and costs incurred within '+esc(scopeLabel)+'.</div>')
           +'</body></html>';
@@ -1873,7 +1873,7 @@ function printProposal(p){
                 <div className="flex items-center gap-2"><button onClick={printExpenditure} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] font-medium text-zinc-700 hover:bg-zinc-50">Print</button><button onClick={()=>setShowAddExp(s=>!s)} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add expense</button></div>
               </div>
               <div className="mb-3 flex flex-wrap gap-x-6 gap-y-2">
-                <Stat n={money(monthTotal)} l={"Cost · "+scopeLabel} />{isAdmin && <Stat n={money(income)} l={"Income · "+scopeLabel} tone="green" />}{isAdmin && <Stat n={money(profitPd)} l="Profit" tone={profitPd>=0?"green":"red"} />}<Stat n={monthExp.length} l="Entries" /><Stat n={money(allTotal)} l="All-time" />
+                <Stat n={money(monthTotal)} l={"Spent · "+scopeLabel} /><Stat n={monthExp.length} l="Entries" /><Stat n={money(allTotal)} l="All-time" />
               </div>
               {cats.length>0 && <div className="mb-4 flex flex-wrap gap-1.5">{cats.map(([c,v])=><span key={c} className="mono rounded-md border border-zinc-200 bg-white px-2 py-1 text-[11px] text-zinc-600">{c} <b className="text-zinc-900">{money(v)}</b></span>)}</div>}
               {showAddExp && (
@@ -1937,7 +1937,15 @@ function printProposal(p){
                 }).filter(r=>r.fee>0||r.costs>0).sort((a,b)=>String(a.p.code||"~~~~").localeCompare(String(b.p.code||"~~~~")));
                 const T={fee:0,received:0,costs:0,profit:0};
                 rows.forEach(r=>{T.fee+=r.fee;T.received+=r.received;T.costs+=r.costs;T.profit+=r.profit;});
+                const yrP=expMonth.slice(0,4);
+                const inScopeP=d=>{const ds=(d||"");if(profitScope==="all")return true;if(profitScope==="year")return ds.slice(0,4)===yrP;return ds.startsWith(expMonth);};
+                const scopeLabelP=profitScope==="all"?"All time":profitScope==="year"?yrP:monthName(expMonth);
+                const prows=projects.map(p=>{const inc=payments.filter(x=>x.projectId===p.id&&inScopeP(x.date)).reduce((s,x)=>s+Number(x.amount||0),0);const cost=expenses.filter(e=>e.projectId===p.id&&inScopeP(e.date)).reduce((s,e)=>s+Number(e.amount||0),0);return {p,inc,cost,profit:inc-cost};}).filter(r=>r.inc>0||r.cost>0).sort((a,b)=>String(a.p.code||"~~~~").localeCompare(String(b.p.code||"~~~~")));
+                const PT={inc:0,cost:0,profit:0}; prows.forEach(r=>{PT.inc+=r.inc;PT.cost+=r.cost;PT.profit+=r.profit;}); const incomeAll=payments.filter(x=>inScopeP(x.date)).reduce((s,x)=>s+Number(x.amount||0),0); const costAll=expenses.filter(e=>inScopeP(e.date)).reduce((s,e)=>s+Number(e.amount||0),0); const profitAll=incomeAll-costAll;
                 return (<div className="pt-1">
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2"><div className="flex flex-wrap items-center gap-2"><div className="flex items-center gap-1">{[["month","Month"],["year","Year"],["all","All time"]].map(([k,l])=>(<button key={k} onClick={()=>setProfitScope(k)} className={`rounded px-2.5 py-1 text-[11px] font-medium ${profitScope===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>))}</div>{profitScope==="month" && <div className="flex items-center gap-2"><button onClick={()=>setExpMonth(m=>shiftMonth(m,-1))} className="rounded-md border border-zinc-300 px-2.5 py-1 text-[13px] text-zinc-600 hover:bg-zinc-50">‹</button><span className="min-w-[120px] text-center text-[13px] font-semibold">{monthName(expMonth)}</span><button onClick={()=>setExpMonth(m=>shiftMonth(m,1))} className="rounded-md border border-zinc-300 px-2.5 py-1 text-[13px] text-zinc-600 hover:bg-zinc-50">›</button></div>}{profitScope==="year" && <div className="flex items-center gap-2"><button onClick={()=>setExpMonth(m=>(Number(m.slice(0,4))-1)+m.slice(4))} className="rounded-md border border-zinc-300 px-2.5 py-1 text-[13px] text-zinc-600 hover:bg-zinc-50">‹</button><span className="min-w-[60px] text-center text-[13px] font-semibold">{yrP}</span><button onClick={()=>setExpMonth(m=>(Number(m.slice(0,4))+1)+m.slice(4))} className="rounded-md border border-zinc-300 px-2.5 py-1 text-[13px] text-zinc-600 hover:bg-zinc-50">›</button></div>}</div><button onClick={printProfit} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] font-medium text-zinc-700 hover:bg-zinc-50">Print</button></div>
+                  <div className="mb-3 flex flex-wrap gap-x-6 gap-y-2"><Stat n={money(incomeAll)} l={"Income · "+scopeLabelP} tone="green" /><Stat n={money(costAll)} l={"Cost · "+scopeLabelP} /><Stat n={money(profitAll)} l="Profit" tone={profitAll>=0?"green":"red"} /></div>
+                  {profitScope!=="all" ? (<div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white"><table className="w-full text-[13px]"><thead><tr className="border-b border-zinc-200 text-left text-[11px] uppercase tracking-wide text-zinc-400"><th className="px-3 py-2 font-medium">Project</th><th className="px-3 py-2 text-right font-medium">Income</th><th className="px-3 py-2 text-right font-medium">Cost</th><th className="px-3 py-2 text-right font-medium">Profit</th></tr></thead><tbody>{prows.length===0?<tr><td colSpan={4} className="px-3 py-6 text-center text-zinc-400">No project income or costs in {scopeLabelP}.</td></tr>:prows.map(r=>(<tr key={r.p.id} className="border-b border-zinc-100"><td className="px-3 py-2 font-medium text-zinc-800">{pname(r.p)}</td><td className="mono px-3 py-2 text-right text-zinc-700">{money(r.inc)}</td><td className="mono px-3 py-2 text-right text-zinc-700">{money(r.cost)}</td><td className={`mono px-3 py-2 text-right font-semibold ${r.profit>=0?"text-emerald-600":"text-red-600"}`}>{money(r.profit)}</td></tr>))}{prows.length>0 && <tr className="border-t-2 border-zinc-800 font-semibold"><td className="px-3 py-2">Total</td><td className="mono px-3 py-2 text-right">{money(PT.inc)}</td><td className="mono px-3 py-2 text-right">{money(PT.cost)}</td><td className={`mono px-3 py-2 text-right ${PT.profit>=0?"text-emerald-600":"text-red-600"}`}>{money(PT.profit)}</td></tr>}</tbody></table><div className="px-3 py-2 text-[11px] text-zinc-400">Period view: income received and project costs incurred within {scopeLabelP}.</div></div>) : (<>
                   <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white">
                     <table className="w-full text-[13px]">
                       <thead><tr className="border-b border-zinc-200 text-left text-[11px] uppercase tracking-wide text-zinc-400"><th className="px-3 py-2 font-medium">Project</th><th className="px-3 py-2 text-right font-medium">Fee</th><th className="px-3 py-2 text-right font-medium">Received</th><th className="px-3 py-2 text-right font-medium">Costs</th><th className="px-3 py-2 text-right font-medium">Profit</th><th className="px-3 py-2 text-right font-medium">Margin</th></tr></thead>
@@ -1962,6 +1970,7 @@ function printProposal(p){
                     </table>
                   </div>
                   <div className="mt-3 text-[11px] text-zinc-400">Fee is the project's contract value from Receivables; costs are expenses tagged to the project. Profit subtracts only the costs you absorb — billable costs you re-bill to the client are treated as pass-through. Tap a row for the cost breakdown.</div>
+                  </>)}
                 </div>);
               })()}
               
