@@ -2363,7 +2363,6 @@ function printProposal(p){
                   <div className="flex flex-wrap items-center gap-1 pt-3">
                     {isAdmin && <button onClick={()=>{setHrForm(blankHr());setHrEditId(null);setHrOpen(true);}} className="order-last ml-auto rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add team member</button>}
                     <div className="flex items-center gap-1">{[["position","Position"],["department","Department"],["type","Type"],["none","None"]].map(([k,l])=>(<button key={k} onClick={()=>setHrGroup(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${hrGroup===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>))}</div>
-                    <div className="mx-1 h-5 w-px self-center bg-zinc-200" />
                     <div className="flex items-center gap-1">{[["active","Active"],["archived","Archived"]].map(([k,l])=>(<button key={k} onClick={()=>setHrArch(k==="archived")} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${(hrArch?"archived":"active")===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>))}</div>
                   </div>
                   <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white">
