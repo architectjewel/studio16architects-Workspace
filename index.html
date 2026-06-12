@@ -174,7 +174,7 @@
       const [boardCfg,setBoardCfg]=useState(false); const [addBoardOpen,setAddBoardOpen]=useState(false); const [nb,setNb]=useState({name:"",desc:"",leadId:""});
       const [showAddP,setShowAddP]=useState(false); const [np,setNp]=useState({raw:"",code:"",nickname:"",client:"",location:"",size:"",address:"",priority:"medium",status:"live",lead:"__none"});
       const [addTaskFor,setAddTaskFor]=useState(null); const [td,setTd]=useState({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:"__none"});
-      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("design"); const [myCheckin,setMyCheckin]=useState(null); const [leads,setLeads]=useState([]); const [showAddLead,setShowAddLead]=useState(false); const [nl,setNl]=useState({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); const [leadEdit,setLeadEdit]=useState(null); const [convFor,setConvFor]=useState(null); const [convDraft,setConvDraft]=useState({code:"",priority:"medium"}); const [receivables,setReceivables]=useState([]); const [showAddRcv,setShowAddRcv]=useState(false); const [rcvProj,setRcvProj]=useState(""); const [nr,setNr]=useState({projectId:"",title:"",amount:"",dueDate:""}); const [rcvEdit,setRcvEdit]=useState(null); const [finTab,setFinTab]=useState("receivables"); const [expenses,setExpenses]=useState([]); const [showAddExp,setShowAddExp]=useState(false); const [ne,setNe]=useState({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:""}); const [expEdit,setExpEdit]=useState(null); const [expMonth,setExpMonth]=useState(dayStr().slice(0,7)); const [conTab,setConTab]=useState("site"); const [vendors,setVendors]=useState([]); const [bills,setBills]=useState([]); const [showAddVendor,setShowAddVendor]=useState(false); const [nvend,setNvend]=useState({name:"",type:"Material supplier",phone:"",note:""}); const [vendorEdit,setVendorEdit]=useState(null); const [showAddBill,setShowAddBill]=useState(false); const [nbill,setNbill]=useState({projectId:"",vendorId:"",category:"Materials",title:"",amount:"",date:dayStr(),dueDate:""}); const [billEdit,setBillEdit]=useState(null); const [siteTasks,setSiteTasks]=useState([]); const [showAddSite,setShowAddSite]=useState(false); const [ns,setNs]=useState({projectId:"",title:"",startDate:"",endDate:"",status:"not_started",progress:"0"}); const [siteEdit,setSiteEdit]=useState(null); const [salesTab,setSalesTab]=useState("leads"); const [salesQ,setSalesQ]=useState(""); const [emailing,setEmailing]=useState(false); const [pdfFile,setPdfFile]=useState(null); const [billEmailFor,setBillEmailFor]=useState(null); const [billPdf,setBillPdf]=useState(null); const [farSaving,setFarSaving]=useState(false); const farRef=React.useRef(null); const [catalog,setCatalog]=useState([]); const [showAddScope,setShowAddScope]=useState(false); const [nsc,setNsc]=useState({code:"",name:"",detail:""}); const [scopeEdit,setScopeEdit]=useState(null); const [tcs,setTcs]=useState([]); const [showAddTc,setShowAddTc]=useState(false); const [ntc,setNtc]=useState({title:"",body:""}); const [tcEdit,setTcEdit]=useState(null); const [resTab,setResTab]=useState("2025"); const [investments,setInvestments]=useState([]); const [showAddInv,setShowAddInv]=useState(false); const [ni,setNi]=useState({business:"",type:"Equity stake",amount:"",date:dayStr(),status:"active"}); const [invEdit,setInvEdit]=useState(null); const [invTxns,setInvTxns]=useState([]); const [invSel,setInvSel]=useState(null); const [invForm,setInvForm]=useState(null); const [invTxnForm,setInvTxnForm]=useState(null); const [invGroupBy,setInvGroupBy]=useState("category"); const [invPick,setInvPick]=useState([]); const [proposals,setProposals]=useState([]); const [propEdit,setPropEdit]=useState(null); const [propNewOpen,setPropNewOpen]=useState(false); const [acceptDraft,setAcceptDraft]=useState(null);
+      const [tab,setTab]=useState("team"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("design"); const [myCheckin,setMyCheckin]=useState(null); const [leads,setLeads]=useState([]); const [showAddLead,setShowAddLead]=useState(false); const [nl,setNl]=useState({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); const [leadEdit,setLeadEdit]=useState(null); const [convFor,setConvFor]=useState(null); const [convDraft,setConvDraft]=useState({code:"",priority:"medium"}); const [receivables,setReceivables]=useState([]); const [showAddRcv,setShowAddRcv]=useState(false); const [rcvProj,setRcvProj]=useState(""); const [nr,setNr]=useState({projectId:"",title:"",amount:"",dueDate:""}); const [rcvEdit,setRcvEdit]=useState(null); const [finTab,setFinTab]=useState("receivables"); const [expenses,setExpenses]=useState([]); const [showAddExp,setShowAddExp]=useState(false); const [ne,setNe]=useState({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:""}); const [expEdit,setExpEdit]=useState(null); const [expMonth,setExpMonth]=useState(dayStr().slice(0,7)); const [conTab,setConTab]=useState("site"); const [vendors,setVendors]=useState([]); const [bills,setBills]=useState([]); const [showAddVendor,setShowAddVendor]=useState(false); const [nvend,setNvend]=useState({name:"",type:"Material supplier",phone:"",note:""}); const [vendorEdit,setVendorEdit]=useState(null); const [showAddBill,setShowAddBill]=useState(false); const [nbill,setNbill]=useState({projectId:"",vendorId:"",category:"Materials",title:"",amount:"",date:dayStr(),dueDate:""}); const [billEdit,setBillEdit]=useState(null); const [siteTasks,setSiteTasks]=useState([]); const [showAddSite,setShowAddSite]=useState(false); const [ns,setNs]=useState({projectId:"",title:"",startDate:"",endDate:"",status:"not_started",progress:"0"}); const [siteEdit,setSiteEdit]=useState(null); const [salesTab,setSalesTab]=useState("leads"); const [salesQ,setSalesQ]=useState(""); const [emailing,setEmailing]=useState(false); const [pdfFile,setPdfFile]=useState(null); const [billEmailFor,setBillEmailFor]=useState(null); const [billPdf,setBillPdf]=useState(null); const [receiptEmailFor,setReceiptEmailFor]=useState(null); const [receiptPdf,setReceiptPdf]=useState(null); const [farSaving,setFarSaving]=useState(false); const farRef=React.useRef(null); const [catalog,setCatalog]=useState([]); const [showAddScope,setShowAddScope]=useState(false); const [nsc,setNsc]=useState({code:"",name:"",detail:""}); const [scopeEdit,setScopeEdit]=useState(null); const [tcs,setTcs]=useState([]); const [showAddTc,setShowAddTc]=useState(false); const [ntc,setNtc]=useState({title:"",body:""}); const [tcEdit,setTcEdit]=useState(null); const [resTab,setResTab]=useState("2025"); const [investments,setInvestments]=useState([]); const [showAddInv,setShowAddInv]=useState(false); const [ni,setNi]=useState({business:"",type:"Equity stake",amount:"",date:dayStr(),status:"active"}); const [invEdit,setInvEdit]=useState(null); const [invTxns,setInvTxns]=useState([]); const [invSel,setInvSel]=useState(null); const [invForm,setInvForm]=useState(null); const [invTxnForm,setInvTxnForm]=useState(null); const [invGroupBy,setInvGroupBy]=useState("category"); const [invPick,setInvPick]=useState([]); const [proposals,setProposals]=useState([]); const [propEdit,setPropEdit]=useState(null); const [propNewOpen,setPropNewOpen]=useState(false); const [acceptDraft,setAcceptDraft]=useState(null);
 
       const realAdmin = profile?.role==="admin";
       const isAdmin = realAdmin && viewAs==="admin";
@@ -333,6 +333,50 @@
         finally{ setEmailing(false); }
       }
 
+function receiptEmailHTML(it){
+        const esc=v=>String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        const proj=projects.find(p=>p.id===it.projectId)||{};
+        const prop=proposals.find(p=>p.convertedProjectId===proj.id)||null;
+        const name=esc(((prop&&prop.clientName)||proj.client||"").trim()||"Client");
+        const addr=esc(((prop&&prop.clientAddress)||proj.address||proj.location||"").trim());
+        const ref=esc(it.receiptRef||"");
+        const lbl="padding:1px 12px 1px 0;font-weight:600;vertical-align:top;white-space:nowrap";
+        return `<div style="font-family:Arial,Helvetica,sans-serif;color:#18181b;font-size:14px;line-height:1.6;max-width:640px">
+          <p>Dear ${name},</p>
+          <p>Greetings from Studio 16 Architects. Please find attached our money receipt${ref?(" (Ref: "+ref+")"):""} acknowledging, with thanks, the payment received${addr?(" for your project at "+addr):""} &mdash; please see the attached PDF file. If you have any question about this receipt, please contact Ar. Jewel Barua, Mobile: +880 1717-222907. We appreciate your continued trust in Studio 16 Architects.</p>
+          <p style="margin:16px 0 2px">With Best Regards,</p>
+          <p style="margin:0;font-weight:700">Ar. Jewel Barua</p>
+          <p style="margin:0;color:#3f3f46">Architect, Founder and Managing Partner, Studio 16 Architects.<br>Member of Institute of Architects Bangladesh (MIAB),<br>B.Arch (AUST), RAJUK, CDA, DCBA &amp; ECPS Registered<br><a href="https://www.studio16architectsbd.com" style="color:#2563eb;text-decoration:none">www.studio16architectsbd.com</a></p>
+          <div style="margin-top:22px"><img src="https://workspace.studio16architectsbd.com/s16a-logo.png" alt="Studio 16 Architects" height="44" style="display:block;border:0" /></div>
+          <table style="margin-top:14px;border-collapse:collapse;font-size:13px;color:#3f3f46">
+            <tr><td style="${lbl}">address</td><td>FLOOR: A7, HOUSE: 08, ROAD: 12, BLOCK: J, BARIDHARA, DHAKA-1212.</td></tr>
+            <tr><td style="${lbl}">contact</td><td><a href="tel:+8801717222907" style="color:#2563eb;text-decoration:none">+880 1717-222907</a></td></tr>
+            <tr><td style="${lbl}">email</td><td><a href="mailto:info.s16a@gmail.com" style="color:#2563eb;text-decoration:none">info.s16a@gmail.com</a></td></tr>
+            <tr><td style="${lbl}">web</td><td><a href="https://www.studio16architectsbd.com" style="color:#2563eb;text-decoration:none">www.studio16architectsbd.com</a></td></tr>
+            <tr><td style="${lbl}">hours</td><td>Sunday &ndash; Thursday, 9:30 am to 6:00 pm. Friday &amp; Saturday closed.</td></tr>
+          </table>
+        </div>`;
+      }
+      async function emailReceipt(it){
+        const proj=projects.find(p=>p.id===it.projectId)||{};
+        const prop=proposals.find(p=>p.convertedProjectId===proj.id)||null;
+        const to=(((prop&&prop.clientEmail)||"").trim());
+        if(!to){ alert("No client email found on the linked proposal. Add the client's email to that proposal and save, then try again."); return; }
+        if(!receiptPdf){ alert("Choose the receipt PDF to attach first (use \u201cChoose receipt PDF\u2026\u201d). Save it from Receipt \u2197 \u2192 Save as PDF."); return; }
+        if(!window.confirm('Email this receipt to '+to+' with \u201c'+receiptPdf.name+'\u201d attached?')) return;
+        setEmailing(true);
+        try{
+          const b64=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(",")[1]); r.onerror=()=>rej(new Error("Could not read the file")); r.readAsDataURL(receiptPdf); });
+          const attachments=[{filename:receiptPdf.name||"receipt.pdf",contentB64:b64,mime:receiptPdf.type||"application/pdf"}];
+          const subj="Money Receipt "+(it.receiptRef||"")+" \u2014 Studio 16 Architects";
+          const res=await fetch(SUPABASE_URL+"/functions/v1/rapid-handler",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+SUPABASE_ANON_KEY},body:JSON.stringify({secret:"s16a-mail-9Fk2",to,subject:subj,html:receiptEmailHTML(it),client:((prop&&prop.clientName)||proj.client||""),attachments})});
+          const jx=await res.json().catch(()=>({}));
+          if(res.ok&&jx.ok){ setReceiptEmailFor(null); setReceiptPdf(null); alert("Receipt emailed to "+to+"."); }
+          else { alert("Could not send the receipt: "+(jx.error||("HTTP "+res.status))+". If this says \u201cFailed to fetch\u201d, the email function may be offline."); }
+        }catch(err){ alert("Could not send the receipt: "+(err.message||err)); }
+        finally{ setEmailing(false); }
+      }
+      
       async function addExp(){ if(!(Number(ne.amount)>0)) return; if(fail((await db.from("expenses").insert({company_id:cid(),date:ne.date||dayStr(),category:ne.category,payee:ne.payee.trim(),amount:Number(ne.amount||0),method:ne.method||null,note:ne.note.trim(),recorded_by:session.user.id,sort_order:expenses.length})).error)) return; setNe({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:""}); setShowAddExp(false); await refresh(); }
       async function saveExp(){ const e=expEdit; if(fail((await db.from("expenses").update({date:e.date||dayStr(),category:e.category,payee:e.payee.trim(),amount:Number(e.amount||0),method:e.method||null,note:e.note.trim()}).eq("id",e.id)).error)) return; setExpEdit(null); await refresh(); }
       async function deleteExp(id){ if(fail((await db.from("expenses").delete().eq("id",id)).error)) return; setExpEdit(null); await refresh(); }
@@ -580,56 +624,71 @@ function printReceipt(it){
         const num=v=>Number(v||0);
         const esc=v=>String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
         const tk=n=>"Tk "+Number(n||0).toLocaleString("en-IN")+"/-";
+        const fmtD=d=>d?new Date(d).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}):"";
+        const fmtL=d=>d?new Date(d).toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"}):"";
         const proj=projects.find(p=>p.id===it.projectId)||{};
         const prop=proposals.find(p=>p.convertedProjectId===proj.id)||null;
-        const propDate=(prop&&prop.date)?new Date(prop.date).toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"}):"";
+        const propDate=fmtL(prop&&prop.date);
         const clientName=(prop&&prop.clientName)||proj.client||"";
         const clientAddr=(prop&&prop.clientAddress)||proj.address||proj.location||"";
         const clientPhone=(prop&&prop.clientPhone)||"";
         const clientEmail=(prop&&prop.clientEmail)||"";
-        const propRef=(prop&&prop.refNo)?(" Proposal No: "+esc(prop.refNo)+(propDate?", Date: "+propDate:"")):"";
         const subject=prop&&prop.subject?prop.subject:(proj.nickname?(it.title+" — "+proj.nickname):it.title);
-        const dt=(it.receiptDate?new Date(it.receiptDate):new Date()).toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"});
-        const recd=it.paidDate?new Date(it.paidDate):null;
-        const recdStr=recd?recd.toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"}):dt;
+        const projAddr=proj.address||proj.location||"";
+        const projLine=subject||("Design Consultancy Service for the proposed project"+(projAddr?" at "+projAddr:""));
+        const dt=fmtL(it.receiptDate)||fmtL(new Date());
+        const recdStr=fmtL(it.paidDate)||dt;
+        const billDateStr=fmtL(it.billedDate);
         const amt=num(it.paidAmount);
+        const txnComposed = it.payMode==="Cheque"
+          ? ("Cheque"+(it.chequeNo?" no "+it.chequeNo:"")+(it.bankName?", "+it.bankName:"")+(it.chequeDate?", dated "+fmtD(it.chequeDate):""))
+          : it.payMode==="Bank transfer"
+          ? ("Bank transfer"+(it.bankName?", "+it.bankName:"")+(it.fromAcct?", from "+it.fromAcct:"")+(it.txnRef?", Txn ID "+it.txnRef:"")+(it.txnDate?", dated "+fmtD(it.txnDate):""))
+          : it.payMode==="bKash"
+          ? ("bKash"+(it.txnRef?", Txn ID "+it.txnRef:""))
+          : (it.txnRef||"");
         const qr=location.origin+"/s16a-qr.svg";
         const lh='<div class="lh"><img class="qr" src="'+qr+'" alt="QR"/><img class="logo" src="data:image/svg+xml;base64,'+LOGO_B64+'" alt="Studio 16 Architects"/></div>';
         const kv=(k,v)=>'<tr><td class="k">'+k+'</td><td>'+v+'</td></tr>';
-        const detail='<div class="sec"><h2>Payment Details</h2><table class="kv"><tbody>'+
-          kv("Received from",esc(clientName)+(clientPhone?" &middot; "+esc(clientPhone):""))+
-          kv("Project",esc(subject))+
-          kv("Against",esc(it.title||"Payment")+(it.covers?' <span class="mono">['+esc(it.covers)+']</span>':""))+
-          kv("Amount received","<b>"+tk(amt)+"</b>")+
-          kv("In words",esc(inWords(amt)))+
-          kv("Mode of payment",esc(it.payMode||"—"))+
-          (it.txnRef?kv("Transaction details",esc(it.txnRef)):"")+
-          kv("Date received",recdStr)+
-          '</tbody></table></div>';
+        const detail='<div class="sec"><table class="kv"><tbody>'
+          + kv("Project", esc(projLine))
+          + (prop&&prop.refNo ? kv("Proposal No", esc(prop.refNo)+(propDate?", dated "+propDate:"")) : "")
+          + (it.billed ? kv("Bill No", esc(it.billRef||"")+(billDateStr?", dated "+billDateStr:"")) : "")
+          + kv("Against", esc(it.title||"Payment")+(it.covers?' <span class="mono">['+esc(it.covers)+']</span>':""))
+          + kv("Amount received", '<b>'+tk(amt)+'</b>')
+          + kv("In words", esc(inWords(amt)))
+          + kv("Mode of payment", esc(it.payMode||"—"))
+          + (txnComposed ? kv("Transaction details", esc(txnComposed)) : "")
+          + kv("Date received", recdStr)
+          + '</tbody></table></div>';
+        const signblk='<div class="sign">'
+          +'<div class="box"><img class="sig" src="data:image/svg+xml;base64,'+SIGN_B64+'" alt="Signature"/><div class="acc">Received by &mdash; Studio 16 Architects</div><div class="who"><b>AR. JEWEL BARUA</b><br>Architect, Managing Partner<br>Mobile: '+esc(STUDIO.phone)+'</div></div>'
+          +'<div class="box"><div class="csig"></div><div class="acc">Client / Payer Signature</div><div class="who">'+esc(clientName)+'<br>Date: ____________</div></div>'
+          +'</div>';
+        const copy=(tag)=>'<section class="copy">'
+          + lh
+          + '<div class="contact">'+esc(STUDIO.address)+'<br>Phone: '+esc(STUDIO.phone)+' &middot; Email: '+esc(STUDIO.email)+' &middot; '+esc(STUDIO.web)+'</div>'
+          + '<div class="rchead"><div class="doctitle" style="margin:2px 0 0">MONEY RECEIPT</div><span class="copytag">'+tag+'</span></div>'
+          + '<div class="meta"><span class="mono">Ref: '+esc(it.receiptRef||"")+'</span><span class="mono">Date: '+dt+'</span></div>'
+          + '<div class="to"><div class="lbl">Received With Thanks From</div><b>'+esc(clientName)+'</b>'+(clientAddr?'<br>'+esc(clientAddr):"")+(clientPhone?'<br>Phone: '+esc(clientPhone):"")+(clientEmail?'<br>Email: '+esc(clientEmail):"")+'</div>'
+          + detail
+          + '<div class="intro" style="margin-top:6px">'+esc(RCPT_INTRO)+' We confirm receipt of <b>'+tk(amt)+'</b> ('+esc(inWords(amt))+'). '+esc(RCPT_CONCL)+'</div>'
+          + signblk
+          + '</section>';
         const css = `*{box-sizing:border-box}@page{size:A4;margin:14mm 14mm 18mm;@bottom-right{content:counter(page) " of " counter(pages);font-size:7.5px;color:#9ca3af}}body{font-family:'Archivo',Helvetica,Arial,sans-serif;color:#18181b;font-size:10.5px;line-height:1.5;margin:0}.mono{font-family:'Spline Sans Mono',monospace}.run-foot{position:fixed;bottom:6mm;left:14mm;right:14mm;font-size:7.5px;color:#9ca3af;text-align:center}.lh{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #18181b;padding-bottom:8px}.lh .qr{height:56px;width:56px}.lh .logo{height:30px;width:auto}.contact{font-size:9px;color:#52525b;line-height:1.55;margin:6px 0 10px}.meta{display:flex;justify-content:space-between;font-size:10px;margin-bottom:8px}.to{margin-bottom:6px}.to .lbl{font-size:8px;text-transform:uppercase;letter-spacing:.12em;color:#a1a1aa}.subj{font-weight:700;margin:8px 0 6px}.intro{font-size:10px;color:#3f3f46;margin-bottom:4px}.doctitle{text-align:center;font-size:15px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;margin:6px 0 10px}.vdet{font-size:8px;color:#71717a;margin-top:1px;line-height:1.45}.valid{font-size:9px;color:#52525b;font-style:italic;margin-bottom:6px}.sec{margin:12px 0;break-inside:avoid}.sec h2{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid #d4d4d8;padding-bottom:3px;margin:0 0 7px}table{width:100%;border-collapse:collapse}td{vertical-align:top}.kv td,.prog td,.val td,.pay td,.del td{padding:4px 6px;border-bottom:1px solid #f1f1f3;font-size:9.5px}.kv td.k,.prog td.k{color:#52525b;font-weight:600}.kv thead td,.prog thead td,.val thead td,.pay thead td,.del thead td{font-size:8px;text-transform:uppercase;letter-spacing:.05em;color:#a1a1aa;border-bottom:1.5px solid #d4d4d8;font-weight:600}.c{text-align:center;white-space:nowrap}.r{text-align:right;white-space:nowrap;font-family:'Spline Sans Mono',monospace}.val .sub td{border-bottom:0;padding:2px 6px;color:#52525b;font-weight:600}.val .sub td.r{color:#18181b}.val .tot td,.pay .tot td{border-top:2px solid #18181b;border-bottom:0;font-weight:700;padding-top:5px}.inword{font-size:10px;font-weight:600;margin-top:6px}.notewrap{font-size:9px;color:#52525b;margin-top:6px}ol.note{margin:3px 0 0;padding-left:18px}ol.note li{margin-bottom:2px}.scg{font-size:9.5px;margin:2px 0;color:#3f3f46}.scg b{color:#18181b}.tsec{margin-bottom:7px;break-inside:avoid}.tt{font-weight:700;font-size:10px;margin-bottom:2px}.tc{display:flex;gap:6px;font-size:9px;color:#3f3f46;padding:1px 0}.tc .tn{font-family:'Spline Sans Mono',monospace;color:#a1a1aa;flex:none;min-width:26px}.concl{font-size:10px;color:#3f3f46;margin:16px 0 4px}.sign{margin-top:18px;display:flex;justify-content:space-between;gap:30px;break-inside:avoid}.sign .box{flex:1}.sign .sig{height:46px;width:auto;display:block;margin-bottom:2px}.sign .who{font-size:9px;line-height:1.5}.sign .who b{font-size:10.5px}.sign .acc{border-top:1px solid #18181b;margin-top:48px;padding-top:4px;font-size:9px}@media screen{html{background:#f1f1f3}body{max-width:800px;margin:18px auto;padding:26px 30px 44px;background:#fff;box-shadow:0 1px 30px #00000014}.run-foot{position:static;margin-top:20px;border-top:1px solid #e4e4e7;padding-top:8px}}`;
-        const head='<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Money Receipt — '+esc(clientName||it.receiptRef||"S16A")+'</title><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet"><style>'+css+'</style></head>';
-        const body=[
-          '<div class="run-foot">Studio 16 Architects &middot; Baridhara, Dhaka &middot; '+esc(STUDIO.web)+' &middot; WhatsApp '+esc(STUDIO.phone)+' &middot; RAJUK &middot; CDA &middot; IAB &middot; IEB</div>',
-          lh,
-          '<div class="contact">'+esc(STUDIO.address)+'<br>Phone: '+esc(STUDIO.phone)+' &middot; Email: '+esc(STUDIO.email)+' &middot; '+esc(STUDIO.web)+'</div>',
-          '<div class="doctitle">MONEY RECEIPT</div>',
-          '<div class="meta"><span class="mono">Ref: '+esc(it.receiptRef||"")+'</span><span class="mono">Date: '+dt+'</span></div>',
-          '<div class="to"><div class="lbl">Received With Thanks From</div><b>'+esc(clientName)+'</b>'+(clientAddr?'<br>'+esc(clientAddr):"")+(clientPhone?'<br>Phone: '+esc(clientPhone):"")+(clientEmail?'<br>Email: '+esc(clientEmail):"")+'</div>',
-          '<div class="subj">Subject: Payment received for '+esc(subject)+'</div>',
-          '<div class="intro">'+esc(RCPT_INTRO)+propRef+'</div>',
-          detail,
-          '<div class="intro" style="margin-top:10px">We confirm receipt of <b>'+tk(amt)+'</b> ('+esc(inWords(amt))+').</div>',
-          '<div class="intro" style="margin-top:12px">If you have any question about this receipt please contact: Ar. Jewel Barua, Mobile: '+esc(STUDIO.phone)+'. '+esc(RCPT_CONCL)+'</div>',
-          '<div class="intro" style="margin-top:8px">Thank you in advance.</div>',
-          '<div class="sign"><div class="box"><img class="sig" src="data:image/svg+xml;base64,'+SIGN_B64+'" alt="Signature"/><div class="who"><b>AR. JEWEL BARUA</b><br>Architect, Managing Partner<br>Studio 16 Architects<br>Member of Institute Architects Bangladesh (MIAB)<br>RAJUK, CDA, DCBA, ECPS Registered<br>Mobile: '+esc(STUDIO.phone)+'<br>Email: '+esc(STUDIO.email)+'<br>Date: '+dt+'</div></div><div class="box"></div></div>'
-        ].join("");
+        const extra='.copy{break-inside:avoid;page-break-inside:avoid;padding-bottom:4px}.rchead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px}.copytag{font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0369a1;border:1px solid #bae6fd;background:#f0f9ff;border-radius:4px;padding:2px 7px}.cut{margin:12px 0;text-align:center;font-size:8px;letter-spacing:.05em;text-transform:uppercase;color:#9ca3af;border-top:1px dashed #cbd5e1;padding-top:5px}.csig{height:38px}.contact{margin-bottom:3px}.sec{margin:6px 0}.kv td{padding:3px 6px}.intro{margin:4px 0}.sign{margin-top:12px}';
+        const head='<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Money Receipt — '+esc(clientName||it.receiptRef||"S16A")+'</title><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet"><style>'+css+extra+'</style></head>';
+        const body='<div class="run-foot">Studio 16 Architects &middot; Baridhara, Dhaka &middot; '+esc(STUDIO.web)+' &middot; WhatsApp '+esc(STUDIO.phone)+' &middot; RAJUK &middot; CDA &middot; IAB &middot; IEB</div>'
+          + copy("ORIGINAL &middot; CLIENT COPY")
+          + '<div class="cut">&#9986; &nbsp; cut here &mdash; hand the Original to the client, keep the Office Copy as proof &nbsp;</div>'
+          + copy("OFFICE COPY &middot; S16A");
         const auto='<scr'+'ipt>setTimeout(function(){try{window.focus();window.print();}catch(e){}},500)</scr'+'ipt>';
         const w=window.open("","_blank");
         if(!w){ alert("Please allow pop-ups for this site to open the printable receipt, then tap again."); return; }
         w.document.open(); w.document.write(head+'<body>'+body+auto+'</body></html>'); w.document.close();
         try{ w.document.title="Receipt "+(it.receiptRef||""); }catch(e){}
       }
-
+      
 function printProposal(p){
         const num=v=>Number(v||0); const lt=r=>num(r.qty)*num(r.rate);
         const esc=v=>String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -1373,6 +1432,7 @@ function printProposal(p){
                         <span className="mono text-[12px] font-semibold">{money(it.amount)}</span>
                         <span className={`mono shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase ${st[2]}`}>{st[1]}</span><span className={"mono shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase "+(it.billed?"border-emerald-200 bg-emerald-50 text-emerald-700":"border-zinc-200 text-zinc-400")} title={it.billed?((it.billRef||"")+(it.billedDate?" · "+it.billedDate:"")):"Not billed"}>{it.billed?"Billed":"Unbilled"}</span><span className={"mono shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase "+(it.receiptRef?"border-sky-200 bg-sky-50 text-sky-700":"border-zinc-200 text-zinc-400")} title={it.receiptRef||"No receipt"}>{it.receiptRef?"Issued":"Unissued"}</span>
                       </div>
+                      {receiptEmailFor===it.id && <div className="border-t border-sky-100 bg-sky-50 px-3 py-2.5"><div className="mb-1.5 text-[11px] text-zinc-500">Save the receipt first (Receipt ↗ → Save as PDF), then attach it here to email the client.</div><div className="flex flex-wrap items-center gap-2"><label className="cursor-pointer rounded-md border border-zinc-300 bg-white px-2.5 py-1 text-[11px] text-zinc-600 hover:bg-zinc-50">{receiptPdf?("✓ "+receiptPdf.name):"Choose receipt PDF…"}<input type="file" accept="application/pdf" className="hidden" onChange={e=>setReceiptPdf(e.target.files&&e.target.files[0]||null)} /></label><button disabled={emailing} onClick={()=>emailReceipt(it)} className="rounded-md bg-sky-700 px-3 py-1 text-[11px] font-medium text-white hover:bg-sky-800 disabled:opacity-50">{emailing?"Sending…":"Send to client"}</button><button onClick={()=>{setReceiptEmailFor(null);setReceiptPdf(null);}} className="rounded-md border border-zinc-200 px-2.5 py-1 text-[11px] text-zinc-500">Cancel</button></div></div>}
                       {billEmailFor===it.id && <div className="border-t border-zinc-100 bg-zinc-50 px-3 py-2.5"><div className="mb-1.5 text-[11px] text-zinc-500">Save the bill first (Bill ↗ → Save as PDF), then attach it here to email the client.</div><div className="flex flex-wrap items-center gap-2"><label className="cursor-pointer rounded-md border border-zinc-300 bg-white px-2.5 py-1 text-[11px] text-zinc-600 hover:bg-zinc-50">{billPdf?("✓ "+billPdf.name):"Choose bill PDF…"}<input type="file" accept="application/pdf" className="hidden" onChange={e=>setBillPdf(e.target.files&&e.target.files[0]||null)} /></label><button disabled={emailing} onClick={()=>emailBill(it)} className="rounded-md bg-zinc-900 px-3 py-1 text-[11px] font-medium text-white hover:bg-zinc-700 disabled:opacity-50">{emailing?"Sending…":"Send to client"}</button><button onClick={()=>{setBillEmailFor(null);setBillPdf(null);}} className="rounded-md border border-zinc-200 px-2.5 py-1 text-[11px] text-zinc-400 hover:bg-zinc-50">Cancel</button></div></div>}
                       {ed && <div className="border-t border-zinc-100 p-3">
                         <div className="space-y-3">
@@ -1418,7 +1478,7 @@ function printProposal(p){
                         <div className="mt-2 flex flex-wrap items-center gap-2 rounded-md border border-sky-100 bg-sky-50 px-2 py-1.5">
                           <span className="mono w-14 text-[9px] font-bold uppercase tracking-wider text-sky-400">Receipt</span>
                           {!rcvEdit.receiptRef&&(Number(rcvEdit.paidAmount||0)>0?<button onClick={()=>generateReceipt(it)} className="rounded-md border border-sky-300 bg-white px-3 py-1 text-[11px] font-semibold text-sky-700 hover:bg-sky-100">Issue receipt</button>:<span className="mono rounded border border-zinc-200 px-2 py-0.5 text-[9px] uppercase text-zinc-300">add a received amount first</span>)}
-                          {rcvEdit.receiptRef&&<><span className="mono rounded border border-sky-200 bg-white px-2 py-0.5 text-[9px] font-bold uppercase text-sky-700" title={it.receiptRef}>Issued</span><button onClick={()=>printReceipt(it)} className="rounded-md border border-sky-300 bg-white px-3 py-1 text-[11px] font-medium text-sky-700 hover:bg-sky-100">Receipt ↗</button><button onClick={()=>clearReceipt(it.id)} className="ml-auto rounded-md border border-amber-300 px-3 py-1 text-[11px] font-medium text-amber-700 hover:bg-amber-50">Remove receipt</button></>}
+                          {rcvEdit.receiptRef&&<><span className="mono rounded border border-sky-200 bg-white px-2 py-0.5 text-[9px] font-bold uppercase text-sky-700" title={it.receiptRef}>Issued</span><button onClick={()=>printReceipt(it)} className="rounded-md border border-sky-300 bg-white px-3 py-1 text-[11px] font-medium text-sky-700 hover:bg-sky-100">Receipt ↗</button><button onClick={()=>{setReceiptEmailFor(receiptEmailFor===it.id?null:it.id);setReceiptPdf(null);}} className="rounded-md border border-sky-300 bg-white px-3 py-1 text-[11px] font-medium text-sky-700 hover:bg-sky-100">✉ Email</button><button onClick={()=>clearReceipt(it.id)} className="ml-auto rounded-md border border-amber-300 px-3 py-1 text-[11px] font-medium text-amber-700 hover:bg-amber-50">Remove receipt</button></>}
                         </div>
                       </div>}
                     </div>
