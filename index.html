@@ -174,7 +174,7 @@
       const [wt,setWt]=useState("all");
       const [expanded,setExpanded]=useState(null);
       const [shareOpen,setShareOpen]=useState(false); const [copied,setCopied]=useState(false);
-      const [showAddM,setShowAddM]=useState(false); const [nm,setNm]=useState({name:"",role:"Architect",teamId:"",department:"Design"}); const blankHr=()=>({name:"",code:"",role:"Architect",type:"salaried",salary:"",join:"",dept:"Design",onBoard:true,mobile:"",nid:"",emergency:"",address:"",blood:"",study:"",institute:"",district:""}); const [hrForm,setHrForm]=useState(blankHr()); const [hrOpen,setHrOpen]=useState(false); const [hrEditId,setHrEditId]=useState(null); const [hrGroup,setHrGroup]=useState("position"); const [hrArch,setHrArch]=useState(false);
+      const [showAddM,setShowAddM]=useState(false); const [nm,setNm]=useState({name:"",role:"Architect",teamId:"",department:"Design"}); const blankHr=()=>({name:"",code:"",role:"Architect",type:"salaried",salary:"",join:"",dept:"Design",onBoard:true,mobile:"",nid:"",emergency:"",address:"",blood:"",study:"",institute:"",district:""}); const [hrForm,setHrForm]=useState(blankHr()); const [hrOpen,setHrOpen]=useState(false); const [hrEditId,setHrEditId]=useState(null); const [hrGroup,setHrGroup]=useState("position"); const [hrArch,setHrArch]=useState(false); const [hrProfile,setHrProfile]=useState(null);
       const [editM,setEditM]=useState(null);
       const [removeM,setRemoveM]=useState(false); const [reassign,setReassign]=useState("");
       const [boardCfg,setBoardCfg]=useState(false); const [addBoardOpen,setAddBoardOpen]=useState(false); const [nb,setNb]=useState({name:"",desc:"",leadId:""});
@@ -2228,8 +2228,32 @@ function printProposal(p){
                 const contract=activeEmps.filter(m=>m.employmentType==="contract");
                 const totalSalary=salaried.reduce((s,m)=>s+Number(m.monthlySalary||0),0);
                 const emps=members.filter(m=>m.status===(hrArch?"archived":"active")).slice().sort((a,b)=>String(a.empCode||"~~~~").localeCompare(String(b.empCode||"~~~~")));
-                const row=(m)=>(<tr key={m.id} className="border-b border-zinc-100"><td className="mono px-3 py-2 text-zinc-500">{m.empCode||"—"}</td><td className="px-3 py-2 font-medium text-zinc-800">{m.name}</td><td className="px-3 py-2 text-zinc-600">{canon(m.department,DEPARTMENTS)||"—"}</td><td className="px-3 py-2">{m.employmentType==="contract"?<span className="rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[11px] text-sky-700">Contract</span>:<span className="rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[11px] text-zinc-600">Salaried</span>}</td><td className="mono px-3 py-2 text-right text-zinc-800">{m.employmentType==="contract"?"—":money(m.monthlySalary||0)}</td>{isAdmin && <td className="px-3 py-2 text-right whitespace-nowrap">{hrArch ? <button onClick={()=>restoreEmployee(m)} className="text-[12px] text-emerald-600 hover:underline">Restore</button> : <React.Fragment><button onClick={()=>{setHrForm({name:m.name||"",code:m.empCode||"",role:canon(m.role,POSITIONS),type:m.employmentType==="contract"?"contract":"salaried",salary:m.monthlySalary||"",join:m.joinDate||"",dept:canon(m.department,DEPARTMENTS)||"Design",onBoard:m.onBoard!==false,mobile:m.mobile||"",nid:m.nid||"",emergency:m.emergency||"",address:m.address||"",blood:m.blood||"",study:m.study||"",institute:m.institute||"",district:m.district||""});setHrEditId(m.id);setHrOpen(true);}} className="text-[12px] text-zinc-500 hover:text-zinc-900 hover:underline">Edit</button><button onClick={()=>removeEmployee(m)} className="ml-3 text-[12px] text-red-500 hover:underline">Remove</button></React.Fragment>}</td>}</tr>);
-                return (<>
+                const row=(m)=>(<tr key={m.id} className="border-b border-zinc-100"><td className="mono px-3 py-2 text-zinc-500">{m.empCode||"—"}</td><td className="px-3 py-2"><button onClick={()=>setHrProfile(m.id)} className="font-medium text-zinc-800 hover:underline">{m.name}</button></td><td className="px-3 py-2 text-zinc-600">{canon(m.department,DEPARTMENTS)||"—"}</td><td className="px-3 py-2">{m.employmentType==="contract"?<span className="rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[11px] text-sky-700">Contract</span>:<span className="rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[11px] text-zinc-600">Salaried</span>}</td><td className="mono px-3 py-2 text-right text-zinc-800">{m.employmentType==="contract"?"—":money(m.monthlySalary||0)}</td>{isAdmin && <td className="px-3 py-2 text-right whitespace-nowrap">{hrArch ? <button onClick={()=>restoreEmployee(m)} className="text-[12px] text-emerald-600 hover:underline">Restore</button> : <React.Fragment><button onClick={()=>{setHrForm({name:m.name||"",code:m.empCode||"",role:canon(m.role,POSITIONS),type:m.employmentType==="contract"?"contract":"salaried",salary:m.monthlySalary||"",join:m.joinDate||"",dept:canon(m.department,DEPARTMENTS)||"Design",onBoard:m.onBoard!==false,mobile:m.mobile||"",nid:m.nid||"",emergency:m.emergency||"",address:m.address||"",blood:m.blood||"",study:m.study||"",institute:m.institute||"",district:m.district||""});setHrEditId(m.id);setHrOpen(true);}} className="text-[12px] text-zinc-500 hover:text-zinc-900 hover:underline">Edit</button><button onClick={()=>removeEmployee(m)} className="ml-3 text-[12px] text-red-500 hover:underline">Remove</button></React.Fragment>}</td>}</tr>);
+                return (<>{hrProfile ? (()=>{
+                  const m=members.find(x=>x.id===hrProfile);
+                  if(!m) return (<div className="pt-1"><button onClick={()=>setHrProfile(null)} className="text-[12px] text-zinc-500 hover:text-zinc-900">← Back to registry</button></div>);
+                  const pays=expenses.filter(e=>e.memberId===m.id).slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));
+                  const totalPaid=pays.reduce((s,e)=>s+Number(e.amount||0),0);
+                  const pname=id=>{ if(!id) return "Salary / general"; const p=projects.find(x=>x.id===id); return p?((p.code?p.code+" ":"")+(p.nickname||p.client||p.location||"Project")):"Project"; };
+                  const groups={}; pays.forEach(e=>{ const k=e.projectId||"__none"; (groups[k]=groups[k]||[]).push(e); });
+                  const gkeys=Object.keys(groups).sort((a,b)=> a==="__none"?1 : b==="__none"?-1 : String(pname(a)).localeCompare(String(pname(b))));
+                  const det=[["Mobile",m.mobile],["Emergency",m.emergency],["NID",m.nid],["Blood group",m.blood],["Study level",m.study],["Last institute",m.institute],["Home district",m.district],["Joined",m.joinDate],["Address",m.address]].filter(d=>d[1]);
+                  return (<div className="pt-1">
+                    <button onClick={()=>setHrProfile(null)} className="mb-3 text-[12px] text-zinc-500 hover:text-zinc-900">← Back to registry</button>
+                    <div className="rounded-lg border border-zinc-200 bg-white p-4">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1"><span className="text-base font-semibold text-zinc-800">{m.name}</span><span className="mono text-[12px] text-zinc-400">{m.empCode||""}</span>{m.employmentType==="contract"?<span className="rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[11px] text-sky-700">Contract</span>:<span className="rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[11px] text-zinc-600">Salaried</span>}</div>
+                      <div className="mt-1 text-[12px] text-zinc-500">{canon(m.role,POSITIONS)||"—"} · {canon(m.department,DEPARTMENTS)||"—"}{m.employmentType!=="contract" && Number(m.monthlySalary||0)>0 && <span> · {money(m.monthlySalary)}/mo</span>}</div>
+                      {det.length>0 && <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 sm:grid-cols-3">{det.map(([l,v])=>(<div key={l}><div className="text-[10px] uppercase tracking-wide text-zinc-400">{l}</div><div className="text-[12px] text-zinc-700">{v}</div></div>))}</div>}
+                    </div>
+                    <div className="mt-4 rounded-lg border border-zinc-200 bg-white p-4">
+                      <div className="mb-2 flex items-center justify-between"><span className="text-[12px] font-semibold uppercase tracking-wide text-zinc-500">Payments</span><span className="mono text-[13px] font-semibold text-zinc-800">{money(totalPaid)} total</span></div>
+                      {pays.length===0?<div className="text-[12px] text-zinc-400">No payments recorded yet.</div>:gkeys.map(k=>{ const arr=groups[k]; const sub=arr.reduce((s,e)=>s+Number(e.amount||0),0); return (<div key={k} className="mt-3">
+                        <div className="flex items-center justify-between border-b border-zinc-200 pb-1"><span className="text-[12px] font-medium text-zinc-700">{pname(k==="__none"?"":k)}</span><span className="mono text-[12px] font-medium text-zinc-700">{money(sub)}</span></div>
+                        {arr.map(e=>(<div key={e.id} className="flex items-center justify-between border-b border-zinc-100 py-1 last:border-0"><span className="text-[12px] text-zinc-500">{e.date} · {e.payee||e.category}{e.billable && <span className="ml-1 rounded bg-sky-50 px-1 text-[10px] text-sky-600">billable</span>}</span><span className="mono text-[12px] text-zinc-700">{money(e.amount)}</span></div>))}
+                      </div>); })}
+                    </div>
+                  </div>);
+                })() : (<>
                   <div className="mb-4 flex flex-wrap gap-x-6 gap-y-2">
                     <Stat n={emps.length} l="Team members" />
                     <Stat n={salaried.length} l="Salaried" />
@@ -2272,7 +2296,7 @@ function printProposal(p){
                     </table>
                   </div>
                   <div className="mt-3 text-[11px] text-zinc-400">Salaried people flow into the monthly run automatically. Contract people (paid per project) don't — they're paid only when you log a project cost against them.</div>
-                </>);
+                </>)}</>);
               })()}
               
 {area==="marketing" && (()=>{ const lbl=(ALL_KEYS.find(([k])=>k===area)||[])[1]||area; return (
