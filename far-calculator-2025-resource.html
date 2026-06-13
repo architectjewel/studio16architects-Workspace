@@ -166,13 +166,15 @@ select:focus,input:focus{border-color:var(--ink)}
 .hl.accent .v{color:#fff}
 .hl.accent .mono{color:var(--brass-2)!important}
 
-section.sec{padding:24px 28px;border-bottom:1px solid var(--line-2)}
-section.sec h2{font-size:11px;display:flex;align-items:center;gap:10px;margin-bottom:16px;text-transform:uppercase;letter-spacing:.16em;font-weight:600}
-section.sec h2:before{content:"";width:18px;height:1.5px;background:var(--brass);flex:none}
+section.sec{padding:24px 28px;border-bottom:1px solid var(--line-2);counter-reset:rownum}
+.rep-body{counter-reset:secnum} section.sec h2{font-size:11px;display:flex;align-items:center;gap:10px;margin-bottom:16px;text-transform:uppercase;letter-spacing:.16em;font-weight:600;counter-increment:secnum}
+section.sec h2:before{content:counter(secnum) ".";color:var(--brass);font-weight:700;flex:none;font-variant-numeric:tabular-nums}
 
 table.kv{width:100%;border-collapse:collapse;font-size:13.5px}
 table.kv td{padding:9px 0;border-bottom:1px solid var(--line-2);vertical-align:top}
 table.kv td:first-child{color:var(--muted)}
+    table.kv tr{counter-increment:rownum}
+    table.kv td:first-child:before{content:counter(secnum) "." counter(rownum);color:var(--brass);font-weight:400;font-size:0.78em;font-variant-numeric:tabular-nums;margin-right:0.65em;opacity:.85}
 table.kv td:last-child{text-align:right;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}
 .badge{display:inline-block;font-size:9px;color:var(--muted);border:1px solid var(--line);border-radius:0;
   padding:2px 7px;margin-left:8px;cursor:help;vertical-align:middle;white-space:nowrap;text-transform:uppercase;letter-spacing:.06em}
@@ -245,14 +247,14 @@ details.audit summary:hover{color:var(--ink)}
   .headline{grid-template-columns:1fr}
 }
 @media print{
-  @page{size:A4 portrait;margin:7mm}
+  @page{size:A4 portrait;margin:9mm 9mm 12mm;@bottom-right{content:"Page " counter(page) " of " counter(pages);font-size:7px;color:#888}}
   html,body{background:#fff}
   body{font-size:8.8px;color:#000;line-height:1.3}
-  header.top,.inputs,.theme-btn,.rep-actions,details.audit,.foot,.coverage,.hero,.disclaimer,.rep-head{display:none!important}
-  .wrap{max-width:none;padding:0 0 30px}
+  header.top,.inputs,.theme-btn,.rep-actions,details.audit,.foot,.coverage,.hero,.disclaimer,.rep-head,.sec-farref,.cta{display:none!important}
+  .wrap{max-width:none;padding:0 0 12px}
   .grid{display:block;margin:0;border:0}
   .panel{box-shadow:none}
-  .report{background:#fff;zoom:0.9}
+  .report{background:#fff;zoom:0.85}
   .print-only{display:block!important}
   a{color:#000;border:0}
   /* small, presentable header */
@@ -269,15 +271,15 @@ details.audit summary:hover{color:var(--ink)}
   .headline .hl .v{font-size:16px;margin-top:2px}
   .hl.accent{background:#4d4842!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .hl.accent .k{color:#d2cdc3!important}.hl.accent .v{color:#fff!important}.hl.accent .mono{color:#e2bc7e!important}
-  /* two sections per row, equal visible gaps */
-  .rep-body{display:grid;grid-template-columns:1fr 1fr;column-gap:16px;row-gap:10px;align-items:start}
-  .sec-planning{grid-column:1;grid-row:1}.sec-unit{grid-column:2;grid-row:1}
-  .sec-far{grid-column:1;grid-row:2}.sec-floor{grid-column:2;grid-row:2}
-  .sec-ground{grid-column:1;grid-row:3}.sec-site{grid-column:2;grid-row:3}
-  .sec-setbacks{grid-column:1;grid-row:4}.sec-density{grid-column:2;grid-row:4}
-  section.sec{padding:7px 0 0;border:0;border-top:1px solid #d4d4d4;break-inside:avoid;page-break-inside:avoid}
+  /* newspaper-style column flow: fill column 1 down the page, then column 2 */
+  .rep-body{display:block;column-count:2;column-gap:16px;column-fill:balance}
+  section.sec{padding:7px 0 0;border:0;border-top:1px solid #d4d4d4;break-inside:avoid;page-break-inside:avoid;-webkit-column-break-inside:avoid;overflow:hidden}
+  /* tall Floor Analysis: allow it to flow into column 2, but keep header + rows/cards intact */
+  section.sec.sec-floor{break-inside:auto;page-break-inside:auto;overflow:visible}
+  section.sec.sec-floor h2{break-after:avoid;page-break-after:avoid}
+  section.sec.sec-floor .floors,section.sec.sec-floor table.kv tr{break-inside:avoid;page-break-inside:avoid}
   section.sec h2{font-size:9px;margin-bottom:6px;letter-spacing:.1em}
-  section.sec h2:before{width:11px}
+  section.sec h2:before{width:auto}
   table.kv td{padding:1.8px 0;font-size:8.4px}
   .badge{font-size:6.8px;padding:0 3px;margin-left:3px}
   /* scenario cards */
@@ -296,9 +298,7 @@ details.audit summary:hover{color:var(--ink)}
   .cta-cap{font-size:7px;margin-bottom:5px}
   .cta-url{font-size:9px;color:#111;border-color:#999;padding:5px 12px}
   /* fixed footer: basis above the line, brand + page below */
-  .print-foot{margin-top:14px;text-align:center;color:#555;background:#fff;padding:8px 8px 2px}
-  .print-foot .pf-basis{font-size:6.6px;color:#666;padding:0 0 3px;line-height:1.3}
-  .print-foot .pf-line{border-top:1px solid #bbb;padding-top:3px;font-size:7.5px;letter-spacing:.1em;text-transform:uppercase}
+  .print-foot{position:fixed;left:0;right:0;bottom:0;margin:0;padding:2.5mm 8mm;background:#fff;border-top:1px solid #ccc;text-align:center;color:#777;font-size:7px;letter-spacing:.06em;line-height:1.4}
 }
 .print-foot{display:none}
 .print-only{display:none}
@@ -309,97 +309,6 @@ details.audit summary:hover{color:var(--ink)}
 </style>
 
 
-
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-/* ===== Studio 16 app-match reskin v2 (screen-scoped; print untouched) ===== */
-:root{
-  --paper:#fafafa; --paper-2:#ffffff; --card:#ffffff; --ink:#18181b;
-  --muted:#71717a; --faint:#a1a1aa; --line:#e4e4e7; --line-2:#f4f4f5;
-  --teal:#18181b; --teal-2:#27272a;
-  --brass:#059669; --brass-2:#10b981;
-  --good:#059669; --warn:#d97706; --cap:#dc2626; --capbg:#dc26260f;
-  --shadow:0 1px 2px #18181b0a,0 10px 30px -22px #18181b1f;
-  --r:8px; --r-sm:6px;
-  --sans:'Archivo',system-ui,-apple-system,sans-serif;
-  --serif:'Archivo',system-ui,sans-serif;
-  --mono:'Spline Sans Mono',ui-monospace,monospace;
-}
-@media screen{
-  body{font-size:13px !important;line-height:1.5}
-  .wrap{max-width:1100px;padding:0 16px 40px}
-  .top-in{padding:10px 16px;gap:12px}
-  .logo-img,.logo-svg{height:30px !important}
-  .logomark{width:32px;height:32px;font-size:13px;border-width:1px}
-  .brand .nm{font-size:12px !important;text-transform:none !important;letter-spacing:0 !important}
-  .brand .tg{font-size:8.5px !important;letter-spacing:.14em !important}
-  .contact{gap:14px;font-size:11px}
-  .contact b{font-size:9px !important;letter-spacing:.08em !important}
-  .theme-btn{width:30px;height:30px;font-size:14px;border-radius:var(--r-sm)}
-  .zonetoggle{padding:8px 16px;gap:6px}
-  .zonetoggle a{padding:8px 12px;font-size:12px !important;border-radius:var(--r-sm)}
-  .hero{padding:18px 0 14px}
-  .hero .eyebrow{font-size:9.5px !important;letter-spacing:.14em !important;color:var(--brass) !important}
-  .hero h1{font-size:clamp(18px,2.6vw,22px) !important;text-transform:none !important;letter-spacing:-.01em !important;font-weight:700 !important;margin:6px 0 6px !important;line-height:1.15 !important}
-  .hero .sub{font-size:12.5px !important;opacity:.9}
-  .hero .sub2{font-size:10.5px !important;letter-spacing:.04em !important;text-transform:none !important}
-  .chip{font-size:10px !important;letter-spacing:.02em !important;text-transform:none !important;padding:4px 10px;border-radius:999px}
-  .inputs{padding:0 20px 24px 0}
-  .step{padding:14px 0}
-  .step .lbl{margin-bottom:10px;gap:9px}
-  .step .n{width:20px;height:20px;font-size:10px;border-radius:5px}
-  .step .t{font-size:11px !important;letter-spacing:.04em !important}
-  .step .ref{font-size:9px !important;letter-spacing:.03em !important}
-  label.fld{font-size:10px !important;letter-spacing:.04em !important;text-transform:none !important}
-  select,input[type=text],input[type=number]{font-size:13px !important;padding:9px 11px !important;border-radius:var(--r-sm) !important}
-  .seg{border-radius:var(--r-sm);overflow:hidden}
-  .seg button{font-size:10.5px !important;letter-spacing:.04em !important;text-transform:none !important;padding:8px}
-  .hint{font-size:10.5px}
-  .plot .pn{font-size:10.5px}
-  .plot .rm{border-radius:var(--r-sm)}
-  .addplot{border-radius:var(--r-sm);font-size:10.5px !important;letter-spacing:.04em !important;text-transform:none !important;padding:8px}
-  .totline{font-size:12px}
-  .inc{font-size:12.5px;padding:7px 0}
-  .inc .iv{font-size:10.5px}
-  .calc-btn{font-size:12px !important;letter-spacing:.06em !important;padding:12px !important;border-radius:var(--r-sm) !important;font-weight:600}
-  .errbox{border-radius:var(--r-sm);font-size:12px}
-  .empty{padding:48px 28px}
-  .empty .big{font-size:14px !important;letter-spacing:.02em !important;text-transform:none !important}
-  .rep-head{padding:16px 18px;gap:12px}
-  .rep-head .ttl{font-size:12px !important;letter-spacing:.04em !important}
-  .rep-sub{font-size:10.5px}
-  .rep-modemeta{font-size:12px}
-  .rep-head .meta{font-size:10px}
-  .rep-actions button{font-size:10px !important;letter-spacing:.04em !important;padding:7px 12px;border-radius:var(--r-sm)}
-  .hl{padding:14px}
-  .hl .k{font-size:9.5px !important;letter-spacing:.06em !important}
-  .hl .v{font-size:22px !important;font-family:var(--mono) !important}
-  .hl .v small{font-size:11px}
-  .hl.accent{background:#18181b !important}
-  .hl.accent .k{color:#a1a1aa !important}
-  section.sec{padding:16px 18px}
-  section.sec h2{font-size:10.5px !important;letter-spacing:.06em !important;margin-bottom:12px}
-  table.kv{font-size:12.5px}
-  table.kv td{padding:7px 0}
-  .badge{font-size:8.5px !important;letter-spacing:.03em !important;border-radius:4px}
-  .fc{padding:12px}
-  .fc .lab{font-size:9px !important;letter-spacing:.04em !important}
-  .fc .gn{font-size:20px !important;font-family:var(--mono) !important}
-  .fc .st{font-size:9.5px !important;letter-spacing:.03em !important}
-  .fc .pl{font-size:10.5px}
-  details.audit{padding:0 18px 18px}
-  details.audit summary{font-size:10.5px !important;letter-spacing:.04em !important}
-  .auditlist{font-size:11px;border-radius:var(--r-sm)}
-  .disclaimer{font-size:11px}
-  .disclaimer h3{font-size:10.5px !important;letter-spacing:.04em !important}
-  .foot{font-size:9.5px;letter-spacing:.04em}
-  .refnote{font-size:10.5px}
-  .cta-cap{font-size:10px !important;letter-spacing:.06em !important}
-  .cta-url{font-size:12px;border-radius:var(--r-sm)}
-  .shm{border-radius:var(--r-sm);font-size:10.5px}
-  .sharebar-h{font-size:9px !important;letter-spacing:.06em !important}
-}
-</style>
 </head>
 <body>
 
@@ -471,6 +380,12 @@ details.audit summary:hover{color:var(--ink)}
           </div>
         </div>
         <div class="hint" id="roadHint"></div>
+        <label class="inc" id="lblFront" style="display:flex;margin-top:10px"><input type="checkbox" id="incFront"><span>I know my plot's road-side edge length (frontage)</span></label>
+        <div class="hint" style="margin:5px 0 0">If the road is under 20 ft it must be widened to 20 ft; you surrender a strip of land and earn <b>3&times; that area</b> as bonus build area (DAP 2025 cl.4). Tick and enter your frontage to quantify it.</div>
+        <div id="frontWrap" style="display:none;margin-top:8px">
+          <label class="fld" style="margin:0 0 4px">Road-side edge length / frontage (ft)</label>
+          <input type="number" id="frontageFt" min="0" step="0.5" placeholder="e.g. 40" style="width:100%;padding:8px;border:1px solid var(--line,#ccc);border-radius:6px;background:transparent;color:inherit">
+        </div>
         <div id="nropt" style="display:none;margin-top:10px;padding:9px 11px;border:1px dashed var(--line,#caa86a);border-radius:8px">
           <div class="hint" id="nrnote" style="margin:0 0 7px"></div>
           <label class="inc" id="lblNR" style="display:flex"><input type="checkbox" id="incNR"><span>Use NR (non-restricted) — size building by parking</span></label>
@@ -485,6 +400,16 @@ details.audit summary:hover{color:var(--ink)}
         <div class="lbl"><span class="n">5</span><span class="t">Optional Incentives</span><span class="ref">DAP 2025 · Table 3.28</span></div>
         <div id="incentives"></div>
         <div class="hint">Plot-size &amp; road-width bonuses are applied automatically and shown in the result.</div>
+      </div>
+
+      <div class="step">
+        <div class="lbl"><span class="n">6</span><span class="t">Basement (optional)</span><span class="ref">Bidhimala 2025 · setbacks</span></div>
+        <label class="inc" style="display:flex"><input type="checkbox" id="incBasement"><span>Include basement(s) — parking, FAR-excluded</span></label>
+        <div id="basementWrap" style="display:none;margin-top:8px">
+          <label class="fld" style="margin:0 0 4px">Number of basement levels</label>
+          <input type="number" id="basementCount" min="1" step="1" value="1" placeholder="e.g. 2" style="width:100%;padding:8px;border:1px solid var(--line,#ccc);border-radius:6px;background:transparent;color:inherit">
+          <div class="hint" style="margin-top:6px">Each level ≈ max ground coverage + ½ the mandatory open space (5 ft road-side, 1.5 ft other setbacks). Not permitted below 4 katha.</div>
+        </div>
       </div>
 
       <div class="errbox" id="errbox"></div>
@@ -505,10 +430,7 @@ details.audit summary:hover{color:var(--ink)}
     This calculator is a professional reference tool based on Dhaka Imarat Nirman Bidhimala 2025 (SRO 469-Law/2025) and DAP 2025 (SRO 468-Law/2025). Results are indicative only. Users must verify all calculations with RAJUK before official submission. Final approval depends on RAJUK's review of the specific application, flood-zone status, LUC conditions and the DAP map. Studio 16 Architects accepts no liability for any design, planning, approval, development or investment decision made solely on the basis of this calculator.
   </div>
   <div class="foot">© 2026 Studio 16 Architects · Registered with RAJUK · CDA · DCBA · IAB · Self-contained build — no external dependencies</div>
-  <div class="print-foot print-only">
-    <div class="pf-basis">Basis: Dhaka Imarat Nirman Bidhimala 2025 (SRO 469/2025) · DAP 2025 (SRO 468/2025) — indicative only, verify with RAJUK before submission</div>
-    <div class="pf-line">Studio 16 Architects · FAR Calculator 2026 &nbsp;·&nbsp; Page 01 of 01</div>
-  </div>
+  <div class="print-foot print-only">Studio 16 Architects &nbsp;·&nbsp; RAJUK FAR Calculator · Bidhimala &amp; DAP 2025 &nbsp;·&nbsp; Indicative only — verify with RAJUK before submission</div>
 </div>
 
 <script>
@@ -2352,7 +2274,17 @@ function computeSingle(I){
   if(isRes && !block) return {error:"Density block not found."};
   const isNR=roadFARisNR(I.location,I.occType,roadM);
   const areaFARsrc = isRes ? Math.max(block.areaFAR, 1.5) : 0;
-  const roadFAR=getRoadFAR(I.location,I.occType,roadM,areaFARsrc);
+  const roadFARexisting=getRoadFAR(I.location,I.occType,roadM,areaFARsrc);
+  const proposedRoadFt=Math.max(20, I.roadFt);
+  const roadFARproposed=getRoadFAR(I.location,I.occType,proposedRoadFt*U.ftToM,areaFARsrc);
+  const roadWidened=proposedRoadFt > I.roadFt + 0.01;
+  const roadGiveawayWidth = roadWidened ? (proposedRoadFt - I.roadFt)/2 : 0;
+  const roadFrontage = (roadWidened && I.frontageFt>0) ? I.frontageFt : 0;
+  const roadGiveawayArea = roadFrontage>0 ? r0(roadGiveawayWidth*roadFrontage) : 0;
+  const roadBenefit = roadGiveawayArea>0 ? r0(3*roadGiveawayArea) : 0;
+  const roadFAR = roadWidened
+    ? ((roadFARexisting!=null && roadFARproposed!=null) ? r2((roadFARexisting+roadFARproposed)/2) : (roadFARproposed!=null?roadFARproposed:roadFARexisting))
+    : roadFARexisting;
   if(roadFAR===null && !isNR) return {error:`${I.occType} is not permitted on this road width here (Bidhimala 2025 §47(5), Table 5).`};
   const areaFAR = isRes ? areaFARsrc : (roadFAR||0);
   const baseFAR=r2(Math.min(areaFAR,roadFAR)), maxFAR=r2(Math.max(areaFAR,roadFAR)), superMax=r2(maxFAR+0.5);
@@ -2366,7 +2298,30 @@ function computeSingle(I){
   const nrFloorSqft=(nrMode&&parking>0)?r0(parking*200/U.sqftToSqm):null;
   const floorAreaBase=r0(sqft*baseFAR); let floorAreaApproved=r0(sqft*approvedFAR); const floorAreaMax=r0(sqft*maxFAR);
   if(nrMode&&nrFloorSqft!=null) floorAreaApproved=nrFloorSqft;
-  const farFloorsApproved=Math.ceil(floorAreaApproved/gcSqft), totalStoreysApproved=farFloorsApproved+1;
+  const minGroundA = mgc.minMGC ? gcSqftMin : r0(sqft*mgc.maxMGC*0.6/100);
+  const maxGroundA = gcSqft;
+  const liftLobby = katha>10 ? 600 : 300;
+  const distrib = Math.max(1, floorAreaApproved - liftLobby);
+  const nLo = Math.max(1, Math.ceil(distrib/maxGroundA));
+  const nHi = Math.max(nLo, Math.floor(distrib/(minGroundA||maxGroundA)));
+  const BONUS_RATE = 0.075;
+  const bonusArea = r0((distrib + roadBenefit)*BONUS_RATE);
+  const totalBuildArea = floorAreaApproved + bonusArea;
+  const platePrimary = r0(distrib/nHi);
+  const platePrimaryBonus = r0(platePrimary*BONUS_RATE);
+  const basementAllowed = katha >= 4;
+  const basementBlocked = !!I.basement && !basementAllowed;
+  const basementCount = (!!I.basement && basementAllowed) ? Math.max(0, I.basementCount||0) : 0;
+  const basementEach = r0(gcSqft + 0.5*(sqft - gcSqft));
+  const totalBasement = r0(basementCount * basementEach);
+  const avgNetFloor = r0(((floorAreaApproved + roadBenefit) - liftLobby)/(nHi||1));
+  const perFloorBonus = r0(bonusArea/(nHi||1));
+  const floorBuild = avgNetFloor + perFloorBonus;
+  const roofArea = floorBuild;
+  const groundArea = r0(sqft);
+  const totalConstruction = r0(floorBuild*nHi + roofArea + groundArea + totalBasement);
+  const farExcludedArea = r0(Math.max(0, groundArea - liftLobby) + totalBasement);
+  const farFloorsApproved=nHi, totalStoreysApproved=farFloorsApproved+1;
   const setbacks=getSetbacks(totalStoreysApproved||2), htM=r1(totalStoreysApproved*U.floorHeightM);
   let units=null;
   if(isRes&&block.katha>0){
@@ -2377,25 +2332,29 @@ function computeSingle(I){
     const farRef = block.avgDU>0 ? Math.floor(floorAreaApproved/block.avgDU) : null;
     units={base:baseUnits, bonus, max, farRef, duKatha:block.katha, avgDU:block.avgDU};
   }
-  function scen(cov,label){
-    const gcArea=r0(sqft*cov/100); const farFlrs=gcArea>0?Math.ceil(floorAreaApproved/gcArea):0;
-    const totFlrs=farFlrs+1; const sb=getSetbacks(totFlrs);
-    const upf=(block&&block.avgDU>0&&gcArea>0)?Math.floor(gcArea/block.avgDU):null;
-    return {label, cov:r1(cov), gcArea, farFlrs, totFlrs, htM:r1(totFlrs*U.floorHeightM), sb, upf};
+  function scen(cov,label,mode){
+    const gcArea=r0(sqft*cov/100);
+    const distribB = distrib + roadBenefit;
+    let n = mode==='min'?Math.floor(distribB/gcArea):mode==='max'?Math.ceil(distribB/gcArea):Math.round(distribB/gcArea);
+    n=Math.min(nHi,Math.max(nLo,Math.max(1,n)));
+    const plate=r0(distribB/n); const totFlrs=n+1;
+    const perFloorBonus=r0(plate*BONUS_RATE);
+    const upf=(block&&block.avgDU>0&&plate>0)?Math.floor(plate/block.avgDU):null;
+    return {label, cov:r1(cov), gcArea, farFlrs:n, totFlrs, plate, coverPct:r1(plate/sqft*100), perFloorBonus, htM:r1(totFlrs*U.floorHeightM), sb:getSetbacks(totFlrs), upf};
   }
   const scenarios = mgc.minMGC ? [
-    scen(mgc.maxMGC,"Max GC — fewest floors"),
-    scen((mgc.minMGC+mgc.maxMGC)/2,"Mid GC — balanced"),
-    scen(mgc.minMGC,"Min GC — most floors")
+    scen(mgc.maxMGC,"Max GC — fewest floors","max"),
+    scen((mgc.minMGC+mgc.maxMGC)/2,"Mid GC — balanced","mid"),
+    scen(mgc.minMGC,"Min GC — most floors","min")
   ] : [
-    scen(mgc.maxMGC,"Max GC — fewest floors"),
-    scen(mgc.maxMGC*0.8,"80% of Max — balanced"),
-    scen(mgc.maxMGC*0.6,"60% of Max — most floors")
+    scen(mgc.maxMGC,"Max GC — fewest floors","max"),
+    scen(mgc.maxMGC*0.8,"80% of Max — balanced","mid"),
+    scen(mgc.maxMGC*0.6,"60% of Max — most floors","min")
   ];
   return {mode:"single", occType:I.occType, block:(block||{id:"—",name:"Not applicable",areas:"",type:"",ppa:0,avgDU:0,katha:0,areaFAR:0}), isRes, sqft, sqm:r1(sqm), katha:r2(katha), roadFt:I.roadFt, location:I.location,
-    areaFAR, roadFAR, baseFAR, maxFAR, superMax, incentives, totalInc, approvedFAR, unconditional, isNR, nrMode, parking, nrFloorSqft,
+    areaFAR, roadFAR, roadFARexisting, roadFARproposed, proposedRoadFt, roadWidened, roadGiveawayWidth, roadFrontage, roadGiveawayArea, roadBenefit, baseFAR, maxFAR, superMax, incentives, totalInc, approvedFAR, unconditional, isNR, nrMode, parking, nrFloorSqft,
     mgc, gcSqft, gcSqftMin, floorAreaBase, floorAreaApproved, floorAreaMax,
-    farFloorsApproved, totalStoreysApproved, setbacks, htM, units, scenarios};
+    farFloorsApproved, totalStoreysApproved, setbacks, htM, units, scenarios, liftLobby, distrib, bonusArea, totalBuildArea, platePrimary, platePrimaryBonus, minGroundA, maxGroundA, basementAllowed, basementBlocked, basementCount, basementEach, totalBasement, avgNetFloor, perFloorBonus, floorBuild, roofArea, groundArea, totalConstruction, farExcludedArea};
 }
 
 function computeBlock(I){
@@ -2468,6 +2427,8 @@ function buildUI(){
   occ.addEventListener('change',occChange);
   if($("#loc"))$("#loc").addEventListener('change',updateNRUI);
   if($("#incNR"))$("#incNR").addEventListener('change',updateNRUI);
+  if($("#incBasement"))$("#incBasement").addEventListener('change',function(){var w=$("#basementWrap");if(w)w.style.display=$("#incBasement").checked?"block":"none";});
+  if($("#incFront"))$("#incFront").addEventListener('change',function(){var w=$("#frontWrap");if(w)w.style.display=$("#incFront").checked?"block":"none";});
 
   const inc=$("#incentives");
   inc.innerHTML=
@@ -2610,11 +2571,11 @@ function calculate(){
   if(problems.length){err.innerHTML=problems.join('<br>');err.style.display='block';return;}
   const a6vis = $("#a6wrap") && $("#a6wrap").style.display!=='none';
   const I={occType:$("#occ").value, location:$("#loc").value, blockId:selectedBlockId,
-    sqft, roadFt:ft, multiPlot:plotCount()>1,
+    sqft, roadFt:ft, frontageFt:($("#incFront")&&$("#incFront").checked?parseFloat($("#frontageFt").value)||0:0), multiPlot:plotCount()>1,
     hasA6:a6vis?$("#incA6").value:"",
     hasGreen:$("#incGreen").checked, hasPub:$("#incPub").checked,
     hasSchool:!!($("#incSchool")&&$("#incSchool").checked), hasPark:!!($("#incPark")&&$("#incPark").checked),
-    parking:($("#nrParking")?parseFloat($("#nrParking").value)||0:0), nrMode:!!($("#incNR")&&$("#incNR").checked)};
+    parking:($("#nrParking")?parseFloat($("#nrParking").value)||0:0), nrMode:!!($("#incNR")&&$("#incNR").checked), basement:!!($("#incBasement")&&$("#incBasement").checked), basementCount:($("#basementCount")?Math.max(0,parseInt($("#basementCount").value)||0):0)};
   const res = state.mode==="block"?computeBlock(I):computeSingle(I);
   if(res.error){err.innerHTML=res.error;err.style.display='block';return;}
   buildAudit(res); renderReport(res);
@@ -2631,7 +2592,8 @@ function buildAudit(r){
     A.push(`Approved = MIN(Base ${fmt(r.baseFAR)} + Inc ${fmt(r.totalInc)}, Max ${fmt(r.maxFAR)}) = <span class="num">${fmt(r.approvedFAR)}</span>`);
     A.push(`Floor Area = ${fmt(r.approvedFAR)} × ${fmt0(r.sqft)} ft² = <span class="num">${fmt0(r.floorAreaApproved)}</span> ft² [§2(81)]`);
     A.push(`MGC: ${r.mgc.minMGC?fmt(r.mgc.minMGC,1)+'–':''}${fmt(r.mgc.maxMGC,1)}% · open ${fmt(r.mgc.minOpen,1)}% [${r.mgc.ref}]`);
-    A.push(`Floors = ⌈${fmt0(r.floorAreaApproved)} / ${fmt0(r.gcSqft)}⌉ = G+${r.farFloorsApproved} (${r.totalStoreysApproved} storeys)`);
+    A.push(`Floors: (${fmt0(r.floorAreaApproved)} FAR − ${fmt0(r.liftLobby)} lift lobby) ÷ ${fmt0(r.minGroundA)} (45% min cover) = G+${r.farFloorsApproved} · ${r.totalStoreysApproved} storeys · ${fmt0(r.platePrimary)} ft²/floor (kept within 45–60% cover)`);
+    A.push(`Build area = ${fmt0(r.floorAreaApproved)} FAR + ${fmt0(r.bonusArea)} bonus (7.5%/floor verandah + green, FAR-excluded) = ${fmt0(r.totalBuildArea)} ft²`);
     if(r.units)A.push(`Units = ⌈${fmt(r.katha)} katha × ${fmt(r.units.duKatha,2)} DU/katha⌉ = <span class="num">${r.units.base}</span>${r.occType==="A3"?` (+10% A3 → ${r.units.max})`:''} [DAP App.3.6]`);
     A.push(`Setbacks @ ${r.totalStoreysApproved} storeys: side ${fmt(r.setbacks.side)} · rear ${fmt(r.setbacks.rear)} · between ${fmt(r.setbacks.between)} m [${r.setbacks.ref}]`);
   } else {
@@ -2650,7 +2612,7 @@ function buildAudit(r){
 function badge(t){return `<span class="badge" title="Source: ${t}">${t}</span>`;}
 const SHARE_URL="";
 const SHARE_TXT="RAJUK FAR Calculator 2025 — free DAP 2025 / Bidhimala 2025 FAR & coverage calculator by Studio 16 Architects";
-const STANDALONE_URL="";  /* set to your hosted (non-Wix) URL e.g.  to enable mobile print */
+const STANDALONE_URL="";  /* set to your hosted (non-Wix) URL e.g. https://xxx.netlify.app to enable mobile print */
 const SHARE_LINKS=(function(){var u=encodeURIComponent(SHARE_URL),t=encodeURIComponent(SHARE_TXT);return{wa:"https://wa.me/?text="+t+"%20"+u,fb:"https://www.facebook.com/sharer/sharer.php?u="+u,x:"https://twitter.com/intent/tweet?text="+t+"&url="+u,li:"https://www.linkedin.com/sharing/share-offsite/?url="+u};})();
 function toggleShareMenu(force){var m=document.getElementById("shareMenu");if(!m)return;m.style.display=(force===true)?"flex":(m.style.display==="flex"?"none":"flex");}
 function doShare(){try{if(navigator.share){navigator.share({title:"RAJUK FAR Calculator 2025",text:SHARE_TXT,url:SHARE_URL}).catch(function(){toggleShareMenu(true);});return;}}catch(e){}toggleShareMenu();}
@@ -2708,6 +2670,7 @@ function renderReport(r){
     <table class="kv">
       <tr><td>Land area / size</td><td>${fmt(r.katha)} katha · ${fmt0(r.sqft)} ft²</td></tr>
       <tr><td>Access road width</td><td>${fmt(r.roadFt,1)} ft · ${fmt(r.roadFt*U.ftToM,2)} m</td></tr>
+      <tr><td>Proposed road width</td><td>${fmt(r.proposedRoadFt,1)} ft · ${fmt(r.proposedRoadFt*U.ftToM,2)} m${r.roadWidened?' · widened to 20 ft / 6 m future minimum':' · already ≥ 20 ft / 6 m'}</td></tr>
       <tr><td>Building / use category</td><td>${occLabel}</td></tr>
       <tr class="res-only"><td>Development type</td><td>${modeLabel}</td></tr>
       <tr><td>Planning Zone</td><td>${locLabel}</td></tr>
@@ -2719,7 +2682,9 @@ function renderReport(r){
   <section class="sec sec-far"><h2>FAR Analysis</h2>
     <table class="kv">`;
   if(r.mode==="single"){
-    h+=`<tr><td>${r.isRes?'Road FAR':'FAR (road-based)'}</td><td>${r.nrMode?'NR (Non-restricted)':fmt(r.roadFAR)}${badge(r.isRes?R.roadFARRef:'Bidhimala 2025 · §47 Table 3')}</td></tr>
+    h+=`${r.nrMode?`<tr><td>${r.isRes?'Road FAR':'FAR (road-based)'}</td><td>NR (Non-restricted)${badge(r.isRes?R.roadFARRef:'Bidhimala 2025 · §47 Table 3')}</td></tr>`:r.roadWidened?`<tr><td>Road FAR · existing road (${fmt(r.roadFt,1)} ft)</td><td>${fmt(r.roadFARexisting)}${badge(r.isRes?R.roadFARRef:'Bidhimala 2025 · §47 Table 3')}</td></tr>
+        <tr><td>Road FAR · proposed road (${fmt(r.proposedRoadFt,1)} ft)</td><td>${fmt(r.roadFARproposed)}${badge('min 20 ft / 6 m future road')}</td></tr>
+        <tr><td>Approved Road FAR · average</td><td>${fmt(r.roadFAR)}${badge('(existing + proposed) ÷ 2')}</td></tr>`:`<tr><td>${r.isRes?'Road FAR':'FAR (road-based)'}</td><td>${fmt(r.roadFAR)}${badge(r.isRes?R.roadFARRef:'Bidhimala 2025 · §47 Table 3')}</td></tr>`}
         <tr class="res-only"><td>Area FAR</td><td>${fmt(r.areaFAR)}${badge('DAP 2025 · Table 3.6')}</td></tr>`;
   } else {
     h+=`<tr><td>Updated Area FAR</td><td>${fmt(r.finalAreaFAR,3)} <span class="mono" style="color:var(--muted);font-size:11px">(raw ${fmt(r.rawAreaFAR)})</span>${badge('DAP Table 3.31')}</td></tr>
@@ -2783,14 +2748,35 @@ function renderReport(r){
     <div class="floors">${r.scenarios.map((s,i)=>`
       <div class="fc ${i===1?'mid':''}"><div class="lab">${s.label}</div>
         <div class="gn">G+${s.farFlrs}</div><div class="st">${s.totFlrs} storied</div>
-        <div class="pl">${fmt0(s.gcArea)} ft² plate<br>≈ ${fmt(s.htM,1)} m tall${s.upf!=null?`<br>~${s.upf}/floor`:''}</div></div>`).join('')}
+        <div class="pl">${s.plate!=null?`${fmt0(s.plate)} ft²/floor<br><span style="opacity:.65">net (excl. bonus) · ${fmt(s.coverPct,1)}%</span>`:`${fmt0(s.gcArea)} ft² plate`}<br>≈ ${fmt(s.htM,1)} m tall${s.upf!=null?`<br>~${s.upf}/floor`:''}</div></div>`).join('')}
     </div>
     <table class="kv" style="margin-top:13px">
+      ${r.totalBuildArea!=null?`
+      <tr><td colspan="2" style="text-align:right;padding-bottom:4px;font-weight:600;color:var(--ink);border-bottom:1px solid var(--line)">Floor area calculation</td></tr>
+      ${(r.roadWidened&&r.roadBenefit>0)?`<tr><td>Total floor area (FAR included)</td><td>${fmt0(r.floorAreaApproved)} ft² · ${fmt0(tfaSqm)} m²${badge('Bidhimala §2(81)')}</td></tr>`:`<tr><td><b>Total floor area (FAR included)</b></td><td><b>${fmt0(r.floorAreaApproved)} ft² · ${fmt0(tfaSqm)} m²</b>${badge('Bidhimala §2(81)')}</td></tr>`}
+      ${r.roadWidened&&r.roadBenefit>0?`<tr><td>Land surrendered for 20 ft road (DAP 2025 cl.4)</td><td>${fmt(r.roadGiveawayWidth,1)} ft × ${fmt0(r.roadFrontage)} ft = ${fmt0(r.roadGiveawayArea)} ft²</td></tr>
+      <tr><td>Road-widening build benefit (3× surrendered)</td><td>+ ${fmt0(r.roadBenefit)} ft²</td></tr>
+      <tr><td><b>Total Floor area incl. road benefit</b></td><td><b>${fmt0(r.floorAreaApproved + r.roadBenefit)} ft²</b></td></tr>`:''}
+      ${r.roadWidened&&!(r.roadBenefit>0)?`<tr><td colspan="2" style="padding:6px 0;color:var(--muted);line-height:1.45;white-space:normal;text-align:left;word-break:break-word">Road widened to 20 ft — you surrender a ${fmt(r.roadGiveawayWidth,1)} ft strip along your frontage to the Government by easement deed, and gain <b>3× that surrendered area</b> as extra build area (DAP 2025 cl.4). Add your road-side edge (frontage) length above to quantify it.</td></tr>`:''}
+      <tr><td>Ground-floor lift lobby (FAR-included area)</td><td>${fmt0(r.liftLobby)} ft² · ${r.katha>10?'land &gt; 10 katha':'land ≤ 10 katha'}</td></tr>
+      <tr><td>Average net floor size (FAR-included area)</td><td>${fmt0(r.avgNetFloor)} ft²</td></tr>
+      <tr><td>Bonus verandah &amp; green area (FAR excluded)</td><td>+ ${fmt0(r.bonusArea)} ft²${badge('2.5% side + 2.5% front + 2.5% green / floor')}</td></tr>
+      <tr><td><b>Total build area (FAR + bonus)</b></td><td><b>${fmt0(r.totalBuildArea + (r.roadBenefit||0))} ft²</b></td></tr>
+      <tr><td>Estimated building</td><td>G+${r.farFloorsApproved} · ${r.totalStoreysApproved} storied · ≈ ${fmt(r.htM,1)} m (${fmt(r.htM/U.ftToM,1)} ft)</td></tr>
+      <tr><td colspan="2" style="text-align:right;padding-top:16px;padding-bottom:4px;font-weight:600;color:var(--ink);border-bottom:1px solid var(--line)">Construction area calculation</td></tr>
+      <tr><td>Average gross floor size (FAR + bonus)</td><td>${fmt0(r.avgNetFloor)} + ${fmt0(r.perFloorBonus)} = <b>${fmt0(r.floorBuild)} ft²</b></td></tr>
+      <tr><td>Number of floors</td><td>${r.farFloorsApproved} × ${fmt0(r.floorBuild)} ft² = ${fmt0(r.farFloorsApproved*r.floorBuild)} ft²</td></tr>
+      <tr><td>Ground floor (full plot)</td><td>${fmt0(r.groundArea)} ft²</td></tr>
+      <tr><td>Basement area</td><td>${r.basementCount>0?`${r.basementCount} × ${fmt0(r.basementEach)} = ${fmt0(r.totalBasement)} ft²`:(r.basementBlocked?'— needs ≥ 4 katha':'— none')}</td></tr>
+      <tr><td>Rooftop area</td><td>${fmt0(r.roofArea)} ft²</td></tr>
+      <tr><td><b>Total construction area</b></td><td><b>${fmt0(r.totalConstruction)} ft²</b>${badge('floors + roof + ground + basements')}</td></tr>
+      `:`
       <tr><td>Total floor area</td><td>${fmt0(tfa)} ft² · ${fmt0(tfaSqm)} m²${badge('Bidhimala §2(81)')}</td></tr>
       <tr><td>Estimated building</td><td>G+${r.mode==="block"?r.farFloors:r.farFloorsApproved} · ${(r.mode==="block"?r.totStoreys:r.totalStoreysApproved)} storied · ≈ ${fmt(r.htM,1)} m (${fmt(r.htM/U.ftToM,1)} ft)</td></tr>
+      `}
     </table>
-    <div class="refnote" style="padding-left:0">G = ground floor (parking, FAR-excluded). Heights approximate at ${U.floorHeightM} m floor-to-floor.</div>
-    <div class="refnote" style="padding-left:0;border-top:0;padding-top:0"><b style="color:var(--ink);font-weight:600">Note on estimated build area:</b> the figure above is based on allowable FAR only. Additional front verandahs, side verandahs, green verandahs, balconies, terraces, landscaped spaces, ducts and other permissible architectural features may be added on each floor in accordance with Dhaka Imarat Nirman Bidhimala 2025 and DAP 2025, which may increase the overall constructed area beyond the FAR-based build area shown here.</div>
+    <div class="refnote" style="padding-left:0">G = ground floor (parking${r.liftLobby!=null?` + ${fmt0(r.liftLobby)} ft² lift lobby`:""}). Floor counts are rounded so every upper floor stays between the minimum (${fmt0(r.minGroundA||0)} ft²) and maximum (${fmt0(r.maxGroundA||r.gcSqft)} ft²) ground-coverage limits. Heights approximate at ${U.floorHeightM} m floor-to-floor.</div>
+    <div class="refnote" style="padding-left:0;border-top:0;padding-top:0"><b style="color:var(--ink);font-weight:600">Bonus area (FAR-excluded):</b> each upper floor may add a side verandah (2.5%), a front / road-side verandah (2.5%) and green space (2.5%) — 7.5% of the floor area — over and above the FAR. The Total build area above includes this bonus. Balconies, terraces, ducts and other permissible features under Bidhimala 2025 &amp; DAP 2025 may increase the constructed area further.</div>
   </section>
 
   <section class="sec sec-site"><h2>Site Overview</h2>
@@ -2799,7 +2785,12 @@ function renderReport(r){
     </div>
   </section>
 
-  <section class="sec sec-density res-only"><h2>Relevant Density Block Details</h2>
+  ${r.totalConstruction!=null?`<section class="sec sec-section"><h2>Sectional Overview</h2>
+    <div class="siteoverview">${sectionSVG(r)}</div>
+    <div class="refnote" style="padding-left:0">By level — basements (FAR-excluded parking) below ground level, ground floor (full plot), each upper floor (FAR area + verandah &amp; green bonus) and roof. Their sum is the total construction area, ${fmt0(r.totalConstruction)} ft².</div>
+  </section>`:''}
+
+    <section class="sec sec-density res-only"><h2>Relevant Density Block Details</h2>
     <table class="kv">
       <tr><td>Block</td><td>${r.block.id} — ${r.block.name}${badge('DAP 2025 · App. 3.6')}</td></tr>
       <tr><td>Areas covered</td><td style="white-space:normal;text-align:right;font-family:var(--sans);color:var(--muted);font-size:12px;font-variant-numeric:normal">${r.block.areas||'—'}</td></tr>
@@ -2819,7 +2810,7 @@ function renderReport(r){
 
   `;
 
-  let _sn=0; h=h.replace(/<h2>/g, ()=>`<h2>${++_sn}.&nbsp; `);
+  /* section numbers rendered via CSS counter (skips display:none per medium) */
   $("#report").innerHTML=h;
   $("#report").classList.toggle('nonres', !r.isRes);
   const cb=$("#shareReportBtn"); if(cb)cb.addEventListener('click',()=>shareReport(r,ref,tfa));
@@ -2827,9 +2818,9 @@ function renderReport(r){
 }
 function setbackSVG(r){
   const sb=r.setbacks;
-  const footprint=r.mode==="block"?r.buildableFootprint:r.gcSqft;
+  const footprint=r.mode==="block"?r.buildableFootprint:(r.floorBuild||r.platePrimary||r.gcSqft);
   const floors=r.mode==="block"?r.farFloors:r.farFloorsApproved;
-  const build=r.mode==="block"?r.tfa:r.floorAreaApproved;
+  const build=r.mode==="block"?r.tfa:((r.totalBuildArea||r.floorAreaApproved) + (r.roadBenefit||0));
   const far=r.approvedFAR, road=r.roadFt;
   const occLabel=(ALL_OCC.find(o=>o.id===r.occType)||{}).label||r.occType;
   const occShort=occLabel.replace(/\s*\([^)]*\)\s*/g,'').trim();
@@ -2848,12 +2839,68 @@ function setbackSVG(r){
     <line x1="82" y1="97" x2="218" y2="97" style="stroke:var(--line)"/>
     <text x="150" y="125" text-anchor="middle" font-size="23" font-weight="700" style="${ink}">G+${floors}</text>
     <text x="150" y="143" text-anchor="middle" font-size="10" style="${ink}">Allowable FAR ${fmt(far)}</text>
-    <text x="150" y="159" text-anchor="middle" font-size="9.5" style="${ink}">Build ${fmt0(build)} ft²</text>
-    <text x="150" y="173" text-anchor="middle" font-size="8.5" style="${mut}">Footprint ${fmt0(footprint)} ft²</text>
+    <text x="150" y="159" text-anchor="middle" font-size="9.5" style="${ink}">Total build ${fmt0(build)} ft²</text>
+    <text x="150" y="173" text-anchor="middle" font-size="8.5" style="${mut}">Floor plate ${fmt0(footprint)} ft²</text>
     <text x="150" y="189" text-anchor="middle" font-size="8.5" style="${ink}">Land ${land}</text>
     <rect x="85" y="230" width="130" height="16" style="fill:color-mix(in srgb,var(--brass) 32%,transparent)"/>
     <text x="150" y="241" text-anchor="middle" font-size="9" font-weight="600" style="${ink}">ROAD · ${fmt0(road)} ft</text>
   </svg>`;
+}
+
+function sectionSVG(r){
+  if(r.totalConstruction==null) return '';
+  const ord=n=>{const s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);};
+  const net=r.platePrimary, bon=r.platePrimaryBonus, gross=r.floorBuild;
+  const ground=r.groundArea, lift=r.liftLobby, baseEach=r.basementEach, nB=r.basementCount, nF=r.farFloorsApproved;
+  const maxA=Math.max(ground,gross,baseEach)||1;
+  const W=400, barMax=168, cx=W*0.42, rowH=16, gap=3;
+  const C={far:'color-mix(in srgb,var(--brass) 34%,transparent)', bonus:'color-mix(in srgb,var(--good) 26%,transparent)', excl:'color-mix(in srgb,var(--muted) 15%,transparent)', ink:'var(--ink)'};
+  const bw=a=>Math.max(16, a/maxA*barMax);
+  let y=16, body='';
+  const gw=bw(gross);
+  body+=`<polygon points="${(cx-gw/2-5).toFixed(1)},${y+7} ${cx},${y} ${(cx+gw/2+5).toFixed(1)},${y+7}" style="fill:${C.ink};opacity:.5"/>`;
+  body+=`<rect x="${(cx-gw/2).toFixed(1)}" y="${y+7}" width="${gw.toFixed(1)}" height="3.5" style="fill:${C.ink}"/>`;
+  body+=`<text x="${cx+barMax/2+12}" y="${y+9}" font-size="8.5" style="fill:var(--ink)">Roof slab · ${fmt0(gross)} ft²</text>`;
+  y+=16;
+  for(let i=nF;i>=1;i--){
+    const g=bw(gross), nW=g*(net/gross);
+    body+=`<rect x="${(cx-g/2).toFixed(1)}" y="${y}" width="${g.toFixed(1)}" height="${rowH}" style="fill:${C.bonus};stroke:var(--line)"/>`;
+    body+=`<rect x="${(cx-nW/2).toFixed(1)}" y="${y}" width="${nW.toFixed(1)}" height="${rowH}" style="fill:${C.far}"/>`;
+    body+=`<text x="${cx}" y="${y+rowH/2+3}" text-anchor="middle" font-size="8.5" style="fill:var(--ink)">${ord(i)}</text>`;
+    body+=`<text x="${cx+barMax/2+12}" y="${y+rowH/2+3}" font-size="8.5" style="fill:var(--ink)">${fmt0(gross)} (${fmt0(net)}+${fmt0(bon)})</text>`;
+    y+=rowH+gap;
+  }
+  const gnd=bw(ground), lw=Math.max(7, gnd*(lift/ground));
+  body+=`<rect x="${(cx-gnd/2).toFixed(1)}" y="${y}" width="${gnd.toFixed(1)}" height="${rowH}" style="fill:${C.excl};stroke:var(--line)"/>`;
+  body+=`<rect x="${(cx-lw/2).toFixed(1)}" y="${y}" width="${lw.toFixed(1)}" height="${rowH}" style="fill:${C.far}"/>`;
+  body+=`<text x="${cx}" y="${y+rowH/2+3}" text-anchor="middle" font-size="8" style="fill:var(--ink)">Ground</text>`;
+  body+=`<text x="${cx+barMax/2+12}" y="${y+rowH/2+3}" font-size="8.5" style="fill:var(--ink)">${fmt0(ground)} · lobby ${fmt0(lift)}</text>`;
+  y+=rowH+gap;
+  body+=`<line x1="6" y1="${(y-gap/2).toFixed(1)}" x2="${W-6}" y2="${(y-gap/2).toFixed(1)}" style="stroke:var(--ink)" stroke-width="1.2"/>`;
+  body+=`<text x="6" y="${(y-gap/2-2).toFixed(1)}" font-size="7.5" style="fill:var(--ink)">ground level</text>`;
+  for(let b=1;b<=nB;b++){
+    const bb=bw(baseEach);
+    body+=`<rect x="${(cx-bb/2).toFixed(1)}" y="${y}" width="${bb.toFixed(1)}" height="${rowH}" style="fill:${C.excl};stroke:var(--line)" stroke-dasharray="3 2"/>`;
+    body+=`<text x="${cx}" y="${y+rowH/2+3}" text-anchor="middle" font-size="8" style="fill:var(--ink)">Basement ${b}</text>`;
+    body+=`<text x="${cx+barMax/2+12}" y="${y+rowH/2+3}" font-size="8.5" style="fill:var(--ink)">${fmt0(baseEach)} ft²</text>`;
+    y+=rowH+gap;
+  }
+  y+=10;
+  const lg=[['FAR floor area',C.far],['Verandah + green bonus',C.bonus],['Parking · FAR-excluded',C.excl]];
+  let lx=10;
+  lg.forEach(it=>{ body+=`<rect x="${lx.toFixed(1)}" y="${y-7}" width="9" height="9" style="fill:${it[1]};stroke:var(--line)"/>`; body+=`<text x="${(lx+13).toFixed(1)}" y="${y}" font-size="8" style="fill:var(--ink)">${it[0]}</text>`; lx+=24+it[0].length*4.3; });
+  y+=16;
+  body+=`<line x1="6" y1="${(y-6).toFixed(1)}" x2="${W-6}" y2="${(y-6).toFixed(1)}" style="stroke:var(--line)"/>`;
+  let fy=y+5;
+  const footRows=[["Total FAR-included area", r.floorAreaApproved]];
+  if(r.roadWidened&&r.roadBenefit>0){ footRows.push(["Total Floor area incl. road benefit", r.floorAreaApproved + r.roadBenefit]); }
+  footRows.push(["Total FAR + "+((r.roadWidened&&r.roadBenefit>0)?"road bonus + ":"")+"bonus (build) area", r.totalBuildArea + (r.roadBenefit||0)]);
+  footRows.push(["FAR-excluded area (parking &amp; basement)", r.farExcludedArea]);
+  footRows.forEach(rw=>{ body+=`<text x="10" y="${fy}" font-size="9" style="fill:var(--ink)">${rw[0]}</text><text x="${W-10}" y="${fy}" text-anchor="end" font-size="9.5" font-weight="600" style="fill:var(--ink)">${fmt0(rw[1])} ft²</text>`; fy+=16; });
+  fy+=1;
+  body+=`<text x="10" y="${fy}" font-size="9.5" font-weight="700" style="fill:var(--ink)">Total construction area</text><text x="${W-10}" y="${fy}" text-anchor="end" font-size="11" font-weight="700" style="fill:var(--ink)">${fmt0(r.totalConstruction)} ft²</text>`;
+  const HH=fy+12;
+  return `<svg viewBox="0 0 ${W} ${HH}" width="100%" style="max-width:400px;border:1px solid var(--line);background:var(--paper-2)">${body}</svg>`;
 }
 function copySummary(r,ref,tfa){
   const occLabel=(ALL_OCC.find(o=>o.id===r.occType)||{}).label||r.occType;
