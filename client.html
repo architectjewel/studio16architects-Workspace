@@ -37,7 +37,7 @@ const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 
   note("Loading your project…");
 
-  fetch(SUPABASE_URL + "/functions/v1/client-view?token=" + encodeURIComponent(token), { headers: { apikey: SUPABASE_ANON, Authorization: "Bearer " + SUPABASE_ANON } })
+  fetch(SUPABASE_URL + "/functions/v1/bright-task?token=" + encodeURIComponent(token), { headers: { apikey: SUPABASE_ANON, Authorization: "Bearer " + SUPABASE_ANON } })
     .then(function(r){ return r.json().catch(function(){ return {}; }); })
     .then(function(d){
       if(!d || !d.ok){ note("We couldn't find this project. The link may have been updated — please ask your architect for the current one."); return; }
