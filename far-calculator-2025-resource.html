@@ -2639,7 +2639,18 @@ window.S16_FAR_AUTORUN=function(p){
   try{
     if(p.occ && ALL_OCC.some(function(o){return o.id===p.occ;})) $("#occ").value=p.occ;
     var matched=null;
-    if(p.area){ var opts=blockOptions(String(p.area)); if(opts&&opts.length) matched=opts[0]; }
+    if(p.area){
+      var atext=String(p.area);
+      var direct=blockOptions(atext);
+      if(direct&&direct.length){ matched=direct[0]; }
+      else {
+        var noise=/^(block|sector|road|plot|holding|house|flat|floor|project|the|near|opposite|beside|main|avenue|lane|no|number|dhaka|bangladesh|at|in|of|and)$/i;
+        var cand=[];
+        atext.split(/[,;/]| at | in /i).forEach(function(seg){ seg=(seg||"").trim(); if(seg) cand.push(seg); });
+        atext.split(/[^A-Za-z]+/).forEach(function(w){ if(w&&w.length>=4 && !noise.test(w)) cand.push(w); });
+        cand.sort(function(a,b){ return b.length-a.length; }).forEach(function(t){ if(matched) return; var o=blockOptions(t); if(o&&o.length) matched=o[0]; });
+      }
+    }
     if(!matched && p.blockId){ var bb=blockById(p.blockId); if(bb) matched=bb; }
     if(matched) selectBlock(matched.id);
     if(p.katha!=null && String(p.katha)!==""){ var pv=document.querySelector("#plots .plot .pv"), pu=document.querySelector("#plots .plot .pu"); if(pv) pv.value=String(p.katha); if(pu) pu.value="katha"; if(typeof totLand==="function") totLand(); }
