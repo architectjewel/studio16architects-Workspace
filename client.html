@@ -28,6 +28,8 @@ const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
   var SITE_LABEL = { not_started:"Not started", ongoing:"In progress", done:"Done", delayed:"Delayed" };
   var SITE_BADGE = { not_started:"bg-zinc-100 text-zinc-500", ongoing:"bg-emerald-50 text-emerald-700", done:"bg-blue-50 text-blue-600", delayed:"bg-red-50 text-red-600" };
   var SITE_BAR = { not_started:"bg-zinc-300", ongoing:"bg-emerald-500", done:"bg-blue-500", delayed:"bg-red-500" };
+  var TASK_LABEL = { upcoming:"Upcoming", ongoing:"In progress", done:"Done" };
+  var TASK_BADGE = { upcoming:"bg-zinc-100 text-zinc-500", ongoing:"bg-amber-50 text-amber-700", done:"bg-emerald-50 text-emerald-700" };
 
   function shell(inner){ return '<div class="mb-6 flex items-center gap-2"><div class="text-[13px] font-bold tracking-tight">STUDIO 16 ARCHITECTS</div><div class="text-[11px] text-zinc-400">· Project status</div></div>' + inner + '<div class="mt-8 border-t border-zinc-200 pt-4 text-center text-[11px] text-zinc-400">Read-only view · studio16architectsbd.com</div>'; }
 
@@ -66,10 +68,27 @@ const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
     if(p.location) html += '<div class="mt-1 text-[12px] text-zinc-400">' + esc(p.location) + '</div>';
     html += '</div>';
 
+    // design progress (project board tasks)
+    var dg = d.design;
+    if(dg && dg.total>0){
+      html += '<div class="mt-4 rounded-xl border border-zinc-200 bg-white p-5">';
+      html += '<div class="flex items-baseline justify-between"><div class="text-[12px] font-medium text-zinc-500">Design progress</div><div class="mono text-[22px] font-bold">' + dg.percent + '%</div></div>';
+      html += '<div class="mt-2 h-2 w-full rounded bg-zinc-100"><div class="h-2 rounded bg-emerald-500" style="width:' + Math.max(0,Math.min(100,dg.percent)) + '%"></div></div>';
+      html += '<div class="mt-1.5 text-[11px] text-zinc-400">' + dg.done + ' of ' + dg.total + ' steps complete</div>';
+      html += '<div class="mt-4 space-y-2">';
+      dg.items.forEach(function(t){
+        html += '<div class="flex items-center gap-2 border-t border-zinc-100 pt-2 first:border-0 first:pt-0">';
+        html += '<span class="min-w-0 flex-1 truncate text-[13px] text-zinc-700">' + esc(t.label||"") + '</span>';
+        html += '<span class="rounded px-1.5 py-0.5 text-[10px] font-semibold ' + (TASK_BADGE[t.status]||"bg-zinc-100 text-zinc-500") + '">' + esc(TASK_LABEL[t.status]||t.status||"") + '</span>';
+        html += '</div>';
+      });
+      html += '</div></div>';
+    }
+
     // overall progress
     if(pg.total>0){
       html += '<div class="mt-4 rounded-xl border border-zinc-200 bg-white p-5">';
-      html += '<div class="flex items-baseline justify-between"><div class="text-[12px] font-medium text-zinc-500">Project progress</div><div class="mono text-[22px] font-bold">' + pg.overall + '%</div></div>';
+      html += '<div class="flex items-baseline justify-between"><div class="text-[12px] font-medium text-zinc-500">Construction progress</div><div class="mono text-[22px] font-bold">' + pg.overall + '%</div></div>';
       html += '<div class="mt-2 h-2 w-full rounded bg-zinc-100"><div class="h-2 rounded bg-emerald-500" style="width:' + Math.max(0,Math.min(100,pg.overall)) + '%"></div></div>';
       html += '<div class="mt-1.5 text-[11px] text-zinc-400">' + pg.done + ' of ' + pg.total + ' stages complete</div>';
       html += '</div>';
