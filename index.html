@@ -484,18 +484,42 @@ function receiptEmailHTML(pmt){
         if(!rep||rep.querySelector(".empty")){ alert("Please calculate the FAR in the calculator first, then press Save."); return; }
         setFarSaving(true);
         try{
-          let farFloors="", farArea="";
-          try{
-            rep.querySelectorAll("tr").forEach(function(tr){ const tds=tr.querySelectorAll("td"); if(tds.length>=2){ const k=(tds[0].textContent||"").trim().toLowerCase(); const v=(tds[1].textContent||""); if(k==="estimated building"){ const m=v.match(/G\s*\+\s*(\d+)/i); if(m) farFloors="G+"+m[1]; } if(!farArea&&(k==="total construction area"||k==="total floor area")){ const m=v.replace(/,/g,"").match(/(\d{2,})/); if(m) farArea=Number(m[1]).toLocaleString("en-IN")+" sft"; } } });
-            if(!farArea){ const hv=rep.querySelector(".hl .v"); if(hv){ const m=(hv.textContent||"").replace(/,/g,"").match(/(\d{2,})/); if(m) farArea=Number(m[1]).toLocaleString("en-IN")+" sft"; } }
-          }catch(_x){}
-          const pi=(e.projectInfo||[]).map(function(r){ const lab=r.label||""; if(/floor\s*number/i.test(lab)&&farFloors) return {...r,value:farFloors}; if(/build\s*area/i.test(lab)&&farArea) return {...r,value:farArea}; return r; });
+          let farFloors="";
+          const grab=function(re){
+            let best=null,bl=Infinity;
+            rep.querySelectorAll("*").forEach(function(el){ if(el.children.length>3) return; const t=(el.textContent||"").trim(); if(t&&re.test(t)&&t.length<bl){ best=el; bl=t.length; } });
+            if(!best) return 0;
+            const scan=function(s){ const m=(s||"").replace(/,/g,"").match(/(\d{2,})\s*(?:ft|sft|sq)/i); return m?Number(m[1]):0; };
+            let v=best.nextElementSibling?scan(best.nextElementSibling.textContent):0;
+            if(!v){ const row=best.closest&&best.closest("tr"); if(row) v=scan(row.textContent.replace(best.textContent,"")); }
+            if(!v&&best.parentElement) v=scan(best.parentElement.textContent.replace(best.textContent,""));
+            return v;
+          };
+          try{ rep.querySelectorAll("tr").forEach(function(tr){ const tds=tr.querySelectorAll("td"); if(tds.length>=2 && (tds[0].textContent||"").trim().toLowerCase()==="estimated building"){ const m=(tds[1].textContent||"").match(/G\s*\+\s*(\d+)/i); if(m) farFloors="G+"+m[1]; } }); }catch(_f){}
+          const land=grab(/ground floor \(full plot\)/i);          // 6.11
+          const faIncl=grab(/total floor area \(far included\)/i);  // 6.2
+          const bonus=grab(/bonus verandah/i);                     // 6.5
+          const basement=grab(/basement area/i);                   // 6.12
+          const rooftop=grab(/rooftop area/i);                     // 6.13
+          const totalCon=grab(/total construction area/i);         // 6.14
+          const excl=(land||0)+(basement||0)+(rooftop||0);         // item 4 = 6.11+6.12+6.13
+          const comma=function(n){ return Number(n).toLocaleString("en-IN"); };
+          const buildArea=totalCon?comma(totalCon)+" sft":"";
+          const pi=(e.projectInfo||[]).map(function(r){ const lab=r.label||""; if(/floor\s*number/i.test(lab)&&farFloors) return {...r,value:farFloors}; if(/build\s*area/i.test(lab)&&buildArea) return {...r,value:buildArea}; return r; });
+          let fb=e.farBasis||"";
+          const setLine=function(re,val){ if(!val) return; fb=fb.split("\n").map(function(ln){ return re.test(ln)? ln.replace(/(=\s*)[\d,]*\s*sft/i,"$1"+comma(val)+" sft") : ln; }).join("\n"); };
+          setLine(/\[Land area\]/i, land);                  // 6.11
+          setLine(/FAR included Total Floor Area/i, faIncl); // 6.2
+          setLine(/Incentive/i, bonus);                     // 6.5
+          setLine(/FAR-excluded area/i, excl);              // 6.11+6.12+6.13
+          setLine(/Total Build Area/i, totalCon);           // 6.14 (direct)
           const styles=Array.prototype.map.call(doc.querySelectorAll("style"),function(x){return x.textContent;}).join("\n");
           const payload=JSON.stringify({mode:e.farMode,styles:styles,html:rep.outerHTML});
-          if(fail((await db.from("proposals").update({far_mode:e.farMode,far_report:payload,project_info:pi}).eq("id",e.id)).error)){ setFarSaving(false); return; }
-          setPropEdit(x=>({...x,farReport:payload,projectInfo:pi})); await refresh();
-          const pulled=[farFloors?("floor number "+farFloors):"",farArea?("build area "+farArea):""].filter(Boolean).join(" and ");
-          alert("FAR calculation saved \u2014 it will be included in Print / PDF."+(pulled?(" Pulled "+pulled+" into Project Information."):""));
+          if(fail((await db.from("proposals").update({far_mode:e.farMode,far_report:payload,project_info:pi,far_basis:fb}).eq("id",e.id)).error)){ setFarSaving(false); return; }
+          setPropEdit(x=>({...x,farReport:payload,projectInfo:pi,farBasis:fb})); await refresh();
+          const got=[farFloors?("floors "+farFloors):"",land?("land "+comma(land)+" sft"):"",faIncl?("FAR floor area "+comma(faIncl)+" sft"):"",bonus?("verandah/green "+comma(bonus)+" sft"):"",excl?("FAR-excluded "+comma(excl)+" sft"):"",totalCon?("total construction "+comma(totalCon)+" sft"):""].filter(Boolean);
+          const miss=[land?"":"Ground floor (full plot)",faIncl?"":"Total floor area (FAR included)",bonus?"":"Bonus verandah & green",totalCon?"":"Total construction area"].filter(Boolean);
+          alert("FAR calculation saved \u2014 it will be included in Print / PDF."+(got.length?(" Pulled: "+got.join(", ")+"."):"")+(miss.length?(" Could not find: "+miss.join(", ")+" \u2014 check the calculator row labels."):""));
         }catch(err){ alert("Could not save FAR calculation: "+(err&&err.message||err)); }
         setFarSaving(false);
       }
