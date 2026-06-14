@@ -2631,6 +2631,31 @@ function copyReportText(btn){var box=document.getElementById("reportShareBox");v
 function shareReport(r,ref,tfa){var txt=reportSummaryText(r,ref,tfa);try{if(navigator.share){navigator.share({title:"RAJUK FAR result — Studio 16 Architects",text:txt}).catch(function(){revealReportShare(txt);});return;}}catch(e){}revealReportShare(txt);}
 function printHint(){var box=document.getElementById("reportShareBox");if(!box)return;box.innerHTML='<div class="hint" style="line-height:1.55">'+(STANDALONE_URL?('To save a PDF on mobile, open the full (non-embedded) calculator: <a class="shm" href="'+STANDALONE_URL+'" target="_blank" rel="noopener">Open full calculator ↗</a>'):'On mobile the embedded calculator cannot open the print dialog. Open the calculator on its own page (hosted outside Wix) to save a PDF.')+'</div>';box.style.display="block";}
 window.doPrint=doPrint;window.doShare=doShare;window.copyShareLink=copyShareLink;window.shareReport=shareReport;window.copyReportText=copyReportText;
+// Programmatic entry point — lets the proposal app auto-fill inputs and calculate.
+// params: {occ:"A3", area:"Aftabnagar", roadFt:30, katha:5, blockId?, loc?}
+window.S16_FAR_AUTORUN=function(p){
+  p=p||{};
+  var out={ok:false,matched:null,error:"",occ:""};
+  try{
+    if(p.occ && ALL_OCC.some(function(o){return o.id===p.occ;})) $("#occ").value=p.occ;
+    var matched=null;
+    if(p.area){ var opts=blockOptions(String(p.area)); if(opts&&opts.length) matched=opts[0]; }
+    if(!matched && p.blockId){ var bb=blockById(p.blockId); if(bb) matched=bb; }
+    if(matched) selectBlock(matched.id);
+    if(p.katha!=null && String(p.katha)!==""){ var pv=document.querySelector("#plots .plot .pv"), pu=document.querySelector("#plots .plot .pu"); if(pv) pv.value=String(p.katha); if(pu) pu.value="katha"; if(typeof totLand==="function") totLand(); }
+    if(p.roadFt!=null && String(p.roadFt)!==""){ var rv=$("#roadVal"); if(rv) rv.value=String(p.roadFt); state.roadUnit="ft"; $$("#roadUnit button").forEach(function(x){ x.classList.toggle("on", x.dataset.u==="ft"); }); if(typeof roadHint==="function") roadHint(); }
+    if(p.loc){ var le=$("#loc"); if(le) le.value=p.loc; }
+    if(typeof occChange==="function") occChange();
+    calculate();
+    var err=$("#errbox"); var failed=!!(err && err.style.display!=="none" && (err.textContent||"").trim());
+    var hasReport=!!document.querySelector("#report .hl, #report table, #report tr");
+    out.ok=!failed && hasReport;
+    out.error=failed?(err.textContent||"").trim():"";
+    out.matched=matched?{id:matched.id,name:matched.name,areas:matched.areas||""}:null;
+    out.occ=$("#occ").value;
+  }catch(e){ out.ok=false; out.error=String(e&&e.message||e); }
+  return out;
+};
 function renderReport(r){
   const now=new Date();
   const ref=`S16A-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${Math.floor(Math.random()*9000+1000)}`;
