@@ -1,0 +1,3403 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAR Calculator 2026 · Studio 16 Architects</title>
+<style>
+/* ===== BASE — tokens, layout, typography ===== */
+/* ============================================================
+   FAR CALCULATOR 2026 — Studio 16 Architects house style
+   Warm bone paper · near-black ink · taupe rules · gold accent
+   Helvetica/Arial · uppercase tracked headings · hairlines
+   ============================================================ */
+:root{
+  --paper:#F4F2EB; --paper-2:#FAF8F2; --card:#FFFFFF; --ink:#1A1916;
+  --muted:#8B867B; --faint:#B7B1A6; --line:#E2DED5; --line-2:#EDEAE2;
+  --teal:#1A1916; --teal-2:#3A352C;            /* primary (kept var names) */
+  --brass:#9C6B1E; --brass-2:#B98A3C;          /* gold accent */
+  --good:#2E6B3E; --warn:#9A6B12; --cap:#A8412F; --capbg:#a8412f12;
+  --shadow:0 1px 2px #1a191608, 0 12px 34px -20px #1a191626;
+  --r:4px; --r-sm:3px;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --serif:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+html[data-theme="dark"]{
+  --paper:#14130F; --paper-2:#1A1813; --card:#1E1C16; --ink:#ECEAE1;
+  --muted:#9A958A; --faint:#6E695E; --line:#ffffff1c; --line-2:#ffffff0e;
+  --teal:#ECEAE1; --teal-2:#CFC9BC; --brass:#C99A4E; --brass-2:#DDB877;
+  --good:#7FB98C; --warn:#D6A444; --cap:#E08868; --capbg:#e0886816;
+  --shadow:0 1px 2px #0006, 0 18px 42px -22px #000a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--sans);color:var(--ink);background:var(--paper);
+  line-height:1.55;-webkit-font-smoothing:antialiased;font-size:15px;}
+a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line)}
+a:hover{border-color:var(--ink)}
+h1,h2,h3{margin:0;font-weight:600}
+.mono{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px 72px}
+
+/* ---------- Header ---------- */
+.zonetoggle{display:flex;flex-wrap:wrap;gap:8px;padding:12px 22px;background:var(--paper-2);border-bottom:1px solid var(--line)}
+.zonetoggle a{flex:1;min-width:150px;text-align:center;padding:11px 14px;border:1px solid var(--line);border-radius:6px;text-decoration:none;font-size:12.5px;font-weight:600;color:var(--ink);background:var(--card)}
+.zonetoggle a.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.zonetoggle a:not(.active):hover{border-color:var(--brass);color:var(--brass)}
+header.top{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--paper) 88%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:0 auto;padding:14px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:13px;min-width:0}
+.logo-img{height:42px;width:auto;display:block}
+.logo-svg{height:40px;width:auto;display:block;color:var(--ink)}
+@media(max-width:520px){.logo-svg{height:34px}}
+.logomark{width:42px;height:42px;border:1.5px solid var(--ink);display:grid;place-items:center;
+  font-weight:700;font-size:17px;flex:none;background:var(--ink);color:var(--paper);letter-spacing:.02em}
+.brand .nm{font-weight:700;font-size:15px;line-height:1.05;letter-spacing:.02em;text-transform:uppercase}
+.brand .tg{font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.contact{margin-left:auto;display:flex;gap:22px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.contact a{color:var(--muted);border:0}
+.contact a:hover{color:var(--ink)}
+.contact b{color:var(--ink);font-weight:600;display:block;font-size:10px;text-transform:uppercase;letter-spacing:.12em;margin-bottom:2px}
+.theme-btn{flex:none;border:1px solid var(--line);background:transparent;color:var(--ink);
+  width:38px;height:38px;border-radius:0;cursor:pointer;font-size:16px;display:grid;place-items:center}
+.theme-btn:hover{border-color:var(--ink)}
+
+/* ---------- Title block ---------- */
+.hero{padding:46px 0 26px;border-bottom:1px solid var(--line)}
+.hero .eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--brass);font-weight:600}
+.hero h1{font-size:clamp(28px,4.6vw,44px);margin:14px 0 12px;line-height:1.04;
+  text-transform:uppercase;letter-spacing:.01em;font-weight:600}
+.hero .sub{color:var(--ink);font-size:15px;max-width:640px;opacity:.85}
+.hero .sub2{color:var(--muted);font-size:12px;margin-top:8px;letter-spacing:.04em;text-transform:uppercase}
+.coverage{margin-top:20px;display:flex;gap:7px;flex-wrap:wrap}
+.chip{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;border:1px solid var(--line);color:var(--muted)}
+.chip.no{color:var(--cap);border-color:var(--cap)}
+.chip.yes{color:var(--paper);background:var(--ink);border-color:var(--ink);font-weight:600}
+.combo{position:relative}
+.combo-list{position:absolute;top:calc(100% - 1px);left:0;right:0;z-index:30;background:var(--card);
+  border:1px solid var(--ink);border-top:0;max-height:280px;overflow:auto;display:none;box-shadow:var(--shadow)}
+.combo-item{padding:9px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--line-2);display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.combo-item:last-child{border-bottom:0}
+.combo-item:hover,.combo-item.active{background:var(--paper-2)}
+.combo-item b{font-weight:600}
+.combo-item .ci-meta{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;font-variant-numeric:tabular-nums}
+.combo-empty{padding:11px 12px;font-size:12px;color:var(--muted)}
+
+/* ---------- Layout ---------- */
+.grid{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:0;margin-top:0;align-items:start;
+  border-bottom:1px solid var(--line)}
+@media(max-width:920px){.grid{grid-template-columns:1fr}}
+.panel{background:transparent}
+.inputs{position:sticky;top:78px;border-right:1px solid var(--line)}
+@media(max-width:920px){.inputs{position:static;border-right:0;border-bottom:1px solid var(--line)}}
+.report{background:var(--paper-2)}
+
+/* ---------- Steps ---------- */
+.inputs{padding:0 26px 30px 0}
+@media(max-width:920px){.inputs{padding:0 0 24px 0}}
+.step{border-bottom:1px solid var(--line-2);padding:20px 0}
+.step:last-of-type{border-bottom:0}
+.step .lbl{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.step .n{font-size:11px;width:24px;height:24px;border:1px solid var(--ink);color:var(--ink);
+  display:grid;place-items:center;font-weight:600;flex:none;font-variant-numeric:tabular-nums}
+.step .t{font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.14em}
+.step .ref{margin-left:auto;font-size:9.5px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+label.fld{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:0 0 6px}
+select,input[type=text],input[type=number]{width:100%;font-family:var(--sans);font-size:14px;color:var(--ink);
+  background:var(--card);border:1px solid var(--line);border-radius:0;padding:10px 12px;outline:none}
+select:focus,input:focus{border-color:var(--ink)}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.seg{display:flex;border:1px solid var(--line);border-radius:0;overflow:hidden;background:var(--card)}
+.seg button{flex:1;border:0;background:none;color:var(--muted);padding:9px;font-family:var(--sans);font-size:11px;
+  cursor:pointer;font-weight:600;text-transform:uppercase;letter-spacing:.1em}
+.seg button.on{background:var(--ink);color:var(--paper)}
+.seg button:disabled{color:var(--faint);cursor:not-allowed;background:repeating-linear-gradient(45deg,transparent,transparent 4px,var(--line-2) 4px,var(--line-2) 5px)}
+.hint{font-size:11px;color:var(--muted);margin-top:7px;letter-spacing:.02em}
+.hint.warn{color:var(--warn)}
+
+.plot{display:flex;gap:8px;align-items:center;margin-bottom:7px}
+.plot .pn{font-size:11px;color:var(--muted);width:16px;flex:none;font-weight:600}
+.plot input{flex:2}.plot select{flex:1.4}
+.plot .rm{flex:none;width:32px;border:1px solid var(--line);background:var(--card);color:var(--cap);border-radius:0;cursor:pointer;font-size:15px}
+.addplot{margin-top:5px;background:none;border:1px dashed var(--line);color:var(--ink);border-radius:0;
+  padding:9px;width:100%;cursor:pointer;font-size:11px;text-transform:uppercase;letter-spacing:.12em}
+.addplot:hover{border-color:var(--ink)}
+.totline{margin-top:11px;font-size:12.5px;display:flex;justify-content:space-between;padding-top:11px;
+  border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.totline b{color:var(--brass);font-weight:600}
+
+.inc{display:flex;align-items:flex-start;gap:10px;padding:8px 0;font-size:13.5px;cursor:pointer}
+.inc input{margin-top:2px;accent-color:var(--ink)}
+.inc .iv{margin-left:auto;font-size:11px;color:var(--brass);white-space:nowrap;font-variant-numeric:tabular-nums}
+
+.calc-btn{margin-top:22px;width:100%;border:0;background:var(--ink);color:var(--paper);font-family:var(--sans);
+  font-weight:600;font-size:12px;padding:16px;cursor:pointer;border-radius:0;text-transform:uppercase;letter-spacing:.18em}
+.calc-btn:hover{background:var(--teal-2)}
+.errbox{margin-top:14px;color:var(--cap);font-size:12.5px;display:none;border:1px solid var(--cap);
+  background:var(--capbg);border-radius:0;padding:10px 12px}
+
+/* ---------- Report ---------- */
+.report{min-height:320px}
+.empty{padding:80px 34px;text-align:center;color:var(--muted)}
+.empty .big{font-size:18px;color:var(--ink);margin-bottom:10px;text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.empty svg{opacity:.4;margin-bottom:16px}
+
+.rep-head{padding:24px 28px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.rep-head .ttl{font-size:13px;text-transform:uppercase;letter-spacing:.16em;font-weight:600}
+.rep-sub{font-size:11px;color:var(--muted);letter-spacing:.06em;margin-top:3px}
+.rep-modemeta{font-size:12.5px;font-weight:600;color:var(--ink);margin-top:9px;letter-spacing:.01em}
+.rep-logo{margin-bottom:13px}
+.rep-logo .logo-svg{height:30px;color:var(--ink)}
+.siteoverview{display:flex;justify-content:center;padding:6px 0}
+.rep-head .meta{font-size:10.5px;color:var(--muted);text-align:right;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.rep-actions{display:flex;gap:8px;margin:0 0 16px}
+.rep-actions button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:0;
+  padding:8px 15px;cursor:pointer;font-family:var(--sans);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.12em}
+.rep-actions button:hover{border-color:var(--ink)}
+
+.headline{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border-bottom:1px solid var(--line)}
+.hl{background:var(--card);padding:20px}
+.hl .k{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.hl .v{font-size:32px;font-weight:600;color:var(--ink);line-height:1.05;margin-top:6px;font-variant-numeric:tabular-nums}
+.hl .v small{font-size:13px;color:var(--muted);font-weight:400}
+.hl.accent{background:#4d4842}
+.hl.accent .k{color:#c9c4ba}
+.hl.accent .v{color:#fff}
+.hl.accent .mono{color:var(--brass-2)!important}
+
+section.sec{padding:24px 28px;border-bottom:1px solid var(--line-2);counter-reset:rownum}
+.report{counter-reset:secnum} section.sec h2{font-size:11px;display:flex;align-items:center;gap:10px;margin-bottom:16px;text-transform:uppercase;letter-spacing:.16em;font-weight:600;counter-increment:secnum}
+section.sec h2:before{content:counter(secnum) ".";color:var(--brass);font-weight:700;flex:none;font-variant-numeric:tabular-nums}
+
+table.kv{width:100%;border-collapse:collapse;font-size:13.5px}
+table.kv td{padding:9px 0;border-bottom:1px solid var(--line-2);vertical-align:top}
+table.kv td:first-child{color:var(--muted)}
+    table.kv tr{counter-increment:rownum}
+    table.kv td:first-child:before{content:counter(secnum) "." counter(rownum);color:var(--brass);font-weight:400;font-size:0.78em;font-variant-numeric:tabular-nums;margin-right:0.65em;opacity:.85}
+table.kv td:last-child{text-align:right;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}
+.badge{display:inline-block;font-size:9px;color:var(--muted);border:1px solid var(--line);border-radius:0;
+  padding:2px 7px;margin-left:8px;cursor:help;vertical-align:middle;white-space:nowrap;text-transform:uppercase;letter-spacing:.06em}
+.badge:hover{border-color:var(--ink);color:var(--ink)}
+.capped{color:var(--cap)!important}
+/* highlighted key result rows — Approved FAR · Total floor area */
+table.kv tr.kv-hi td{background:color-mix(in srgb,var(--brass) 13%,var(--card));font-weight:700;
+  border-top:1.5px solid color-mix(in srgb,var(--brass) 55%,transparent);
+  border-bottom:1.5px solid color-mix(in srgb,var(--brass) 55%,transparent);
+  padding-top:11px;padding-bottom:11px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+table.kv tr.kv-hi td:first-child{color:var(--ink);box-shadow:inset 4px 0 0 var(--brass);padding-left:12px}
+table.kv tr.kv-hi td:first-child:before{color:var(--brass);opacity:1}
+table.kv tr.kv-hi td:last-child{color:var(--brass);font-size:1.12em;letter-spacing:.01em}
+
+.floors{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+@media(max-width:560px){.floors{grid-template-columns:1fr}}
+.fc{border:0;border-radius:0;padding:16px;text-align:center;background:var(--card)}
+.fc .lab{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.fc .gn{font-size:27px;font-weight:600;color:var(--ink);margin:8px 0 2px;font-variant-numeric:tabular-nums}
+.fc .st{font-size:10.5px;color:var(--brass);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.fc .pl{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.4;font-variant-numeric:tabular-nums}
+.fc.mid{background:var(--paper-2);box-shadow:inset 0 2px 0 var(--brass)}
+
+.sbwrap{display:grid;grid-template-columns:1fr 200px;gap:22px;align-items:center}
+@media(max-width:560px){.sbwrap{grid-template-columns:1fr}}
+
+details.audit{padding:0 28px 22px}
+details.audit summary{cursor:pointer;font-size:11px;color:var(--muted);padding:14px 0;text-transform:uppercase;letter-spacing:.12em}
+details.audit summary:hover{color:var(--ink)}
+.auditlist{font-size:11.5px;color:var(--muted);line-height:1.85;background:var(--card);
+  border:1px solid var(--line);border-radius:0;padding:15px 17px;font-variant-numeric:tabular-nums}
+.auditlist .step-a{color:var(--ink);font-weight:600}
+.auditlist .num{color:var(--brass);font-weight:600}
+
+.disclaimer{margin-top:0;border:0;border-top:1px solid var(--line);border-radius:0;padding:24px 0 0;background:transparent;font-size:12px;color:var(--muted)}
+.disclaimer h3{font-size:11px;color:var(--ink);margin-bottom:9px;text-transform:uppercase;letter-spacing:.14em;font-weight:600}
+.foot{margin-top:26px;text-align:center;font-size:10.5px;color:var(--faint);letter-spacing:.08em;text-transform:uppercase}
+.refnote{padding:14px 28px;font-size:11px;color:var(--muted);border-top:1px solid var(--line-2);letter-spacing:.02em}
+.cta{text-align:center;margin:30px 0 6px;padding-top:20px;border-top:1px solid var(--line-2)}
+.cta-cap{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:9px}
+.cta-url{font-family:var(--mono);font-size:13px;color:var(--brass);border:1px solid var(--line);padding:9px 18px;display:inline-block;text-decoration:none}
+.cta-url:hover{border-color:var(--brass)}
+
+.shm{font-size:11px;border:1px solid var(--line);background:transparent;color:var(--ink);padding:6px 11px;border-radius:4px;text-decoration:none;cursor:pointer;display:inline-block}
+.shm:hover{border-color:var(--brass)}
+.sharebar{display:flex;flex-wrap:wrap;align-items:center;gap:7px;padding:14px 0 16px;margin-bottom:10px;border-bottom:1px solid var(--line-2)}
+.sharebar-h{width:100%;font-size:9.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:3px}
+.shm-icon{padding:8px 12px;display:inline-flex;align-items:center;justify-content:center;line-height:0;color:var(--ink)}
+.shm-icon svg{display:block}
+.shm-icon:hover{color:var(--brass);border-color:var(--brass)}
+@media(max-width:600px){
+  header.top{position:static}
+  .zonetoggle{padding:10px}
+  .zonetoggle a{min-width:0;font-size:11.5px;padding:10px 8px}
+  .grid{zoom:0.92}
+  .wrap{padding:0 8px 40px}
+  .rep-head{padding:16px 14px;flex-direction:column;align-items:flex-start;gap:8px}
+  .rep-head .meta{text-align:left}
+  .sec{padding:16px 14px}
+  .headline .hl .v{font-size:22px}
+  .headline .hl{padding:8px 10px}
+  .fc{padding:12px}
+  .fc .gn{font-size:21px}
+  table.kv{font-size:12.5px}
+  table.kv td{padding:8px 0}
+  table.kv td:last-child{white-space:normal;word-break:break-word}
+  .badge{margin-left:6px}
+  .siteoverview svg,.sec svg{max-width:100%;height:auto}
+  .report{overflow-x:hidden}
+  .rep-actions{flex-wrap:wrap}
+  .ttl{font-size:12px}
+}
+@media(max-width:430px){
+  .grid{zoom:0.85}
+  .headline{grid-template-columns:1fr 1fr}
+}
+@media(max-width:340px){
+  .headline{grid-template-columns:1fr}
+}
+@media print{
+  @page{size:A4 portrait;margin:9mm 9mm 12mm;@bottom-right{content:"Page " counter(page) " of " counter(pages);font-size:7px;color:#888}}
+  html,body{background:#fff}
+  body{font-size:8.8px;color:#000;line-height:1.3}
+  header.top,.inputs,.theme-btn,.rep-actions,details.audit,.foot,.coverage,.hero,.disclaimer,.rep-head,.sec-farref,.cta{display:none!important}
+  .wrap{max-width:none;padding:0 0 12px}
+  .grid{display:block;margin:0;border:0}
+  .panel{box-shadow:none}
+  .report{background:#fff;zoom:0.82}
+  .print-only{display:block!important}
+  a{color:#000;border:0}
+  /* small, presentable header */
+  .print-head{padding:0 0 3px;margin-bottom:7px;border-bottom:1.2px solid #000;align-items:center}
+  .print-head .pl{font-weight:700}
+  .print-head .logo-svg{height:16px;color:#000}
+  .print-head .pr{font-size:6.5px;line-height:1.3}
+  .print-head .pr b{font-size:9px;display:inline-block;margin-bottom:2px;letter-spacing:.01em}
+  /* headline banner */
+  .headline{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid #000;margin-bottom:9px}
+  .headline .hl{padding:5px 8px;border-right:1px solid #ccc}
+  .headline .hl:last-child{border-right:0}
+  .headline .hl .k{font-size:7.4px}
+  .headline .hl .v{font-size:16px;margin-top:2px}
+  .hl.accent{background:#4d4842!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .hl.accent .k{color:#d2cdc3!important}.hl.accent .v{color:#fff!important}.hl.accent .mono{color:#e2bc7e!important}
+  /* newspaper-style column flow: fill column 1 down the page, then column 2 */
+  .rep-body{display:block;column-count:2;column-gap:16px;column-fill:balance}
+  section.sec{padding:7px 0 0;border:0;border-top:1px solid #d4d4d4;break-inside:avoid;page-break-inside:avoid;-webkit-column-break-inside:avoid;overflow:hidden}
+  /* tall Floor Analysis: allow it to flow into column 2, but keep header + rows/cards intact */
+  section.sec.sec-floor{break-inside:auto;page-break-inside:auto;overflow:visible}
+  section.sec.sec-floor h2{break-after:avoid;page-break-after:avoid}
+  section.sec.sec-floor .floors,section.sec.sec-floor table.kv tr{break-inside:avoid;page-break-inside:avoid}
+  section.sec h2{font-size:9px;margin-bottom:6px;letter-spacing:.1em}
+  section.sec h2:before{width:auto}
+  table.kv td{padding:1.8px 0;font-size:8.4px}
+  .badge{font-size:6.8px;padding:0 3px;margin-left:3px}
+  /* scenario cards */
+  .floors{gap:6px}
+  .fc{border:1px solid #c4c4c4;padding:6px 5px}
+  .fc.mid{box-shadow:none;border:1.5px solid #777;background:#fff}
+  .fc .lab{font-size:7.2px}
+  .fc .gn{font-size:16px;margin:2px 0 1px}
+  .fc .st{font-size:7px}
+  .fc .pl{font-size:7.2px;margin-top:3px;line-height:1.4}
+  .refnote{padding:3px 0;font-size:7.2px;border:0}
+  /* larger, readable site map (fills its half column) */
+  .siteoverview{padding:0;justify-content:center}
+  .siteoverview svg{max-width:325px!important}
+  .cta{margin:14px 0 0;padding-top:9px;border-top:1px solid #ccc;text-align:center}
+  .cta-cap{font-size:7px;margin-bottom:5px}
+  .cta-url{font-size:9px;color:#111;border-color:#999;padding:5px 12px}
+  /* fixed footer: basis above the line, brand + page below */
+  .print-foot{position:fixed;left:0;right:0;bottom:0;margin:0;padding:2.5mm 8mm;background:#fff;border-top:1px solid #ccc;text-align:center;color:#777;font-size:7px;letter-spacing:.06em;line-height:1.4}
+}
+.print-foot{display:none}
+.print-only{display:none}
+.nonres .res-only{display:none!important}
+.print-head{padding:14px 28px;border-bottom:2px solid var(--ink);display:flex;justify-content:space-between;align-items:flex-start}
+.print-head .pl .logo-svg{height:30px}
+.print-head .pr{font-size:10px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* ===== REPORT & COMPONENTS ===== */
+.cls-1{fill:currentColor;}
+
+/* ===== PRINT + misc (a) ===== */
+'+css+'
+
+/* ===== PRINT + misc (b) ===== */
+@media print{.printbanner{display:none!important}}
+
+/* ============================================================
+   Official RAJUK Land Use Clearance (LUC) worksheet table
+   (kept white + worksheet colours on any theme) — re-added
+   ============================================================ */
+.luc{width:100%;border-collapse:collapse;table-layout:fixed;
+  font-family:'Nikosh','Kalpurush','Noto Sans Bengali','Hind Siliguri','Bangla Sangam MN','Nirmala UI','SolaimanLipi',sans-serif;
+  font-size:12.5px;line-height:1.4;background:#fff;color:#1a1a1a;border-radius:8px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.luc th,.luc td{border:1px solid #4a4a4a;padding:5px 7px;vertical-align:middle;word-break:break-word}
+.luc .luc-h{background:#f2f2f2;font-weight:700;text-align:center}
+.luc .luc-sl{text-align:center;font-variant-numeric:normal;white-space:nowrap}
+.luc .luc-d{text-align:left}
+.luc .luc-sub{text-align:center;font-size:11px;color:#333}
+.luc .luc-v{text-align:center;font-weight:700;font-variant-numeric:normal;white-space:nowrap}
+.luc .luc-note{text-align:left;font-size:11.5px;color:#222}
+.luc .luc-tan{background:#fce9c8}
+.luc .luc-blue{background:#b8cce4}
+.luc .luc-green{background:#92d050}
+.luc .luc-gray{background:#bfbfbf}
+.luc .luc-v.luc-red{color:#c00000}
+.luc .luc-v.luc-blue{background:transparent;color:#0070c0}
+@media print{
+  section.sec.sec-luc{break-inside:avoid;page-break-inside:avoid;overflow:visible;border-top:0;padding-top:0;break-before:page;page-break-before:always}
+  section.sec.sec-luc h2{break-after:avoid;page-break-after:avoid}
+  section.sec.sec-luc h2{break-after:avoid;page-break-after:avoid}
+  .luc{font-size:8.6px;box-shadow:none;border-radius:0}
+  .luc th,.luc td{padding:2.4px 4px;border:0.6px solid #555}
+  .luc .luc-sub{font-size:7.6px}.luc .luc-note{font-size:8px}
+  .luc tr{break-inside:avoid;page-break-inside:avoid}
+  .luc .luc-h,.luc .luc-tan,.luc .luc-blue,.luc .luc-green,.luc .luc-gray{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+/* ============================================================
+   Language toggle button + Bangla typography
+   ============================================================ */
+.lang-btn{flex:none;border:1px solid var(--line);background:transparent;color:var(--ink);
+  height:34px;padding:0 13px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;
+  letter-spacing:.04em;transition:border-color .15s}
+.lang-btn:hover{border-color:var(--ink)}
+body.lang-bn{--display:'Hind Siliguri','Noto Sans Bengali','Nikosh','Kalpurush','Bangla Sangam MN','Nirmala UI','SolaimanLipi',system-ui,sans-serif;
+  --sans:'Hind Siliguri','Noto Sans Bengali','Nikosh','Kalpurush','Bangla Sangam MN','Nirmala UI','SolaimanLipi',system-ui,sans-serif;
+  --serif:'Hind Siliguri','Noto Sans Bengali','Nikosh','Kalpurush','Bangla Sangam MN','Nirmala UI','SolaimanLipi',system-ui,sans-serif;
+  --mono:'Hind Siliguri','Noto Sans Bengali','Nikosh','Kalpurush','Bangla Sangam MN','Nirmala UI','SolaimanLipi',system-ui,sans-serif}
+</style>
+
+
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <svg class="logo-svg" role="img" aria-label="Studio 16 Architects" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 289.24 84.06"><defs></defs><path class="cls-1" d="M222.8,386a5.49,5.49,0,0,0,1.94,4.61,8,8,0,0,0,5.09,1.52,8.09,8.09,0,0,0,3.37-.61,4.58,4.58,0,0,0,2-1.57,3.73,3.73,0,0,0,.63-2.05,3.22,3.22,0,0,0-2.37-3.48,29,29,0,0,0-4.63-1.43,46.75,46.75,0,0,1-5.13-1.5,7.76,7.76,0,0,1-3.29-2.3,6.4,6.4,0,0,1-1.38-4.34,7.35,7.35,0,0,1,1.42-4.58,8.47,8.47,0,0,1,3.77-2.8,13.18,13.18,0,0,1,5-.94,13.79,13.79,0,0,1,5.45,1,8.78,8.78,0,0,1,3.86,3.09,8.36,8.36,0,0,1,1.42,4.91h-4.81a5.53,5.53,0,0,0-.91-2.89A4.52,4.52,0,0,0,232,371a8.15,8.15,0,0,0-3-.52,7.29,7.29,0,0,0-3.63.89,3,3,0,0,0-1.59,2.82c0,1.85,1.14,3.07,3.4,3.66.12.05,1.38.38,3.77,1L235.3,380a7.94,7.94,0,0,1,2.95,1.73,7.36,7.36,0,0,1,1.79,2.6,7.89,7.89,0,0,1,.59,3,7.81,7.81,0,0,1-1.54,4.94,8.92,8.92,0,0,1-4.09,2.9,15.8,15.8,0,0,1-5.48.93,15.13,15.13,0,0,1-5.9-1.09,9.25,9.25,0,0,1-4.19-3.36,10.08,10.08,0,0,1-1.65-5.65Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M241.57,375H245v-6.15h4.45V375h4.06v3.32h-4.08v11a4.53,4.53,0,0,0,.39,2.24c.26.41.85.61,1.78.61a9.62,9.62,0,0,0,1.91-.15v3.47c-.32,0-.81,0-1.44.08s-1.13.08-1.47.08a10.32,10.32,0,0,1-2.82-.32,3.7,3.7,0,0,1-1.67-.95,3.5,3.5,0,0,1-.84-1.58,10.63,10.63,0,0,1-.27-2.35l0-12.09h-3.36Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M273.79,375v20.45h-4.35V392.6a6.64,6.64,0,0,1-2.56,2.44,6.5,6.5,0,0,1-3.36,1,10.14,10.14,0,0,1-3.38-.51A5.91,5.91,0,0,1,257.8,394a6.34,6.34,0,0,1-1.33-2.49A12.42,12.42,0,0,1,256,388V375h4.43v12.56a5.8,5.8,0,0,0,1,3.76,3.59,3.59,0,0,0,2.89,1.13,4.56,4.56,0,0,0,3.83-1.53,6.34,6.34,0,0,0,1.21-4.08V375Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M297.07,367.11v28.32h-4.33l0-2.77a5.34,5.34,0,0,1-2.52,2.51,8.51,8.51,0,0,1-3.77.83,9.23,9.23,0,0,1-5.23-1.43A8.6,8.6,0,0,1,278,390.7a14,14,0,0,1-1.08-5.64,13.68,13.68,0,0,1,.74-4.68,9.83,9.83,0,0,1,2-3.33,8.32,8.32,0,0,1,2.84-1.94,8.71,8.71,0,0,1,3.26-.63,10.06,10.06,0,0,1,4,.78,6.6,6.6,0,0,1,1.63,1,4.57,4.57,0,0,1,.87.95c.2.3.3.45.31.45V367.11Zm-15.6,18.36a8.41,8.41,0,0,0,1.41,4.91,4.73,4.73,0,0,0,4.16,2.05,4.9,4.9,0,0,0,3.1-1,6.15,6.15,0,0,0,2-2.7,9.66,9.66,0,0,0,.66-3.56,9.5,9.5,0,0,0-.65-3.5,6,6,0,0,0-1.93-2.63,4.9,4.9,0,0,0-3.07-1,4.7,4.7,0,0,0-4.28,2.13A9.65,9.65,0,0,0,281.47,385.47Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M301.37,371.47v-4.36h4.45v4.36Zm0,24V375h4.45v20.43Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M313.84,394.62a8.77,8.77,0,0,1-3.5-3.83,13.23,13.23,0,0,1,0-11.14,8.93,8.93,0,0,1,3.49-3.81,10.6,10.6,0,0,1,5.49-1.36,10.85,10.85,0,0,1,5.55,1.36,9.09,9.09,0,0,1,3.57,3.8,12.25,12.25,0,0,1,1.23,5.6,12,12,0,0,1-1.24,5.56,9.11,9.11,0,0,1-3.58,3.82,10.71,10.71,0,0,1-5.53,1.38A10.5,10.5,0,0,1,313.84,394.62Zm8.63-3.21a6.28,6.28,0,0,0,2-2.68,9.33,9.33,0,0,0,.66-3.49,9.45,9.45,0,0,0-.66-3.52,6.23,6.23,0,0,0-2-2.67,5,5,0,0,0-3.16-1,4.87,4.87,0,0,0-3.11,1,6.21,6.21,0,0,0-2,2.67,9.45,9.45,0,0,0-.66,3.52,9.33,9.33,0,0,0,.66,3.49,6.24,6.24,0,0,0,2,2.68,4.93,4.93,0,0,0,3.11,1A5,5,0,0,0,322.47,391.41Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M216,431.43l10.7-28.32H232l10.7,28.32h-5.31L234.91,424H223.64L221,431.43Zm9-11.21h8.48l-4.2-12.15Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M244,431.43V411h4.14l0,4q1-4.4,7.66-4.4v4.32c-.85-.1-1.46-.16-1.84-.16a5,5,0,0,0-2.83.83,5.39,5.39,0,0,0-2,2.42,8.71,8.71,0,0,0-.73,3.71l0,9.76Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M269.61,417.78a4,4,0,0,0-1.46-2.79,5.16,5.16,0,0,0-3.22-1,4.8,4.8,0,0,0-3.08,1,6.21,6.21,0,0,0-1.94,2.73,9.44,9.44,0,0,0-.69,3.59,9.17,9.17,0,0,0,.65,3.45,6,6,0,0,0,1.91,2.61,4.77,4.77,0,0,0,3,1,4.85,4.85,0,0,0,2.32-.55,4.39,4.39,0,0,0,1.66-1.6,6.06,6.06,0,0,0,.82-2.48h4.48a9.73,9.73,0,0,1-3,6.05,9.09,9.09,0,0,1-6.29,2.15,10,10,0,0,1-5.33-1.37,8.74,8.74,0,0,1-3.41-3.76,12.1,12.1,0,0,1-1.16-5.4,13.47,13.47,0,0,1,1.14-5.64,8.86,8.86,0,0,1,3.4-3.93,10,10,0,0,1,5.48-1.42,10.52,10.52,0,0,1,6.33,1.85,7.06,7.06,0,0,1,2.83,5.45Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M277,431.43V403.11h4.43l.08,10.59a5.89,5.89,0,0,1,2.43-2.33,7.33,7.33,0,0,1,3.6-.89,7.58,7.58,0,0,1,5.29,1.76,6.71,6.71,0,0,1,1.92,5.19v14H290.3V418.58a5.16,5.16,0,0,0-1.06-3.47,3.92,3.92,0,0,0-3-1.08,4.42,4.42,0,0,0-3.46,1.51,5.55,5.55,0,0,0-1.34,3.8v12.09Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M298.79,407.47v-4.36h4.46v4.36Zm0,24V411h4.46v20.43Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M305.32,411h3.38v-6.15h4.45V411h4.06v3.32h-4.08v11a4.53,4.53,0,0,0,.39,2.24c.26.41.85.61,1.78.61a9.62,9.62,0,0,0,1.91-.15v3.47c-.32,0-.81,0-1.44.08s-1.13.08-1.47.08a10.32,10.32,0,0,1-2.82-.32,3.7,3.7,0,0,1-1.67-.95,3.6,3.6,0,0,1-.84-1.58,10.63,10.63,0,0,1-.27-2.35l0-12.09h-3.36Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M322.74,422.35a7.68,7.68,0,0,0,.58,3,5.21,5.21,0,0,0,1.84,2.23,5.35,5.35,0,0,0,3,.82,4.73,4.73,0,0,0,5-3.4h4.26a8.47,8.47,0,0,1-3.3,5.1,9.65,9.65,0,0,1-5.92,1.87,10.15,10.15,0,0,1-5.36-1.37,8.74,8.74,0,0,1-3.43-3.81,12.74,12.74,0,0,1-1.17-5.58,12.14,12.14,0,0,1,1.2-5.39,9.57,9.57,0,0,1,3.45-3.92,9.89,9.89,0,0,1,10.23-.05,9.46,9.46,0,0,1,3.41,3.79,11.39,11.39,0,0,1,1.2,5.2,10.94,10.94,0,0,1-.08,1.48Zm10.41-3a5.94,5.94,0,0,0-1.52-3.77A4.62,4.62,0,0,0,328,414a4.93,4.93,0,0,0-3.71,1.51,5.8,5.8,0,0,0-1.56,3.82Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M353.7,417.78a4,4,0,0,0-1.47-2.79,5.14,5.14,0,0,0-3.22-1,4.8,4.8,0,0,0-3.08,1A6.29,6.29,0,0,0,344,417.8a9.44,9.44,0,0,0-.69,3.59,9.17,9.17,0,0,0,.65,3.45,6.13,6.13,0,0,0,1.91,2.61,5.17,5.17,0,0,0,5.35.43,4.41,4.41,0,0,0,1.67-1.6,6.37,6.37,0,0,0,.82-2.48h4.47a9.73,9.73,0,0,1-3,6.05,9.09,9.09,0,0,1-6.29,2.15,10.06,10.06,0,0,1-5.33-1.37,8.74,8.74,0,0,1-3.41-3.76,12.23,12.23,0,0,1-1.16-5.4,13.47,13.47,0,0,1,1.14-5.64,8.93,8.93,0,0,1,3.4-3.93,10,10,0,0,1,5.48-1.42,10.55,10.55,0,0,1,6.34,1.85,7.05,7.05,0,0,1,2.82,5.45Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M358.87,411h3.38v-6.15h4.45V411h4.07v3.32h-4.09v11a4.53,4.53,0,0,0,.39,2.24c.27.41.86.61,1.78.61a9.66,9.66,0,0,0,1.92-.15v3.47c-.33,0-.81,0-1.45.08s-1.13.08-1.46.08a10.45,10.45,0,0,1-2.83-.32,3.7,3.7,0,0,1-1.67-.95,3.6,3.6,0,0,1-.84-1.58,12,12,0,0,1-.27-2.35l0-12.09h-3.36Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M376.94,424.87a3.41,3.41,0,0,0,1.35,2.7,5.41,5.41,0,0,0,3.16.86q4.57,0,4.57-2.76a2.09,2.09,0,0,0-.65-1.36,4.44,4.44,0,0,0-1.42-.85,17.36,17.36,0,0,0-2.18-.6l-2.47-.55a18.64,18.64,0,0,1-3.36-1.05,5.44,5.44,0,0,1-2.28-1.81,5.22,5.22,0,0,1-.88-3.17,4.62,4.62,0,0,1,1.29-3.4A7.21,7.21,0,0,1,377.3,411a14.83,14.83,0,0,1,4-.54,12.73,12.73,0,0,1,3,.34,8.41,8.41,0,0,1,2.57,1.09,6.37,6.37,0,0,1,1.93,2,7.21,7.21,0,0,1,1,2.87h-4.69c-.34-1.81-1.72-2.72-4.16-2.72a7.18,7.18,0,0,0-2.52.44,1.57,1.57,0,0,0-1.17,1.55,1.73,1.73,0,0,0,.53,1.32,3.73,3.73,0,0,0,1.36.83,14.89,14.89,0,0,0,2.09.61l2.62.56a19.74,19.74,0,0,1,3.34,1.12,5.64,5.64,0,0,1,2.32,1.81,5,5,0,0,1,.9,3.07,5.56,5.56,0,0,1-1.32,3.82,7.66,7.66,0,0,1-3.4,2.16,13.87,13.87,0,0,1-4.36.68,12.15,12.15,0,0,1-4.59-.82,6.79,6.79,0,0,1-3.18-2.4,6.48,6.48,0,0,1-1.23-3.91Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M348,391.73h5.86V374.87c0-.65,0-1.34.06-2.06l-4.16,3.48a1.36,1.36,0,0,1-.53.3,1.63,1.63,0,0,1-.53.08,1.51,1.51,0,0,1-.73-.17,1.32,1.32,0,0,1-.49-.39L346,374l8.82-7.5h4.06v25.26H364v3.7H348Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M379.26,377.37a9.59,9.59,0,0,1,3.19.54,7.7,7.7,0,0,1,2.73,1.63,8.11,8.11,0,0,1,1.9,2.71,9.24,9.24,0,0,1,.72,3.78,9.59,9.59,0,0,1-.74,3.79,9.21,9.21,0,0,1-2.08,3.09,9.56,9.56,0,0,1-3.23,2.08,11.94,11.94,0,0,1-8.33,0,9.05,9.05,0,0,1-3.14-2.07,8.94,8.94,0,0,1-2-3.2,11.89,11.89,0,0,1-.69-4.15,11.69,11.69,0,0,1,.83-4.19,19.27,19.27,0,0,1,2.57-4.47l6.9-9.26a2.89,2.89,0,0,1,1.05-.82,3.65,3.65,0,0,1,1.59-.34h4.4L376.36,377c-.18.23-.36.44-.53.64l-.49.62a8.59,8.59,0,0,1,3.92-.9Zm-6.92,9a6.89,6.89,0,0,0,.33,2.19,4.56,4.56,0,0,0,1,1.69,4.46,4.46,0,0,0,1.61,1.09,5.87,5.87,0,0,0,2.22.39,5.66,5.66,0,0,0,2.17-.4,4.85,4.85,0,0,0,1.7-1.12,5,5,0,0,0,1.11-1.69,5.4,5.4,0,0,0,.4-2.11,6.07,6.07,0,0,0-.38-2.23,4.59,4.59,0,0,0-1.08-1.68,4.53,4.53,0,0,0-1.68-1.05,6.2,6.2,0,0,0-2.16-.36,5.66,5.66,0,0,0-2.14.4,5,5,0,0,0-1.65,1.11,5.05,5.05,0,0,0-1.06,1.68A6,6,0,0,0,372.34,386.35Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M216.4,359.43l4.25-11.25h2.11L227,359.43H224.9l-1-2.95h-4.48l-1,2.95ZM220,355h3.37l-1.67-4.83Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M227.78,359.43V348.18h5.3a4.09,4.09,0,0,1,2.74.8,3.34,3.34,0,0,1,.34,4.26,4,4,0,0,1-.75.6,1.89,1.89,0,0,1-.5.27,1.83,1.83,0,0,1,1.17.62,2.49,2.49,0,0,1,.51,1.75v.06c0,1.52.2,2.48.61,2.89h-2.12a3.34,3.34,0,0,1-.28-1.63,6.25,6.25,0,0,0-.19-1.74,1.61,1.61,0,0,0-.66-1,2.47,2.47,0,0,0-1.36-.31h-2.9v4.64Zm1.91-9.62v3.5h3.23a2,2,0,0,0,1.41-.46,1.73,1.73,0,0,0,.5-1.32,1.53,1.53,0,0,0-.52-1.35,2.39,2.39,0,0,0-1.42-.37Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M246.09,351.79a3.46,3.46,0,0,0-1-1.66,2.61,2.61,0,0,0-1.8-.6,2.93,2.93,0,0,0-1.88.61,3.69,3.69,0,0,0-1.18,1.6,5.68,5.68,0,0,0-.4,2.1,5.62,5.62,0,0,0,.4,2.08,3.78,3.78,0,0,0,1.18,1.59,3,3,0,0,0,1.88.6,2.71,2.71,0,0,0,1.44-.38,2.83,2.83,0,0,0,1-1.06,4.09,4.09,0,0,0,.44-1.5H248a5.21,5.21,0,0,1-.41,1.83,4.48,4.48,0,0,1-1,1.44,4.3,4.3,0,0,1-1.47.92,5.05,5.05,0,0,1-1.84.33,5.37,5.37,0,0,1-2.22-.45,4.94,4.94,0,0,1-1.7-1.26,5.74,5.74,0,0,1-1.08-1.88,7,7,0,0,1-.37-2.25,6.88,6.88,0,0,1,.38-2.29,5.66,5.66,0,0,1,1.07-1.89,5,5,0,0,1,1.7-1.28,5.31,5.31,0,0,1,2.22-.45,5.64,5.64,0,0,1,2.27.45,4.15,4.15,0,0,1,1.67,1.34,4,4,0,0,1,.75,2.06Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M249.62,359.43V348.18h1.94v4.48h5.08v-4.48h2v11.25h-2v-5.07h-5.08v5.07Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M260.77,359.43V348.18h1.91v11.25Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M263.83,349.91v-1.73h9v1.73h-3.54v9.52h-1.92v-9.52Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M274,359.43V348.18h8v1.73h-6.09v2.94h5.64v1.61h-5.64v3.29h6.18v1.68Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M291.2,351.79a3.45,3.45,0,0,0-1-1.66,2.62,2.62,0,0,0-1.81-.6,3,3,0,0,0-1.88.61,3.67,3.67,0,0,0-1.17,1.6,5.49,5.49,0,0,0-.4,2.1,5.42,5.42,0,0,0,.4,2.08,3.76,3.76,0,0,0,1.17,1.59,3,3,0,0,0,1.88.6,2.71,2.71,0,0,0,1.44-.38,2.68,2.68,0,0,0,1-1.06,3.91,3.91,0,0,0,.44-1.5h1.87a5,5,0,0,1-.41,1.83,4.3,4.3,0,0,1-1,1.44,4.25,4.25,0,0,1-1.48.92,5.05,5.05,0,0,1-1.84.33,5.29,5.29,0,0,1-2.21-.45A4.88,4.88,0,0,1,284.5,358a5.54,5.54,0,0,1-1.07-1.88,6.72,6.72,0,0,1-.37-2.25,6.87,6.87,0,0,1,.37-2.29,5.84,5.84,0,0,1,1.07-1.89,5,5,0,0,1,1.7-1.28,5.37,5.37,0,0,1,2.22-.45,5.61,5.61,0,0,1,2.27.45,4.11,4.11,0,0,1,1.68,1.34,3.86,3.86,0,0,1,.74,2.06Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M293.7,349.91v-1.73h9v1.73h-3.55v9.52h-1.92v-9.52Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M303.71,348.18h1.93v6.55a9.21,9.21,0,0,0,.07,1.27,2.66,2.66,0,0,0,.31,1,1.89,1.89,0,0,0,.78.75,3.26,3.26,0,0,0,1.45.27,2.75,2.75,0,0,0,1.75-.46,2,2,0,0,0,.72-1.14,7.91,7.91,0,0,0,.15-1.68v-6.55h2v7.23a4.52,4.52,0,0,1-.57,2.35,3.54,3.54,0,0,1-1.61,1.45,5.66,5.66,0,0,1-2.41.48,5.6,5.6,0,0,1-2.41-.48,3.48,3.48,0,0,1-1.57-1.44,4.66,4.66,0,0,1-.56-2.36Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M314.89,359.43V348.18h5.3a4.09,4.09,0,0,1,2.74.8,3.34,3.34,0,0,1,.34,4.26,3.72,3.72,0,0,1-.76.6,1.75,1.75,0,0,1-.49.27,1.83,1.83,0,0,1,1.17.62,2.49,2.49,0,0,1,.5,1.75v.06c0,1.52.21,2.48.62,2.89h-2.12a3.34,3.34,0,0,1-.28-1.63,6.25,6.25,0,0,0-.19-1.74,1.61,1.61,0,0,0-.66-1,2.47,2.47,0,0,0-1.36-.31h-2.9v4.64Zm1.91-9.62v3.5H320a2,2,0,0,0,1.41-.46,1.73,1.73,0,0,0,.5-1.32,1.53,1.53,0,0,0-.52-1.35,2.39,2.39,0,0,0-1.42-.37Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M325.71,359.43V348.18h8v1.73h-6.09v2.94h5.65v1.61h-5.65v3.29h6.18v1.68Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M340.84,355.68a2.18,2.18,0,0,0,.77,1.83,3.19,3.19,0,0,0,2,.6,3.25,3.25,0,0,0,1.34-.24,1.68,1.68,0,0,0,.78-.63,1.43,1.43,0,0,0,.25-.81,1.27,1.27,0,0,0-.94-1.38,10.58,10.58,0,0,0-1.84-.57,18,18,0,0,1-2-.6,3.11,3.11,0,0,1-1.31-.91,2.58,2.58,0,0,1-.55-1.73,2.93,2.93,0,0,1,.57-1.82,3.36,3.36,0,0,1,1.5-1.11,5.23,5.23,0,0,1,2-.37,5.42,5.42,0,0,1,2.17.41,3.58,3.58,0,0,1,1.53,1.23,3.3,3.3,0,0,1,.56,1.95h-1.91a2.21,2.21,0,0,0-.36-1.15,1.88,1.88,0,0,0-.84-.65,3.45,3.45,0,0,0-1.21-.2,3,3,0,0,0-1.45.35,1.21,1.21,0,0,0-.62,1.12c0,.74.45,1.22,1.35,1.45,0,0,.54.16,1.49.4l1.74.46A3,3,0,0,1,347,354a2.77,2.77,0,0,1,.71,1,3,3,0,0,1,.24,1.17,3.09,3.09,0,0,1-.62,2,3.54,3.54,0,0,1-1.62,1.15,6.2,6.2,0,0,1-2.18.37,6.07,6.07,0,0,1-2.35-.43,3.65,3.65,0,0,1-1.66-1.34,4,4,0,0,1-.66-2.24Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M349.55,359.43V348.18h1.91v11.25Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M353.58,359.43V348.18h2.74l3.05,8.83,3-8.83h2.72v11.25h-1.86v-8.68l-3.11,8.68h-1.61l-3.13-8.66v8.66Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M367.13,359.43V348.18H372a4.25,4.25,0,0,1,2.31.54,2.91,2.91,0,0,1,1.17,1.34,4.37,4.37,0,0,1,.31,1.63,4.26,4.26,0,0,1-.31,1.6,2.79,2.79,0,0,1-1.16,1.31,4.29,4.29,0,0,1-2.31.54h-3v4.29Zm1.9-9.62v3.69h2.88a2.13,2.13,0,0,0,1.36-.44,1.88,1.88,0,0,0-1.31-3.25Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M377.21,359.43V348.18h1.91v9.57h5.71v1.68Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M385.92,359.43V348.18h1.91v11.25Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M397.6,351.79a3.54,3.54,0,0,0-1-1.66,2.61,2.61,0,0,0-1.8-.6,2.93,2.93,0,0,0-1.88.61,3.61,3.61,0,0,0-1.18,1.6,5.49,5.49,0,0,0-.4,2.1,5.42,5.42,0,0,0,.4,2.08,3.7,3.7,0,0,0,1.18,1.59,3,3,0,0,0,1.88.6,2.71,2.71,0,0,0,1.44-.38,2.83,2.83,0,0,0,1-1.06,4.29,4.29,0,0,0,.44-1.5h1.87a5.21,5.21,0,0,1-.41,1.83,4.48,4.48,0,0,1-1,1.44,4.25,4.25,0,0,1-1.48.92,5,5,0,0,1-1.83.33,5.34,5.34,0,0,1-2.22-.45,4.94,4.94,0,0,1-1.7-1.26,5.74,5.74,0,0,1-1.08-1.88,7,7,0,0,1-.37-2.25,6.88,6.88,0,0,1,.38-2.29,5.5,5.5,0,0,1,1.07-1.89,4.9,4.9,0,0,1,1.7-1.28,5.31,5.31,0,0,1,2.22-.45,5.56,5.56,0,0,1,2.26.45,4.11,4.11,0,0,1,1.68,1.34,4,4,0,0,1,.75,2.06Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M401.16,359.43V348.18h1.91v11.25Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M404.22,349.91v-1.73h9v1.73h-3.55v9.52h-1.92v-9.52Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M417.28,355.05l-4.19-6.87h2.27l2.94,5,2.91-5h2.18l-4.17,6.87v4.38h-1.94Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M428,359.43V348.18h4.6a5.27,5.27,0,0,1,2.18.42,4,4,0,0,1,1.54,1.21,5.1,5.1,0,0,1,.89,1.79,8.34,8.34,0,0,1,.29,2.25,8.07,8.07,0,0,1-.29,2.2,5,5,0,0,1-.89,1.76,4,4,0,0,1-1.53,1.19,5.19,5.19,0,0,1-2.19.43Zm1.91-9.62v8h2a4.23,4.23,0,0,0,2.28-.52,2.66,2.66,0,0,0,1.13-1.39,6.1,6.1,0,0,0,.31-2.07,6.65,6.65,0,0,0-.31-2.13,2.57,2.57,0,0,0-1.14-1.4,4.31,4.31,0,0,0-2.27-.51Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M439.05,359.43V348.18H441v11.25Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M445.64,359.43l-3.7-11.25h2l2.86,8.92,2.81-8.92h2l-3.8,11.25Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M452.59,359.43V348.18h8v1.73H454.5v2.94h5.64v1.61H454.5v3.29h6.18v1.68Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M462.21,359.43V348.18h5.29a4.12,4.12,0,0,1,2.75.8,3.32,3.32,0,0,1,.33,4.26,3.66,3.66,0,0,1-.75.6,1.89,1.89,0,0,1-.5.27,1.88,1.88,0,0,1,1.18.62,2.54,2.54,0,0,1,.5,1.75v.06c0,1.52.2,2.48.61,2.89H469.5a3.46,3.46,0,0,1-.28-1.63,6.72,6.72,0,0,0-.18-1.74,1.7,1.7,0,0,0-.66-1,2.5,2.5,0,0,0-1.37-.31h-2.89v4.64Zm1.91-9.62v3.5h3.23a2,2,0,0,0,1.41-.46,1.73,1.73,0,0,0,.5-1.32,1.55,1.55,0,0,0-.52-1.35,2.4,2.4,0,0,0-1.43-.37Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M474.3,355.68a2.19,2.19,0,0,0,.78,1.83,3.17,3.17,0,0,0,2,.6,3.28,3.28,0,0,0,1.34-.24,1.79,1.79,0,0,0,.78-.63,1.5,1.5,0,0,0,.24-.81,1.27,1.27,0,0,0-.93-1.38,11.2,11.2,0,0,0-1.84-.57,17.68,17.68,0,0,1-2.05-.6,3.08,3.08,0,0,1-1.3-.91,2.53,2.53,0,0,1-.55-1.73,2.93,2.93,0,0,1,.57-1.82,3.28,3.28,0,0,1,1.49-1.11,5.24,5.24,0,0,1,2-.37,5.4,5.4,0,0,1,2.16.41,3.55,3.55,0,0,1,1.54,1.23,3.37,3.37,0,0,1,.56,1.95h-1.91a2.21,2.21,0,0,0-.36-1.15,1.88,1.88,0,0,0-.84-.65,3.51,3.51,0,0,0-1.22-.2,3,3,0,0,0-1.44.35,1.2,1.2,0,0,0-.63,1.12c0,.74.45,1.22,1.35,1.45,0,0,.55.16,1.5.4l1.73.46a3,3,0,0,1,1.17.69,2.92,2.92,0,0,1,.72,1,3.21,3.21,0,0,1,.23,1.17,3.09,3.09,0,0,1-.61,2,3.52,3.52,0,0,1-1.63,1.15,6.2,6.2,0,0,1-2.18.37,6,6,0,0,1-2.34-.43,3.73,3.73,0,0,1-1.67-1.34,4.06,4.06,0,0,1-.65-2.24Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M483,359.43V348.18h1.91v11.25Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M486.07,349.91v-1.73h9v1.73h-3.55v9.52h-1.92v-9.52Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M499.13,355.05,495,348.18h2.26l3,5,2.9-5h2.18l-4.17,6.87v4.38h-1.94Z" transform="translate(-216 -347.94)"/><path class="cls-1" d="M505.16,431.93h-64v-64h64Zm-63-1h62v-62h-62Z" transform="translate(-216 -347.94)"/><rect class="cls-1" x="233.54" y="28.37" width="7.87" height="47.25"/><rect class="cls-1" x="249.29" y="28.37" width="31.5" height="7.88"/><rect class="cls-1" x="249.29" y="44.12" width="31.5" height="31.5"/></svg>
+    </div>
+    <div class="contact">
+      <div><b data-i18n="Call">Call</b><a href="tel:+8801717222907">+880-1717-222-907</a></div>
+      <div><b data-i18n="Email">Email</b><a href="mailto:info.s16a@gmail.com">info.s16a@gmail.com</a></div>
+      <div><b data-i18n="Web">Web</b>studio16architectsbd.com</div>
+    </div>
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()" title="English / বাংলা" aria-label="Switch language">EN</button>
+    <button class="theme-btn" id="themeBtn" title="Toggle light / dark" aria-label="Toggle theme">◐</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow" data-i18n="Studio 16 Architects · RAJUK Dhaka">Studio 16 Architects · RAJUK Dhaka</div>
+    <h1 data-i18n="FAR Calculator · Bidhimala &amp; DAP 2025">FAR Calculator · Bidhimala &amp; DAP 2025</h1>
+    <div class="sub" data-i18n="Floor Area Ratio · Ground Coverage · Setbacks · Units · Incentive FAR — following the Detailed Area Plan (DAP) 2025 and Dhaka Imarat Nirman Bidhimala 2025.">Floor Area Ratio · Ground Coverage · Setbacks · Units · Incentive FAR — following the Detailed Area Plan (DAP) 2025 and Dhaka Imarat Nirman Bidhimala 2025.</div>
+    <div class="sub2" data-i18n="Basis: SRO 469-Law/2025 (Bidhimala 2025) · SRO 468-Law/2025 (DAP 2nd Amendment)">Basis: SRO 469-Law/2025 (Bidhimala 2025) · SRO 468-Law/2025 (DAP 2nd Amendment)</div>
+    <div class="coverage">
+      <span class="chip" data-i18n="DNCC">DNCC</span><span class="chip" data-i18n="DSCC">DSCC</span><span class="chip yes" data-i18n="All RAJUK Areas">All RAJUK Areas</span>
+      <span class="chip" data-i18n="Purbachal · Uttara · Bashundhara">Purbachal · Uttara · Bashundhara</span><span class="chip" data-i18n="Savar · Gazipur · Narayanganj">Savar · Gazipur · Narayanganj</span>
+      <span class="chip" data-i18n="Not for CDA / KDA / RDA">Not for CDA / KDA / RDA</span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="panel inputs">
+      <div class="step">
+        <div class="lbl"><span class="n">1</span><span class="t" data-i18n="Occupancy Type">Occupancy Type</span><span class="ref">Bidhimala 2025 · Table 5</span></div>
+        <label class="fld" for="occ" data-i18n="Building / use category">Building / use category</label>
+        <select id="occ"></select>
+        <div class="seg" id="modeSeg" style="margin-top:10px">
+          <button data-mode="single" class="on" data-i18n="Single Building">Single Building</button>
+          <button data-mode="block" data-i18n="Block-Based">Block-Based</button>
+        </div>
+        <div class="hint" id="modeHint"></div>
+      </div>
+
+      <div class="step">
+        <div class="lbl"><span class="n">2</span><span class="t" data-i18n="Planning Zone">Planning Zone</span><span class="ref">DAP 2025 · App. 3.6</span></div>
+        <label class="fld" for="loc" data-i18n="Planning Zone">Planning Zone</label>
+        <select id="loc"></select>
+        <label class="fld" style="margin-top:9px" data-i18n="Density block — type an area name to search">Density block — type an area name to search</label>
+        <div class="combo">
+          <input type="text" id="blockInput" autocomplete="off" placeholder="e.g. Uttara, Mirpur, Gulshan, Savar…" data-i18n-ph="e.g. Uttara, Mirpur, Gulshan, Savar…">
+          <div class="combo-list" id="blockList"></div>
+        </div>
+        <div class="hint" id="zoneHint"></div>
+      </div>
+
+      <div class="step">
+        <div class="lbl"><span class="n">3</span><span class="t" data-i18n="Land Area">Land Area</span><span class="ref">1 katha = 720 ft²</span></div>
+        <div id="plots"></div>
+        <button class="addplot" id="addPlot" data-i18n="+ add plot (amalgamation)">+ add plot (amalgamation)</button>
+        <div class="totline"><span data-i18n="Total land area">Total land area</span><b id="totLand">— katha</b></div>
+      </div>
+
+      <div class="step">
+        <div class="lbl"><span class="n">4</span><span class="t" data-i18n="Access Road Width">Access Road Width</span><span class="ref">§47(5) Table 5</span></div>
+        <div class="row">
+          <input type="number" id="roadVal" value="30" min="0" step="0.5">
+          <div class="seg" id="roadUnit" style="max-width:120px">
+            <button data-u="ft" class="on" data-i18n="Feet">Feet</button><button data-u="m" data-i18n="Metre">Metre</button>
+          </div>
+        </div>
+        <div class="hint" id="roadHint"></div>
+        <label class="inc" id="lblFront" style="display:flex;margin-top:10px"><input type="checkbox" id="incFront"><span data-i18n="I know my plot's road-side edge length (frontage)">I know my plot's road-side edge length (frontage)</span></label>
+        <div class="hint" style="margin:5px 0 0" data-i18n-html="If the road is under 20 ft it must be widened to 20 ft; you surrender a strip of land and earn <b>3&times; that area</b> as bonus build area (DAP 2025 cl.4). Tick and enter your frontage to quantify it.">If the road is under 20 ft it must be widened to 20 ft; you surrender a strip of land and earn <b>3&times; that area</b> as bonus build area (DAP 2025 cl.4). Tick and enter your frontage to quantify it.</div>
+        <div id="frontWrap" style="display:none;margin-top:8px">
+          <label class="fld" style="margin:0 0 4px" data-i18n="Road-side edge length / frontage (ft)">Road-side edge length / frontage (ft)</label>
+          <input type="number" id="frontageFt" min="0" step="0.5" placeholder="e.g. 40" style="width:100%;padding:8px;border:1px solid var(--line,#ccc);border-radius:6px;background:transparent;color:inherit">
+        </div>
+        <div id="nropt" style="display:none;margin-top:10px;padding:9px 11px;border:1px dashed var(--line,#caa86a);border-radius:8px">
+          <div class="hint" id="nrnote" style="margin:0 0 7px"></div>
+          <label class="inc" id="lblNR" style="display:flex"><input type="checkbox" id="incNR"><span data-i18n="Use NR (non-restricted) — size building by parking">Use NR (non-restricted) — size building by parking</span></label>
+          <div id="nrwrap" style="display:none;margin-top:8px">
+            <label class="fld" style="margin:0 0 4px" data-i18n="Parking spaces (200 m² of floor area per space)">Parking spaces (200 m² of floor area per space)</label>
+            <input type="number" id="nrParking" min="0" step="1" placeholder="e.g. 40" style="width:100%;padding:8px;border:1px solid var(--line,#ccc);border-radius:6px;background:transparent;color:inherit">
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="lbl"><span class="n">5</span><span class="t" data-i18n="Optional Incentives">Optional Incentives</span><span class="ref">DAP 2025 · Table 3.28</span></div>
+        <div id="incentives"></div>
+        <div class="hint" data-i18n="Plot-size &amp; road-width bonuses are applied automatically and shown in the result.">Plot-size &amp; road-width bonuses are applied automatically and shown in the result.</div>
+      </div>
+
+      <div class="step">
+        <div class="lbl"><span class="n">6</span><span class="t" data-i18n="Basement (optional)">Basement (optional)</span><span class="ref">Bidhimala 2025 · setbacks</span></div>
+        <label class="inc" style="display:flex"><input type="checkbox" id="incBasement"><span data-i18n="Include basement(s) — parking, FAR-excluded">Include basement(s) — parking, FAR-excluded</span></label>
+        <div id="basementWrap" style="display:none;margin-top:8px">
+          <label class="fld" style="margin:0 0 4px" data-i18n="Number of basement levels">Number of basement levels</label>
+          <input type="number" id="basementCount" min="1" step="1" value="1" placeholder="e.g. 2" style="width:100%;padding:8px;border:1px solid var(--line,#ccc);border-radius:6px;background:transparent;color:inherit">
+          <div class="hint" style="margin-top:6px" data-i18n-html="Each level ≈ max ground coverage + ½ the mandatory open space (5 ft road-side, 1.5 ft other setbacks). Not permitted below 4 katha.">Each level ≈ max ground coverage + ½ the mandatory open space (5 ft road-side, 1.5 ft other setbacks). Not permitted below 4 katha.</div>
+        </div>
+      </div>
+
+      <div class="errbox" id="errbox"></div>
+      <button class="calc-btn" id="calcBtn"><span data-i18n="Calculate Development Potential">Calculate Development Potential</span> →</button>
+    </div>
+
+    <div class="panel report" id="report">
+      <div class="empty">
+        <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>
+        <div class="big" data-i18n="Your planning analysis appears here">Your planning analysis appears here</div>
+        <div data-i18n-html="Complete the steps on the left and press <b>Calculate</b>. Every result shows its legal source and a transparent formula trail.">Complete the steps on the left and press <b>Calculate</b>. Every result shows its legal source and a transparent formula trail.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <h3 data-i18n="Disclaimer">Disclaimer</h3>
+    <span data-i18n="This calculator is a professional reference tool based on Dhaka Imarat Nirman Bidhimala 2025 (SRO 469-Law/2025) and DAP 2025 (SRO 468-Law/2025). Results are indicative only. Users must verify all calculations with RAJUK before official submission. Final approval depends on RAJUK's review of the specific application, flood-zone status, LUC conditions and the DAP map. Studio 16 Architects accepts no liability for any design, planning, approval, development or investment decision made solely on the basis of this calculator.">This calculator is a professional reference tool based on Dhaka Imarat Nirman Bidhimala 2025 (SRO 469-Law/2025) and DAP 2025 (SRO 468-Law/2025). Results are indicative only. Users must verify all calculations with RAJUK before official submission. Final approval depends on RAJUK's review of the specific application, flood-zone status, LUC conditions and the DAP map. Studio 16 Architects accepts no liability for any design, planning, approval, development or investment decision made solely on the basis of this calculator.</span>
+  </div>
+  <div class="foot" data-i18n="© 2026 Studio 16 Architects · Registered with RAJUK · CDA · DCBA · IAB · Self-contained build — no external dependencies">© 2026 Studio 16 Architects · Registered with RAJUK · CDA · DCBA · IAB · Self-contained build — no external dependencies</div>
+  <div class="print-foot print-only">Studio 16 Architects &nbsp;·&nbsp; RAJUK FAR Calculator · Bidhimala &amp; DAP 2025 &nbsp;·&nbsp; Indicative only — verify with RAJUK before submission</div>
+</div>
+
+<script>
+/* ================================================================
+   DATA LAYER — verified rule tables (DAP 2025 / Bidhimala 2025).
+   Edit values here to update for a new gazette; logic stays the same.
+   ================================================================ */
+const R = {
+ "_meta": {
+  "title": "FAR Calculator 2026 — Rule Data Layer (verified)",
+  "owner": "Studio 16 Architects",
+  "version": "2026.2",
+  "basis": [
+   "Dhaka Imarat Nirman Bidhimala 2025 (SRO 469-Law/2025, 14 Dec 2025)",
+   "DAP 2022-2035, 2nd Amendment (SRO 468-Law/2025)"
+  ],
+  "note": "Tables transcribed from Studio 16 verified build. Road FAR matrix, 68 density blocks, MGC, setbacks and incentives reflect gazette readings. Edit here to update; logic does not change."
+ },
+ "units": {
+  "kathaToSqft": 720,
+  "sqftToSqm": 0.0929,
+  "ftToM": 0.3048,
+  "floorHeightM": 3.2
+ },
+ "occupancyGroups": [
+  {
+   "group": "A: Residential",
+   "items": [
+    {
+     "id": "A1",
+     "label": "A1 – Single Family House (একক পরিবার বাড়ি)"
+    },
+    {
+     "id": "A2",
+     "label": "A2 – Two Family House (দুই পরিবারের বাড়ি)"
+    },
+    {
+     "id": "A3",
+     "label": "A3 – Apartment/Flat Building (ফ্লাট ও এ্যাপার্টমেন্ট বাড়ি)"
+    },
+    {
+     "id": "A4",
+     "label": "A4 – Mess/Boarding/Dormitory/Hostel ⚠ (health/edu/industrial only)"
+    },
+    {
+     "id": "A5",
+     "label": "A5 – Hotel/Motel/Guest House/Serviced Apartment"
+    },
+    {
+     "id": "A6",
+     "label": "A6 – Affordable Housing (সাশ্রয়ী আবাসন)"
+    }
+   ]
+  },
+  {
+   "group": "B: Educational",
+   "items": [
+    {
+     "id": "B1",
+     "label": "B1 – School/College (≤12th grade)"
+    },
+    {
+     "id": "B2",
+     "label": "B2 – University/Medical College/Training Academy"
+    },
+    {
+     "id": "B3",
+     "label": "B3 – Pre-School"
+    }
+   ]
+  },
+  {
+   "group": "C: Institutional",
+   "items": [
+    {
+     "id": "C1",
+     "label": "C1 – Child Care"
+    },
+    {
+     "id": "C2",
+     "label": "C2 – Adult Care (Physically able)"
+    },
+    {
+     "id": "D1",
+     "label": "D1 – Hospital/Clinic"
+    },
+    {
+     "id": "D3",
+     "label": "D3 – Diagnostic Lab/Pathology"
+    }
+   ]
+  },
+  {
+   "group": "E: Business",
+   "items": [
+    {
+     "id": "E1",
+     "label": "E1 – Office"
+    },
+    {
+     "id": "E3",
+     "label": "E3 – Essential Services (Bank, Post Office)"
+    }
+   ]
+  },
+  {
+   "group": "F: Mercantile",
+   "items": [
+    {
+     "id": "F1",
+     "label": "F1 – Small Shop/Bazar (<300sqm)"
+    },
+    {
+     "id": "F2",
+     "label": "F2 – Large Shop/Mall (≥300sqm)"
+    }
+   ]
+  },
+  {
+   "group": "G/H: Industrial/Storage",
+   "items": [
+    {
+     "id": "G1",
+     "label": "G1 – Light/Low-pollution Industrial"
+    },
+    {
+     "id": "G2",
+     "label": "G2 – Medium-pollution Industrial"
+    },
+    {
+     "id": "H1",
+     "label": "H1 – Low-hazard Storage/Warehouse"
+    },
+    {
+     "id": "H2",
+     "label": "H2 – General-hazard Storage"
+    }
+   ]
+  },
+  {
+   "group": "I: Assembly",
+   "items": [
+    {
+     "id": "I2",
+     "label": "I2 – Small Assembly Hall (<1000 seats)"
+    },
+    {
+     "id": "I3",
+     "label": "I3 – Large Assembly, unfixed seats (300+)"
+    },
+    {
+     "id": "I5",
+     "label": "I5 – Religious/Sports/Cultural"
+    }
+   ]
+  },
+  {
+   "group": "K: Miscellaneous",
+   "items": [
+    {
+     "id": "K1",
+     "label": "K1 – Commercial Parking"
+    },
+    {
+     "id": "K2",
+     "label": "K2 – Private Parking"
+    },
+    {
+     "id": "K3",
+     "label": "K3 – Repair Workshop"
+    }
+   ]
+  }
+ ],
+ "residentialTypes": [
+  "A1",
+  "A2",
+  "A3",
+  "A4",
+  "A5",
+  "A6"
+ ],
+ "locations": [
+  {
+   "id": "central",
+   "label": "Central Dhaka (কেন্দ্রীয় ঢাকা)",
+   "desc": "DNCC/DSCC core wards, Purbachal, Kilomil, Gulshan, Banani, Dhanmondi, Mirpur"
+  },
+  {
+   "id": "outside_city",
+   "label": "Outside Central (বহিঃস্থ নগর)",
+   "desc": "Narayanganj CC, Savar Municipality, extended DNCC/DSCC (Badda, Rampura, Khilgaon)"
+  },
+  {
+   "id": "other_urban",
+   "label": "Other Urban Areas (অন্যান্য এলাকা)",
+   "desc": "Gazipur CC, Keraniganj, Rupganj, other municipalities and unions"
+  }
+ ],
+ "roadStepsM": [
+  2.5,
+  3.66,
+  4.88,
+  6,
+  9,
+  12,
+  18,
+  24
+ ],
+ "roadFARTable": {
+  "central": {
+   "A1": [
+    1.25,
+    1.5,
+    1.75,
+    2,
+    2.5,
+    3,
+    3.5,
+    3.75,
+    4.25
+   ],
+   "A2": [
+    1.25,
+    1.5,
+    1.75,
+    2,
+    2.5,
+    3,
+    3.5,
+    3.75,
+    4.25
+   ],
+   "A3": [
+    1.25,
+    1.75,
+    2,
+    2.25,
+    3.25,
+    3.5,
+    4,
+    4.25,
+    4.75
+   ],
+   "A4": [
+    null,
+    2,
+    2.25,
+    2.5,
+    3,
+    3.5,
+    4,
+    4.5,
+    5.5
+   ],
+   "A5": [
+    null,
+    null,
+    null,
+    null,
+    4,
+    4.5,
+    5,
+    6,
+    "7.0*"
+   ],
+   "A6": [
+    1.5,
+    2,
+    2.25,
+    2.5,
+    3,
+    3.25,
+    3.75,
+    4,
+    4.25
+   ],
+   "B1": [
+    null,
+    null,
+    null,
+    null,
+    2.5,
+    3,
+    3.5,
+    4.5,
+    4.5
+   ],
+   "B2": [
+    null,
+    null,
+    null,
+    null,
+    2.5,
+    3.5,
+    4,
+    6,
+    "6.0*"
+   ],
+   "B3": [
+    null,
+    null,
+    null,
+    2,
+    2.5,
+    3,
+    3.5,
+    4.5,
+    4.5
+   ],
+   "C1": [
+    null,
+    null,
+    2,
+    2.5,
+    3,
+    3.5,
+    4,
+    6,
+    6
+   ],
+   "C2": [
+    null,
+    null,
+    null,
+    2.5,
+    3,
+    3.5,
+    4,
+    6,
+    6
+   ],
+   "D1": [
+    null,
+    null,
+    null,
+    null,
+    3,
+    4,
+    4.5,
+    "4.5*",
+    "4.5*"
+   ],
+   "D3": [
+    null,
+    null,
+    null,
+    1.5,
+    2.5,
+    3,
+    3.5,
+    4,
+    4.5
+   ],
+   "E1": [
+    null,
+    null,
+    1.5,
+    2,
+    3,
+    4,
+    4.5,
+    6,
+    "6.0*"
+   ],
+   "E3": [
+    null,
+    null,
+    1.5,
+    2,
+    3,
+    4,
+    4.5,
+    6,
+    "6.0*"
+   ],
+   "F1": [
+    null,
+    null,
+    1,
+    1.75,
+    2,
+    2.25,
+    2.5,
+    2.75,
+    3
+   ],
+   "F2": [
+    null,
+    null,
+    null,
+    null,
+    2,
+    4,
+    4.5,
+    4.5,
+    6.5
+   ],
+   "G1": [
+    null,
+    null,
+    null,
+    null,
+    3,
+    4,
+    4.5,
+    4.5,
+    4.5
+   ],
+   "G2": [
+    null,
+    null,
+    null,
+    null,
+    3,
+    4,
+    4.5,
+    4,
+    4.5
+   ],
+   "H1": [
+    null,
+    null,
+    null,
+    1,
+    2,
+    2.5,
+    3.5,
+    4,
+    4
+   ],
+   "H2": [
+    null,
+    null,
+    null,
+    null,
+    1.5,
+    2,
+    3,
+    4,
+    4
+   ],
+   "I1": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    3.5,
+    4.5,
+    4.5,
+    6.5
+   ],
+   "I2": [
+    null,
+    null,
+    null,
+    null,
+    2,
+    3,
+    4,
+    6,
+    6
+   ],
+   "I3": [
+    null,
+    null,
+    1.5,
+    2.5,
+    3.5,
+    4.5,
+    4.5,
+    6,
+    6
+   ],
+   "I5": [
+    null,
+    null,
+    1.5,
+    2,
+    3,
+    4,
+    6,
+    6,
+    7
+   ],
+   "K1": [
+    null,
+    null,
+    null,
+    null,
+    3.5,
+    4,
+    4.5,
+    6,
+    6.5
+   ],
+   "K2": [
+    null,
+    null,
+    1,
+    1.5,
+    3.5,
+    4,
+    4.5,
+    6,
+    6.5
+   ],
+   "K3": [
+    null,
+    null,
+    null,
+    null,
+    2,
+    2.25,
+    2.5,
+    3,
+    4
+   ]
+  },
+  "outside_city": {
+   "A1": [
+    1,
+    1.25,
+    1.5,
+    1.75,
+    2.25,
+    2.75,
+    3.25,
+    3.5,
+    4
+   ],
+   "A2": [
+    1,
+    1.25,
+    1.5,
+    1.75,
+    2.25,
+    2.75,
+    3.25,
+    3.5,
+    4
+   ],
+   "A3": [
+    1.25,
+    1.5,
+    1.75,
+    2,
+    2.5,
+    3,
+    3.5,
+    3.75,
+    4.25
+   ],
+   "A4": [
+    1.25,
+    1.75,
+    2,
+    2.25,
+    2.75,
+    3.25,
+    3.75,
+    4.25,
+    4.75
+   ],
+   "A5": [
+    null,
+    null,
+    null,
+    null,
+    3.75,
+    4.25,
+    4.75,
+    5.75,
+    6.75
+   ],
+   "A6": [
+    1.5,
+    1.75,
+    2,
+    2.25,
+    2.75,
+    3,
+    3.5,
+    3.75,
+    4
+   ],
+   "B1": [
+    null,
+    null,
+    null,
+    null,
+    2.5,
+    3,
+    3.5,
+    4.5,
+    4.5
+   ],
+   "B2": [
+    null,
+    null,
+    null,
+    null,
+    2.5,
+    3.5,
+    4,
+    6,
+    "6.0*"
+   ],
+   "D1": [
+    null,
+    null,
+    null,
+    null,
+    3,
+    4,
+    4.5,
+    "4.5*",
+    "4.5*"
+   ],
+   "E1": [
+    null,
+    null,
+    1.5,
+    2,
+    3,
+    4,
+    4.5,
+    6,
+    "6.0*"
+   ],
+   "F1": [
+    null,
+    null,
+    1,
+    1.75,
+    2,
+    2.25,
+    2.5,
+    2.75,
+    3
+   ],
+   "F2": [
+    null,
+    null,
+    null,
+    null,
+    2,
+    4,
+    4.5,
+    4.5,
+    6.5
+   ],
+   "G1": [
+    null,
+    null,
+    null,
+    null,
+    3,
+    4,
+    4.5,
+    4.5,
+    4.5
+   ],
+   "H1": [
+    null,
+    null,
+    null,
+    1,
+    2,
+    2.5,
+    3.5,
+    4,
+    4
+   ],
+   "I2": [
+    null,
+    null,
+    null,
+    null,
+    2,
+    3,
+    4,
+    6,
+    6
+   ],
+   "K1": [
+    null,
+    null,
+    null,
+    null,
+    3.5,
+    4,
+    4.5,
+    6,
+    6.5
+   ]
+  },
+  "other_urban": {
+   "A1": [
+    1,
+    1.25,
+    1.5,
+    1.75,
+    2.25,
+    2.75,
+    3.25,
+    3.5,
+    4
+   ],
+   "A2": [
+    1,
+    1.25,
+    1.5,
+    1.75,
+    2.25,
+    2.75,
+    3.25,
+    3.5,
+    4
+   ],
+   "A3": [
+    1,
+    1.25,
+    1.5,
+    1.75,
+    2.3,
+    2.8,
+    3.3,
+    3.5,
+    4
+   ],
+   "A4": [
+    1,
+    1.5,
+    1.75,
+    2,
+    2.5,
+    3,
+    3.5,
+    4,
+    4.5
+   ],
+   "A5": [
+    null,
+    null,
+    null,
+    null,
+    3.5,
+    4,
+    4.5,
+    5.5,
+    6.5
+   ],
+   "A6": [
+    1.5,
+    1.75,
+    2,
+    2.25,
+    2.75,
+    3,
+    3.5,
+    3.75,
+    4
+   ],
+   "B1": [
+    null,
+    null,
+    null,
+    null,
+    2.5,
+    3,
+    3.5,
+    4.5,
+    4.5
+   ],
+   "E1": [
+    null,
+    null,
+    1.5,
+    2,
+    3,
+    4,
+    4.5,
+    6,
+    "6.0*"
+   ],
+   "F1": [
+    null,
+    null,
+    1,
+    1.75,
+    2,
+    2.25,
+    2.5,
+    2.75,
+    3
+   ],
+   "G1": [
+    null,
+    null,
+    null,
+    null,
+    3,
+    4,
+    4.5,
+    4.5,
+    4.5
+   ],
+   "H1": [
+    null,
+    null,
+    null,
+    1,
+    2,
+    2.5,
+    3.5,
+    4,
+    4
+   ],
+   "I2": [
+    null,
+    null,
+    null,
+    null,
+    2,
+    3,
+    4,
+    6,
+    6
+   ],
+   "K1": [
+    null,
+    null,
+    null,
+    null,
+    3.5,
+    4,
+    4.5,
+    6,
+    6.5
+   ]
+  }
+ },
+ "roadFARRef": "Bidhimala 2025 §47(5) Table 5 = DAP 2025 Appendix 3.5",
+ "roadInterpLowAnchorM": 1.8,
+ "densityBlocks": [
+  {
+   "id": "Block-01",
+   "name": "Reserved",
+   "areas": "Airport Area",
+   "type": "P",
+   "ppa": 0,
+   "avgDU": 0,
+   "katha": 0,
+   "areaFAR": 0.0
+  },
+  {
+   "id": "Block-02",
+   "name": "Jinjira, Kalindi, Aganagar",
+   "areas": "Aganagar, Kalindi, Shubhadya (Part), Jinjira Union",
+   "type": "S",
+   "ppa": 220,
+   "avgDU": 940,
+   "katha": 2.3,
+   "areaFAR": 3.0
+  },
+  {
+   "id": "Block-03",
+   "name": "Bashundhara Residential Area",
+   "areas": "DNCC-17, 40, 42, 43 (Part)",
+   "type": "P",
+   "ppa": 250,
+   "avgDU": 1480,
+   "katha": 2.0,
+   "areaFAR": 4.1
+  },
+  {
+   "id": "Block-04",
+   "name": "Dakshin Khan",
+   "areas": "DNCC-44 (Part), 45, 46, 48 (Part)",
+   "type": "S",
+   "ppa": 250,
+   "avgDU": 1200,
+   "katha": 1.9,
+   "areaFAR": 3.1
+  },
+  {
+   "id": "Block-05",
+   "name": "Faridabad",
+   "areas": "DNCC-47, 50",
+   "type": "S",
+   "ppa": 300,
+   "avgDU": 1000,
+   "katha": 2.2,
+   "areaFAR": 3.1
+  },
+  {
+   "id": "Block-06",
+   "name": "Kawla",
+   "areas": "DNCC-17, 49 (Part)",
+   "type": "S",
+   "ppa": 220,
+   "avgDU": 1150,
+   "katha": 2.0,
+   "areaFAR": 3.2
+  },
+  {
+   "id": "Block-07",
+   "name": "Uttara 1st & 2nd Phase",
+   "areas": "DNCC-1, 51 (Part)",
+   "type": "P",
+   "ppa": 300,
+   "avgDU": 1630,
+   "katha": 2.0,
+   "areaFAR": 4.5
+  },
+  {
+   "id": "Block-08",
+   "name": "Kamarpara",
+   "areas": "DNCC-53, 54 (Part)",
+   "type": "S",
+   "ppa": 280,
+   "avgDU": 980,
+   "katha": 2.3,
+   "areaFAR": 3.1
+  },
+  {
+   "id": "Block-09",
+   "name": "Mirpur",
+   "areas": "DNCC-2,3,4,5,6,7,8,12,13,14,16,52 (Part)",
+   "type": "P",
+   "ppa": 250,
+   "avgDU": 1300,
+   "katha": 1.9,
+   "areaFAR": 3.4
+  },
+  {
+   "id": "Block-10",
+   "name": "Keraniganj, Taranagar, Bhakurta, Konda",
+   "areas": "Alirtek, Amin Bazar, Baghabali, Basta, Bhakurta, Hazratpur, Kalatia, Konda, Rohitpur, Shakta Union",
+   "type": "S",
+   "ppa": 200,
+   "avgDU": 860,
+   "katha": 2.1,
+   "areaFAR": 2.5
+  },
+  {
+   "id": "Block-11",
+   "name": "Anandnagar Embankment",
+   "areas": "DNCC-8, 9, 10 (Part)",
+   "type": "S",
+   "ppa": 220,
+   "avgDU": 950,
+   "katha": 2.0,
+   "areaFAR": 2.6
+  },
+  {
+   "id": "Block-12",
+   "name": "Shewrapara",
+   "areas": "DNCC-10,11,12,13,14 (Part),16,28 (Part)",
+   "type": "S",
+   "ppa": 300,
+   "avgDU": 1150,
+   "katha": 1.9,
+   "areaFAR": 3.0
+  },
+  {
+   "id": "Block-13",
+   "name": "Ibrahimpur East Shewrapara",
+   "areas": "DNCC-14,16 (Part)",
+   "type": "S",
+   "ppa": 300,
+   "avgDU": 1150,
+   "katha": 1.9,
+   "areaFAR": 3.0
+  },
+  {
+   "id": "Block-14",
+   "name": "Baunia",
+   "areas": "DNCC-3,4,5,15 (Part)",
+   "type": "S",
+   "ppa": 250,
+   "avgDU": 1200,
+   "katha": 2.1,
+   "areaFAR": 3.5
+  },
+  {
+   "id": "Block-15",
+   "name": "Khilkhet Vatara",
+   "areas": "DNCC-17,18,40 (Part)",
+   "type": "S",
+   "ppa": 250,
+   "avgDU": 1180,
+   "katha": 1.9,
+   "areaFAR": 3.1
+  },
+  {
+   "id": "Block-16",
+   "name": "Baridhara",
+   "areas": "DNCC-18,39,40 (Part)",
+   "type": "P",
+   "ppa": 250,
+   "avgDU": 1880,
+   "katha": 1.8,
+   "areaFAR": 4.7
+  },
+  {
+   "id": "Block-17",
+   "name": "Gulshan Banani",
+   "areas": "DNCC-19 (Part)",
+   "type": "P",
+   "ppa": 250,
+   "avgDU": 2100,
+   "katha": 1.9,
+   "areaFAR": 5.5
+  },
+  {
+   "id": "Block-18",
+   "name": "Baipail, Ashulia, Dhamsona, Yarpur",
+   "areas": "Ashulia, Dhamsona, Shimulia, Yarpur Union",
+   "type": "S",
+   "ppa": 200,
+   "avgDU": 930,
+   "katha": 2.1,
+   "areaFAR": 2.7
+  },
+  {
+   "id": "Block-19",
+   "name": "Korail",
+   "areas": "DNCC-19 (Part)",
+   "type": "S",
+   "ppa": 250,
+   "avgDU": 1050,
+   "katha": 1.4,
+   "areaFAR": 2.0
+  },
+  {
+   "id": "Block-20",
+   "name": "Mohakhali DOHS",
+   "areas": "DNCC-20 (Part)",
+   "type": "P",
+   "ppa": 200,
+   "avgDU": 1580,
+   "katha": 2.0,
+   "areaFAR": 4.4
+  },
+  {
+   "id": "Block-21",
+   "name": "Niketan",
+   "areas": "DNCC-19,20,24 (Part)",
+   "type": "S",
+   "ppa": 280,
+   "avgDU": 1500,
+   "katha": 1.8,
+   "areaFAR": 3.8
+  },
+  {
+   "id": "Block-22",
+   "name": "Mohakhali",
+   "areas": "DNCC-20 (Part)",
+   "type": "S",
+   "ppa": 250,
+   "avgDU": 960,
+   "katha": 2.5,
+   "areaFAR": 3.3
+  },
+  {
+   "id": "Block-23",
+   "name": "Rampura",
+   "areas": "DNCC-18,21,22,38,39 (Part)",
+   "type": "S",
+   "ppa": 300,
+   "avgDU": 1180,
+   "katha": 2.2,
+   "areaFAR": 3.6
+  },
+  {
+   "id": "Block-24",
+   "name": "Tejgaon I/A",
+   "areas": "DNCC-24,25 (Part)",
+   "type": "S",
+   "ppa": 220,
+   "avgDU": 1040,
+   "katha": 2.3,
+   "areaFAR": 3.3
+  },
+  {
+   "id": "Block-25",
+   "name": "Mohammadpur",
+   "areas": "DNCC-29,31 (Part),32 (Part)",
+   "type": "P",
+   "ppa": 300,
+   "avgDU": 1100,
+   "katha": 2.2,
+   "areaFAR": 3.4
+  },
+  {
+   "id": "Block-26",
+   "name": "Banagram Baitul Aman",
+   "areas": "Banagram, Tetuljhora Union (Part)",
+   "type": "S",
+   "ppa": 150,
+   "avgDU": 950,
+   "katha": 1.6,
+   "areaFAR": 2.1
+  },
+  {
+   "id": "Block-27",
+   "name": "Mohammadpur",
+   "areas": "DNCC-10,11,30,33 (Part)",
+   "type": "S",
+   "ppa": 300,
+   "avgDU": 1080,
+   "katha": 2.1,
+   "areaFAR": 3.2
+  },
+  {
+   "id": "Block-28",
+   "name": "Moghbazar",
+   "areas": "DNCC-22,35,36 (Part), DSCC-8,10 (Part),11,12,13,19 (Part)",
+   "type": "S",
+   "ppa": 300,
+   "avgDU": 1050,
+   "katha": 2.2,
+   "areaFAR": 3.2
+  },
+  {
+   "id": "Block-29A",
+   "name": "Old Dhaka",
+   "areas": "DSCC-24,25,50-54,58,59,60,61,62 (Part)",
+   "type": "S",
+   "ppa": 300,
+   "avgDU": 1000,
+   "katha": 2.4,
+   "areaFAR": 3.3
+  },
+  {
+   "id": "Block-29B",
+   "name": "Donia-Muradpur",
+   "areas": "DSCC-52,53,58,59,61,62 (Part)",
+   "type": "S",
+   "ppa": 300,
+   "avgDU": 1000,
+   "katha": 2.4,
+   "areaFAR": 3.3
+  },
+  {
+   "id": "Block-30",
+   "name": "Green Model Town",
+   "areas": "DSCC-63,71,72,73 (Part)",
+   "type": "P",
+   "ppa": 250,
+   "avgDU": 1350,
+   "katha": 2.1,
+   "areaFAR": 3.9
+  },
+  {
+   "id": "Block-31",
+   "name": "Satarkul, Nasirabad",
+   "areas": "DNCC-37 (Part),41-42 (Part), DSCC-70 (Part),75 (Part)",
+   "type": "S",
+   "ppa": 220,
+   "avgDU": 1050,
+   "katha": 1.3,
+   "areaFAR": 1.9
+  },
+  {
+   "id": "Block-32",
+   "name": "Basabo, Khilgaon",
+   "areas": "DNCC-22,23 (Part), DSCC-1-7,40 (Part),48 (Part),49,50 (Part),71,72 (Part)",
+   "type": "S",
+   "ppa": 300,
+   "avgDU": 1160,
+   "katha": 2.1,
+   "areaFAR": 3.4
+  },
+  {
+   "id": "Block-33",
+   "name": "Bandar, Mograpara, Kanchpur",
+   "areas": "Bandar, Kanchpur, Kalagachhia, Madanpur, Muchapur, Sadipur Union",
+   "type": "S",
+   "ppa": 200,
+   "avgDU": 860,
+   "katha": 2.1,
+   "areaFAR": 2.5
+  },
+  {
+   "id": "Block-34",
+   "name": "Ramna, Dhaka University Area",
+   "areas": "DSCC-8,9,10 (Part),13,18,19,20,21,22 (Part),23 (Part),26 (Part)",
+   "type": "S",
+   "ppa": 220,
+   "avgDU": 1040,
+   "katha": 2.3,
+   "areaFAR": 3.3
+  },
+  {
+   "id": "Block-35",
+   "name": "Panthapath",
+   "areas": "DNCC-25,26,27 (Part); DSCC-15,16,17,18 (Part)",
+   "type": "S",
+   "ppa": 250,
+   "avgDU": 1100,
+   "katha": 2.2,
+   "areaFAR": 3.4
+  },
+  {
+   "id": "Block-36",
+   "name": "Dhanmondi Residential",
+   "areas": "DNCC-31 (Part),32 (Part),34 (Part), DSCC-15,17,18 (Part)",
+   "type": "P",
+   "ppa": 220,
+   "avgDU": 2000,
+   "katha": 1.8,
+   "areaFAR": 5.0
+  },
+  {
+   "id": "Block-37",
+   "name": "Narayanganj Center",
+   "areas": "NCC-8,10,11-17, Boktabali, Enayetnagar, Fatullah, Kashipur Union",
+   "type": "S",
+   "ppa": 250,
+   "avgDU": 1060,
+   "katha": 2.4,
+   "areaFAR": 3.5
+  },
+  {
+   "id": "Block-38",
+   "name": "Tongi",
+   "areas": "GCC-43,44,45,46,55,56,57 (Part)",
+   "type": "S",
+   "ppa": 250,
+   "avgDU": 990,
+   "katha": 2.3,
+   "areaFAR": 3.2
+  },
+  {
+   "id": "Block-39",
+   "name": "Birulia",
+   "areas": "Birulia, Savar Union",
+   "type": "S",
+   "ppa": 175,
+   "avgDU": 946,
+   "katha": 1.8,
+   "areaFAR": 2.4
+  },
+  {
+   "id": "Block-40",
+   "name": "Gognagar, NCC 27",
+   "areas": "NCC-5,6,18-27 (Part), Gognagar Union",
+   "type": "S",
+   "ppa": 200,
+   "avgDU": 930,
+   "katha": 2.1,
+   "areaFAR": 2.7
+  },
+  {
+   "id": "Block-41",
+   "name": "Dasherkandi, Kayetpara",
+   "areas": "Kayetpara Union",
+   "type": "S",
+   "ppa": 175,
+   "avgDU": 950,
+   "katha": 1.8,
+   "areaFAR": 2.4
+  },
+  {
+   "id": "Block-42a",
+   "name": "Matuail, Sarulia",
+   "areas": "DSCC-63 (Part),64 (Part),65,66,67,68,69 (Part),70 (Part)",
+   "type": "S",
+   "ppa": 200,
+   "avgDU": 1280,
+   "katha": 1.9,
+   "areaFAR": 3.4
+  },
+  {
+   "id": "Block-42b",
+   "name": "Kutubpur, Fatullah",
+   "areas": "NCC-1,2,3,4,7,9 (Part), Kutubpur Union",
+   "type": "S",
+   "ppa": 200,
+   "avgDU": 1280,
+   "katha": 1.9,
+   "areaFAR": 3.4
+  },
+  {
+   "id": "Block-43",
+   "name": "Pathalia",
+   "areas": "Pathalia Union",
+   "type": "S",
+   "ppa": 200,
+   "avgDU": 930,
+   "katha": 2.1,
+   "areaFAR": 2.7
+  },
+  {
+   "id": "Block-44",
+   "name": "Rupganj, Isapur",
+   "areas": "Rupganj Union",
+   "type": "S",
+   "ppa": 200,
+   "avgDU": 930,
+   "katha": 2.1,
+   "areaFAR": 2.7
+  },
+  {
+   "id": "Block-45",
+   "name": "Bhulta, Golakandail",
+   "areas": "Bhulta, Golakandail, Murapara Union",
+   "type": "S",
+   "ppa": 200,
+   "avgDU": 930,
+   "katha": 2.1,
+   "areaFAR": 2.7
+  },
+  {
+   "id": "Block-46",
+   "name": "Savar Municipality Area",
+   "areas": "SP-1,2,3,4,5,6,7,8,9, Tetuljhora Union",
+   "type": "S",
+   "ppa": 250,
+   "avgDU": 1050,
+   "katha": 2.3,
+   "areaFAR": 3.4
+  },
+  {
+   "id": "Block-47",
+   "name": "Jhilmil Residential Area",
+   "areas": "Jhilmil Residential Area",
+   "type": "P",
+   "ppa": 250,
+   "avgDU": 1600,
+   "katha": 1.9,
+   "areaFAR": 4.3
+  },
+  {
+   "id": "Block-48",
+   "name": "Hemayetpur, Tetuljhora",
+   "areas": "Tetuljhora Union",
+   "type": "S",
+   "ppa": 220,
+   "avgDU": 890,
+   "katha": 2.3,
+   "areaFAR": 2.8
+  },
+  {
+   "id": "Block-49",
+   "name": "Tarabo Municipality",
+   "areas": "TP-1,2,3,4,5,6,7,8,9 (Part)",
+   "type": "S",
+   "ppa": 220,
+   "avgDU": 940,
+   "katha": 2.3,
+   "areaFAR": 3.0
+  },
+  {
+   "id": "Block-50",
+   "name": "Jalsiri",
+   "areas": "Jalsiri Housing",
+   "type": "P",
+   "ppa": 200,
+   "avgDU": 1400,
+   "katha": 2.1,
+   "areaFAR": 4.1
+  },
+  {
+   "id": "Block-51",
+   "name": "Badda",
+   "areas": "DNCC-37,38,39 (Part)",
+   "type": "S",
+   "ppa": 250,
+   "avgDU": 1180,
+   "katha": 2.1,
+   "areaFAR": 3.4
+  },
+  {
+   "id": "Block-52",
+   "name": "Aftabnagar, Banasree",
+   "areas": "DNCC-22,37 (Part), DSCC-3,74 (Part)",
+   "type": "P",
+   "ppa": 250,
+   "avgDU": 1600,
+   "katha": 1.7,
+   "areaFAR": 3.7
+  },
+  {
+   "id": "Block-53",
+   "name": "United, Sunvalley",
+   "areas": "DNCC-41,42,43 (Part)",
+   "type": "P",
+   "ppa": 300,
+   "avgDU": 1380,
+   "katha": 1.9,
+   "areaFAR": 3.7
+  },
+  {
+   "id": "Block-54",
+   "name": "Purbachal Residential Area",
+   "areas": "Purbachal New Town",
+   "type": "P",
+   "ppa": 250,
+   "avgDU": 1680,
+   "katha": 1.9,
+   "areaFAR": 4.5
+  },
+  {
+   "id": "Block-55",
+   "name": "Uttara 3rd Phase",
+   "areas": "DNCC-52,53 (Part)",
+   "type": "P",
+   "ppa": 250,
+   "avgDU": 1760,
+   "katha": 1.9,
+   "areaFAR": 4.7
+  },
+  {
+   "id": "Block-56",
+   "name": "POHS and Shornali Residential Area",
+   "areas": "DNCC-43,44,48 (Part)",
+   "type": "P",
+   "ppa": 250,
+   "avgDU": 1560,
+   "katha": 1.9,
+   "areaFAR": 4.1
+  },
+  {
+   "id": "Block-57",
+   "name": "Nolbhog",
+   "areas": "DNCC-52,53 (Part)",
+   "type": "S",
+   "ppa": 220,
+   "avgDU": 900,
+   "katha": 2.0,
+   "areaFAR": 2.6
+  },
+  {
+   "id": "Block-58",
+   "name": "Kalyanpur-Retention",
+   "areas": "Kalyanpur-Retention Area",
+   "type": "S",
+   "ppa": 0,
+   "avgDU": 0,
+   "katha": 0,
+   "areaFAR": 0.0
+  },
+  {
+   "id": "Block-59",
+   "name": "Bosila, Chandrima",
+   "areas": "DNCC-33, DSCC-34 (Part),14,15 (Part),18 (Part),22 (Part),23 (Part),26,55,56,57 (Part)",
+   "type": "S",
+   "ppa": 250,
+   "avgDU": 980,
+   "katha": 2.3,
+   "areaFAR": 3.1
+  },
+  {
+   "id": "Block-60",
+   "name": "Khilkhet Residential Area",
+   "areas": "DNCC-43,44 (Part)",
+   "type": "P",
+   "ppa": 250,
+   "avgDU": 1850,
+   "katha": 1.7,
+   "areaFAR": 4.4
+  },
+  {
+   "id": "Block-61",
+   "name": "Mirpur DOHS",
+   "areas": "DNCC-02,52 (Part)",
+   "type": "P",
+   "ppa": 220,
+   "avgDU": 2050,
+   "katha": 1.7,
+   "areaFAR": 4.8
+  },
+  {
+   "id": "Block-62",
+   "name": "Paikpara, Tolarbagh",
+   "areas": "DNCC-10 (Part),11 (Part),12 (Part)",
+   "type": "S",
+   "ppa": 300,
+   "avgDU": 1250,
+   "katha": 1.9,
+   "areaFAR": 3.3
+  },
+  {
+   "id": "Block-63",
+   "name": "Kaundia, Aminbazar",
+   "areas": "Kaundia Union",
+   "type": "S",
+   "ppa": 175,
+   "avgDU": 1100,
+   "katha": 1.3,
+   "areaFAR": 2.0
+  },
+  {
+   "id": "Block-64",
+   "name": "Kachkura Moinartek",
+   "areas": "DNCC-43 (Part),44 (Part)",
+   "type": "S",
+   "ppa": 200,
+   "avgDU": 890,
+   "katha": 2.1,
+   "areaFAR": 2.6
+  },
+  {
+   "id": "Block-65",
+   "name": "Pallabi 2",
+   "areas": "DNCC-8,52 (Part)",
+   "type": "S",
+   "ppa": 250,
+   "avgDU": 1400,
+   "katha": 1.7,
+   "areaFAR": 3.3
+  },
+  {
+   "id": "Block-66",
+   "name": "Ghatarchar",
+   "areas": "Taranagar (Part), Shakta (Part) Union",
+   "type": "S",
+   "ppa": 220,
+   "avgDU": 1150,
+   "katha": 2.0,
+   "areaFAR": 3.2
+  },
+  {
+   "id": "Block-67",
+   "name": "Demra, Konapara",
+   "areas": "DSCC-63 (Part),64 (Part),69,70,73-75 (Part)",
+   "type": "S",
+   "ppa": 250,
+   "avgDU": 1280,
+   "katha": 1.8,
+   "areaFAR": 3.2
+  },
+  {
+   "id": "Block-68",
+   "name": "Subaddhya, Arakul, Beyara",
+   "areas": "Subaddhya (Part), Konda (Part), Tegheria (Part) Union",
+   "type": "S",
+   "ppa": 200,
+   "avgDU": 930,
+   "katha": 2.1,
+   "areaFAR": 2.7
+  }
+ ],
+ "densityBlocksRef": "DAP 2025 Appendix 3.6 (SRO 468/2025)",
+ "mgcA6": {
+  "minMGC": 52,
+  "maxMGC": 75,
+  "minOpen": 25,
+  "ref": "Bidhimala 2025 Table 3 Row 1 (A6 Affordable, any size)"
+ },
+ "mgcRows": [
+  {
+   "maxSqm": 134,
+   "minMGC": 52.5,
+   "maxMGC": 70,
+   "minOpen": 30,
+   "ref": "Table 3 Row 2 (≤134 sqm / ≤2 katha)"
+  },
+  {
+   "maxSqm": 201,
+   "minMGC": 50,
+   "maxMGC": 67.5,
+   "minOpen": 32.5,
+   "ref": "Table 3 Row 3 (134–201 sqm)"
+  },
+  {
+   "maxSqm": 268,
+   "minMGC": 48.5,
+   "maxMGC": 65,
+   "minOpen": 35,
+   "ref": "Table 3 Row 4 (201–268 sqm)"
+  },
+  {
+   "maxSqm": 402,
+   "minMGC": 46.5,
+   "maxMGC": 62.5,
+   "minOpen": 37.5,
+   "ref": "Table 3 Row 5 (268–402 sqm)"
+  },
+  {
+   "maxSqm": 670,
+   "minMGC": 45,
+   "maxMGC": 60,
+   "minOpen": 40,
+   "ref": "Table 3 Row 6 (402–670 sqm)"
+  },
+  {
+   "maxSqm": 937,
+   "minMGC": null,
+   "maxMGC": 55,
+   "minOpen": 45,
+   "ref": "Table 3 Row 7 (670–937 sqm)"
+  },
+  {
+   "maxSqm": 1339,
+   "minMGC": null,
+   "maxMGC": 50,
+   "minOpen": 50,
+   "ref": "Table 3 Row 8 (937–1339 sqm)"
+  },
+  {
+   "maxSqm": 2677,
+   "minMGC": null,
+   "maxMGC": 45,
+   "minOpen": 55,
+   "ref": "Table 3 Row 9 (1339–2677 sqm)"
+  },
+  {
+   "maxSqm": null,
+   "minMGC": null,
+   "maxMGC": 40,
+   "minOpen": 60,
+   "ref": "Table 3 Row 10 (>2677 sqm)"
+  }
+ ],
+ "mgcRef": "Bidhimala 2025 §45(1) Table 3",
+ "setbackRows": [
+  {
+   "maxFloors": 7,
+   "between": 2,
+   "side": 1,
+   "rear": 1.25,
+   "ref": "Table 1 Row 1 (≤7 floors)"
+  },
+  {
+   "maxFloors": 10,
+   "between": 2.5,
+   "side": 1.25,
+   "rear": 2,
+   "ref": "Table 1 Row 2 (8–10 floors)"
+  },
+  {
+   "maxFloors": 15,
+   "between": 5,
+   "side": 3,
+   "rear": 3,
+   "ref": "Table 1 Row 3 (11–15 floors)"
+  },
+  {
+   "maxFloors": 20,
+   "between": 6,
+   "side": 3.25,
+   "rear": 3.25,
+   "ref": "Table 1 Row 4 (16–20 floors)"
+  },
+  {
+   "maxFloors": 30,
+   "between": 6.5,
+   "side": 3.5,
+   "rear": 3.5,
+   "ref": "Table 1 Row 5 (21–30 floors)"
+  },
+  {
+   "maxFloors": 40,
+   "between": 7,
+   "side": 4.5,
+   "rear": 4.5,
+   "ref": "Table 1 Row 6 (31–40 floors)"
+  },
+  {
+   "maxFloors": null,
+   "between": 10,
+   "side": 5,
+   "rear": 5,
+   "ref": "Table 1 Row 7 (>40 floors)"
+  }
+ ],
+ "setbackRef": "Bidhimala 2025 §41(3) Table 1",
+ "frontSetbackRef": "Bidhimala 2025 §41(1): ≥4.5m from road centre OR ≥1.5m from plot boundary",
+ "incentives": {
+  "ref": "DAP 2025 Table 3.28 (SRO 468/2025)",
+  "plotSizeTiers": [
+   {
+    "minKatha": 3,
+    "maxKatha": 6,
+    "val": 0.2
+   },
+   {
+    "minKatha": 6,
+    "maxKatha": 10,
+    "val": 0.35
+   },
+   {
+    "minKatha": 10,
+    "maxKatha": 15,
+    "val": 0.5
+   },
+   {
+    "minKatha": 15,
+    "maxKatha": 20,
+    "val": 0.65
+   },
+   {
+    "minKatha": 20,
+    "maxKatha": null,
+    "val": 0.75
+   }
+  ],
+  "roadWidthBonus": {
+   "aboveFt": 30,
+   "perFt": 0.02,
+   "cap": 1,
+   "ref": "Table 3.28 Item 2"
+  },
+  "a6Units": {
+   "val": 0.5,
+   "minKatha": 10,
+   "ref": "Table 3.28 Item 3(i)"
+  },
+  "a6Pct": {
+   "val": 0.75,
+   "minKatha": 20,
+   "ref": "Table 3.28 Item 3(ii)"
+  },
+  "green": {
+   "val": 0.5,
+   "ref": "Table 3.28 Item 4"
+  },
+  "publicSpace": {
+   "val": 0.5,
+   "minKatha": 10,
+   "ref": "Table 3.28 Item 5"
+  },
+  "civicSchool": {
+   "val": 0.25,
+   "ref": "Table 3.28 Item 9"
+  },
+  "civicPark": {
+   "val": 0.25,
+   "ref": "Table 3.28 Item 9"
+  }
+ },
+ "block3_31": {
+  "ref": "DAP 2025 §3.6.10 + Table 3.31 (SRO 468/2025)",
+  "minBlockKatha": {
+   "central_S": 10,
+   "central_P": 30,
+   "outside_city": 20,
+   "other_urban": 66
+  },
+  "rows": [
+   {
+    "label": "Row 1 (Old Dhaka ≤20 katha)",
+    "densityPct": 0.15,
+    "areaFARPct": 0.15,
+    "plotFARBonus": 0.5,
+    "minRoadFt": 20
+   },
+   {
+    "label": "Row 2 (≤2 acre)",
+    "densityPct": 0.15,
+    "areaFARPct": 0.15,
+    "plotFARBonus": 0.5,
+    "minRoadFt": 20
+   },
+   {
+    "label": "Row 3 (≤5 acre)",
+    "densityPct": 0.2,
+    "areaFARPct": 0.2,
+    "plotFARBonus": 0.75,
+    "minRoadFt": 40
+   },
+   {
+    "label": "Row 4 (>5 acre)",
+    "densityPct": 0.3,
+    "areaFARPct": 0.3,
+    "plotFARBonus": 1,
+    "minRoadFt": 60
+   }
+  ],
+  "oldDhakaBlocks": [
+   "Block-29A",
+   "Block-29B"
+  ],
+  "openSpacePct": 40,
+  "contiguousPct": 50,
+  "blockMGCpct": {
+   "le2acre": 40,
+   "gt2acre": 45
+  }
+ }
+};
+const U = R.units;
+
+/* ================================================================
+   ENGINE — ported 1:1 from the verified Studio 16 build.
+   (Parity-tested: 240,000 random cases, 0 mismatches.)
+   ================================================================ */
+const r0=n=>+n.toFixed(0), r1=n=>+n.toFixed(1), r2=n=>+n.toFixed(2), r3=n=>+n.toFixed(3);
+const RES=new Set(R.residentialTypes);
+const ALL_OCC=[].concat(...R.occupancyGroups.map(g=>g.items));
+const blockById=id=>R.densityBlocks.find(b=>b.id===id);
+
+function getRoadFAR(locKey, occType, roadM, areaFAR){
+  const table=R.roadFARTable[locKey]||R.roadFARTable.other_urban;
+  const row=table[occType]; if(!row) return null;
+  const S=R.roadStepsM; let col=0;
+  for(let i=0;i<S.length;i++){ if(roadM>=S[i]) col=i+1; else break; }
+  let base=row[col]; if(base===null||base===undefined) return null;
+  base=(typeof base==="string")?parseFloat(base):base;
+  const nx=row[col+1]; const nxv=(typeof nx==="string")?parseFloat(nx):nx;
+  if(col<8 && nx!==null && nx!==undefined && isFinite(nxv)){
+    const lo=col===0?R.roadInterpLowAnchorM:S[col-1]; const hi=S[col];
+    if(roadM<hi) return r3(base+(roadM-lo)/(hi-lo)*(nxv-base));
+  }
+  return base;
+}
+function roadFARisNR(locKey, occType, roadM){
+  const table=R.roadFARTable[locKey]||R.roadFARTable.other_urban;
+  const row=table[occType]; if(!row) return false;
+  const S=R.roadStepsM; let col=0;
+  for(let i=0;i<S.length;i++){ if(roadM>=S[i]) col=i+1; else break; }
+  const c=row[col]; return typeof c==="string" && c.indexOf("*")>=0;
+}
+function getMGC(sqm,isA6){ if(isA6) return R.mgcA6; for(const row of R.mgcRows){ if(row.maxSqm===null||sqm<=row.maxSqm) return row; } }
+function getSetbacks(floors){ for(const row of R.setbackRows){ if(row.maxFloors===null||floors<=row.maxFloors) return row; } }
+function calcIncentives(katha, roadFt, hasA6, hasGreen, hasPub, hasSchool, hasPark){
+  const items=[]; const I=R.incentives; let bonus=0;
+  for(const t of I.plotSizeTiers){ if(katha>=t.minKatha&&(t.maxKatha===null||katha<t.maxKatha)){bonus=t.val;break;} }
+  if(bonus>0) items.push({label:`Plot Size Bonus (${katha.toFixed(1)} katha)`, val:bonus, ref:"DAP 2025 Table 3.28 Item 1"});
+  const rb=I.roadWidthBonus;
+  if(roadFt>rb.aboveFt){ const v=+Math.min((roadFt-rb.aboveFt)*rb.perFt, rb.cap).toFixed(2);
+    items.push({label:`Road Width Bonus (${roadFt}ft > ${rb.aboveFt}ft)`, val:v, ref:rb.ref}); }
+  if(hasA6==="units"&&katha>=I.a6Units.minKatha) items.push({label:"Affordable Housing A6 — 5+ units (≥10 katha)", val:I.a6Units.val, ref:I.a6Units.ref});
+  if(hasA6==="5pct"&&katha>=I.a6Pct.minKatha) items.push({label:"Affordable Housing A6 — 5% of floor space (≥20 katha)", val:I.a6Pct.val, ref:I.a6Pct.ref});
+  if(hasGreen) items.push({label:"Green Building Certification", val:I.green.val, ref:I.green.ref});
+  if(hasPub&&katha>=I.publicSpace.minKatha) items.push({label:"Public Open Space Surrender (10%, ≥10 katha)", val:I.publicSpace.val, ref:I.publicSpace.ref});
+  if(hasSchool) items.push({label:"Civic Amenity — School (new · Table 6.1)", val:I.civicSchool.val, ref:I.civicSchool.ref});
+  if(hasPark) items.push({label:"Civic Amenity — Park/Playground (new · Table 6.1)", val:I.civicPark.val, ref:I.civicPark.ref});
+  return items;
+}
+
+function computeSingle(I){
+  const sqft=I.sqft, sqm=sqft*U.sqftToSqm, roadM=I.roadFt*U.ftToM, katha=sqft/U.kathaToSqft;
+  const isRes=RES.has(I.occType); const block=blockById(I.blockId);
+  if(isRes && !block) return {error:"Density block not found."};
+  const isNR=roadFARisNR(I.location,I.occType,roadM);
+  const areaFARsrc = isRes ? Math.max(block.areaFAR, 1.5) : 0;
+  const roadFARexisting=getRoadFAR(I.location,I.occType,roadM,areaFARsrc);
+  const proposedRoadFt=Math.max(20, I.roadFt);
+  const roadFARproposed=getRoadFAR(I.location,I.occType,proposedRoadFt*U.ftToM,areaFARsrc);
+  const roadWidened=proposedRoadFt > I.roadFt + 0.01;
+  const roadGiveawayWidth = roadWidened ? (proposedRoadFt - I.roadFt)/2 : 0;
+  const roadFrontage = (roadWidened && I.frontageFt>0) ? I.frontageFt : 0;
+  const roadGiveawayArea = roadFrontage>0 ? r0(roadGiveawayWidth*roadFrontage) : 0;
+  const roadBenefit = roadGiveawayArea>0 ? r0(3*roadGiveawayArea) : 0;
+  const roadFAR = roadWidened
+    ? ((roadFARexisting!=null && roadFARproposed!=null) ? r2((roadFARexisting+roadFARproposed)/2) : (roadFARproposed!=null?roadFARproposed:roadFARexisting))
+    : roadFARexisting;
+  if(roadFAR===null && !isNR) return {error:`${I.occType} is not permitted on this road width here (Bidhimala 2025 §47(5), Table 5).`};
+  const areaFAR = isRes ? areaFARsrc : (roadFAR||0);
+  const baseFAR=r2(Math.min(areaFAR,roadFAR)), maxFAR=r2(Math.max(areaFAR,roadFAR)), superMax=r2(maxFAR+0.5);
+  const incentives=isRes?calcIncentives(katha,I.roadFt,I.hasA6,I.hasGreen,I.hasPub,I.hasSchool,I.hasPark):[];
+  const totalInc=r2(incentives.reduce((s,i)=>s+i.val,0));
+  const approvedFAR=r2(Math.min(baseFAR+totalInc,maxFAR));
+  const unconditional=(maxFAR-baseFAR)<=0.1;
+  const mgc=getMGC(sqm, I.occType==="A6");
+  const gcSqft=r0(sqft*mgc.maxMGC/100), gcSqftMin=mgc.minMGC?r0(sqft*mgc.minMGC/100):null;
+  const nrMode=isNR&&!!I.nrMode; const parking=Math.max(0,Math.floor(+I.parking||0));
+  const nrFloorSqft=(nrMode&&parking>0)?r0(parking*200/U.sqftToSqm):null;
+  const floorAreaBase=r0(sqft*baseFAR); let floorAreaApproved=r0(sqft*approvedFAR); const floorAreaMax=r0(sqft*maxFAR);
+  if(nrMode&&nrFloorSqft!=null) floorAreaApproved=nrFloorSqft;
+  const minGroundA = mgc.minMGC ? gcSqftMin : r0(sqft*mgc.maxMGC*0.6/100);
+  const maxGroundA = gcSqft;
+  const liftLobby = katha>10 ? 600 : 300;
+  const distrib = Math.max(1, floorAreaApproved - liftLobby);
+  const nLo = Math.max(1, Math.ceil(distrib/maxGroundA));
+  const nHi = Math.max(nLo, Math.floor(distrib/(minGroundA||maxGroundA)));
+  const BONUS_RATE = 0.075;
+  const bonusArea = r0((distrib + roadBenefit)*BONUS_RATE);
+  const totalBuildArea = floorAreaApproved + bonusArea;
+  const platePrimary = r0(distrib/nHi);
+  const platePrimaryBonus = r0(platePrimary*BONUS_RATE);
+  const basementAllowed = katha >= 4;
+  const basementBlocked = !!I.basement && !basementAllowed;
+  const basementCount = (!!I.basement && basementAllowed) ? Math.max(0, I.basementCount||0) : 0;
+  const basementEach = r0(gcSqft + 0.5*(sqft - gcSqft));
+  const totalBasement = r0(basementCount * basementEach);
+  const avgNetFloor = r0(((floorAreaApproved + roadBenefit) - liftLobby)/(nHi||1));
+  const perFloorBonus = r0(bonusArea/(nHi||1));
+  const floorBuild = avgNetFloor + perFloorBonus;
+  const roofArea = floorBuild;
+  const groundArea = r0(sqft);
+  const totalConstruction = r0(floorBuild*nHi + roofArea + groundArea + totalBasement);
+  const farExcludedArea = r0(Math.max(0, groundArea - liftLobby) + totalBasement);
+  const farFloorsApproved=nHi, totalStoreysApproved=farFloorsApproved+1;
+  const setbacks=getSetbacks(totalStoreysApproved||2), htM=r1(totalStoreysApproved*U.floorHeightM);
+  let units=null;
+  if(isRes&&block.katha>0){
+    const rawBase=katha*block.katha;
+    const baseUnits=Math.ceil(rawBase);
+    let bonus=0, max=baseUnits;
+    if(I.occType==="A3"){ bonus=Math.ceil(rawBase*0.10); max=Math.ceil(rawBase*1.10); }
+    const farRef = block.avgDU>0 ? Math.floor(floorAreaApproved/block.avgDU) : null;
+    units={base:baseUnits, bonus, max, farRef, duKatha:block.katha, avgDU:block.avgDU};
+  }
+  function scen(cov,label,mode){
+    const gcArea=r0(sqft*cov/100);
+    const distribB = distrib + roadBenefit;
+    let n = mode==='min'?Math.floor(distribB/gcArea):mode==='max'?Math.ceil(distribB/gcArea):Math.round(distribB/gcArea);
+    n=Math.min(nHi,Math.max(nLo,Math.max(1,n)));
+    const plate=r0(distribB/n); const totFlrs=n+1;
+    const perFloorBonus=r0(plate*BONUS_RATE);
+    const upf=(block&&block.avgDU>0&&plate>0)?Math.floor(plate/block.avgDU):null;
+    return {label, cov:r1(cov), gcArea, farFlrs:n, totFlrs, plate, coverPct:r1(plate/sqft*100), perFloorBonus, htM:r1(totFlrs*U.floorHeightM), sb:getSetbacks(totFlrs), upf};
+  }
+  const scenarios = mgc.minMGC ? [
+    scen(mgc.maxMGC,"Max GC — fewest floors","max"),
+    scen((mgc.minMGC+mgc.maxMGC)/2,"Mid GC — balanced","mid"),
+    scen(mgc.minMGC,"Min GC — most floors","min")
+  ] : [
+    scen(mgc.maxMGC,"Max GC — fewest floors","max"),
+    scen(mgc.maxMGC*0.8,"80% of Max — balanced","mid"),
+    scen(mgc.maxMGC*0.6,"60% of Max — most floors","min")
+  ];
+  return {mode:"single", occType:I.occType, block:(block||{id:"—",name:"Not applicable",areas:"",type:"",ppa:0,avgDU:0,katha:0,areaFAR:0}), isRes, sqft, sqm:r1(sqm), katha:r2(katha), roadFt:I.roadFt, location:I.location,
+    areaFAR, roadFAR, roadFARexisting, roadFARproposed, proposedRoadFt, roadWidened, roadGiveawayWidth, roadFrontage, roadGiveawayArea, roadBenefit, baseFAR, maxFAR, superMax, incentives, totalInc, approvedFAR, unconditional, isNR, nrMode, parking, nrFloorSqft,
+    mgc, gcSqft, gcSqftMin, floorAreaBase, floorAreaApproved, floorAreaMax,
+    farFloorsApproved, totalStoreysApproved, setbacks, htM, units, scenarios, liftLobby, distrib, bonusArea, totalBuildArea, platePrimary, platePrimaryBonus, minGroundA, maxGroundA, basementAllowed, basementBlocked, basementCount, basementEach, totalBasement, avgNetFloor, perFloorBonus, floorBuild, roofArea, groundArea, totalConstruction, farExcludedArea};
+}
+
+function computeBlock(I){
+  const roadM=I.roadFt*U.ftToM, totalSqft=I.sqft, totalKatha=totalSqft/U.kathaToSqft,
+        totalSqM=totalSqft*U.sqftToSqm, totalAcres=totalSqft/43560;
+  const blk=blockById(I.blockId); if(!blk) return {error:"Density block not found."};
+  const B=R.block3_31;
+  const minKatha = (I.location==="central"&&blk.type==="S")?B.minBlockKatha.central_S
+    : (I.location==="central"&&blk.type==="P")?B.minBlockKatha.central_P
+    : (I.location==="outside_city")?B.minBlockKatha.outside_city : B.minBlockKatha.other_urban;
+  if(totalKatha<minKatha) return {error:`Minimum block size here is ${minKatha} katha (DAP 2025 Table 3.31). Your block is ${totalKatha.toFixed(1)} katha.`};
+  const isOld = I.location==="central"&&blk.type==="S"&&B.oldDhakaBlocks.includes(blk.id);
+  let row;
+  if(isOld&&totalKatha<=20) row=B.rows[0];
+  else if(totalAcres<=2) row=B.rows[1];
+  else if(totalAcres<=5) row=B.rows[2];
+  else row=B.rows[3];
+  if(I.roadFt<row.minRoadFt) return {error:`${row.label} requires a minimum ${row.minRoadFt}ft road. Your road is ${I.roadFt}ft (DAP 2025 Table 3.31).`};
+  const rawAreaFAR=Math.max(blk.areaFAR,1.5), rawDUkatha=blk.katha;
+  const avgDUsize=r1(rawAreaFAR*720/rawDUkatha);
+  const newDUkatha=r3(rawDUkatha*(1+row.densityPct));
+  const step1AreaFAR=r3(newDUkatha*avgDUsize/720);
+  const finalAreaFAR=r3(step1AreaFAR*(1+row.areaFARPct));
+  const oldRoadFAR=getRoadFAR(I.location,I.occType,roadM,rawAreaFAR)||rawAreaFAR;
+  const newRoadFAR=r3(oldRoadFAR+row.plotFARBonus);
+  const baseFAR=r2(Math.min(finalAreaFAR,newRoadFAR)), maxFAR=r2(Math.max(finalAreaFAR,newRoadFAR));
+  let amalg=0;
+  if(I.multiPlot){ for(const t of R.incentives.plotSizeTiers){ if(totalKatha>=t.minKatha&&(t.maxKatha===null||totalKatha<t.maxKatha)){amalg=t.val;break;} } }
+  const isRes=RES.has(I.occType);
+  const incentives=isRes?calcIncentives(totalKatha,I.roadFt,I.hasA6,I.hasGreen,I.hasPub,I.hasSchool,I.hasPark):[];
+  if(amalg>0) incentives.unshift({label:`Amalgamation Bonus (${totalKatha.toFixed(1)} katha, multi-plot)`, val:amalg, ref:"DAP 2025 Table 3.28 Item 1"});
+  const totalInc=r2(incentives.reduce((s,i)=>s+i.val,0));
+  const approvedFAR=r2(Math.min(baseFAR+totalInc,maxFAR)), superMax=r2(maxFAR+0.5);
+  const openSpaceSqFt=r0(totalSqft*B.openSpacePct/100), netBuildSqFt=r0(totalSqft*(100-B.openSpacePct)/100);
+  const blockMGCpct = totalAcres<=2?B.blockMGCpct.le2acre:B.blockMGCpct.gt2acre;
+  const buildableFootprint=r0(totalSqft*blockMGCpct/100);
+  const basementSqft=r0(buildableFootprint + totalSqft*0.10);
+  const tfaBase=r0(totalSqft*baseFAR), tfa=r0(totalSqft*approvedFAR), tfaMax=r0(totalSqft*maxFAR);
+  function scen(cov,label){ const gcArea=r0(totalSqft*cov/100); const farFlrs=gcArea>0?Math.ceil(tfa/gcArea):0;
+    const totFlrs=farFlrs+1; return {label, cov:r1(cov), gcArea, farFlrs, totFlrs, htM:r1(totFlrs*U.floorHeightM), sb:getSetbacks(totFlrs)}; }
+  const scenarios=[ scen(blockMGCpct,"Max GC — fewest floors"), scen(blockMGCpct*0.8,"Mid GC"), scen(blockMGCpct*0.6,"Min GC — most floors") ];
+  const farFloors=buildableFootprint>0?Math.ceil(tfa/buildableFootprint):0, totStoreys=farFloors+1;
+  const setbacks=getSetbacks(totStoreys), htM=r1(totStoreys*U.floorHeightM);
+  const units=Math.ceil(totalKatha*newDUkatha), unitsA3=I.occType==="A3"?Math.ceil(units*1.10):units;
+  return {mode:"block", occType:I.occType, block:blk, isRes, sqft:totalSqft, sqm:r1(totalSqM), katha:r2(totalKatha),
+    acres:r3(totalAcres), roadFt:I.roadFt, location:I.location, row,
+    rawAreaFAR, rawDUkatha, avgDUsize, newDUkatha, step1AreaFAR, finalAreaFAR, oldRoadFAR:r2(oldRoadFAR), newRoadFAR,
+    baseFAR, maxFAR, superMax, incentives, totalInc, approvedFAR,
+    openSpaceSqFt, netBuildSqFt, blockMGCpct, buildableFootprint, basementSqft, tfaBase, tfa, tfaMax,
+    scenarios, farFloors, totStoreys, setbacks, htM, units, unitsA3};
+}
+
+/* ================================================================
+   UI
+   ================================================================ */
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+
+/* ============================================================
+   i18n — English ⇄ Bangla.  t() is keyed by the English source,
+   so any untranslated string falls back to English safely.
+   ============================================================ */
+let lang=(function(){try{return localStorage.getItem('s16_lang')||'bn';}catch(e){return 'bn';}})();
+let lastResult=null;
+const DICT={
+  /* header / hero */
+  "RAJUK Dhaka · Bidhimala & DAP 2025":"রাজউক ঢাকা · বিধিমালা ও ড্যাপ ২০২৫",
+  "Studio 16 Architects · RAJUK Dhaka":"স্টুডিও ১৬ আর্কিটেক্টস · রাজউক ঢাকা",
+  "What can you <span class=\"u\">build</span>?":"আপনি কী <span class=\"u\">নির্মাণ</span> করতে পারবেন?",
+  "FAR, floors, height, units and the official RAJUK clearance — in seconds.":"ফার, তলা, উচ্চতা, ইউনিট ও অফিসিয়াল রাজউক ক্লিয়ারেন্স — মুহূর্তেই।",
+  "All RAJUK areas":"সকল রাজউক এলাকা",
+  "Not CDA / KDA / RDA":"সিডিএ / কেডিএ / আরডিএ নয়",
+  /* step titles */
+  "Occupancy Type":"ভবনের ব্যবহার",
+  "Planning Zone":"পরিকল্পনা অঞ্চল",
+  "Land Area":"জমির পরিমাণ",
+  "Access Road Width":"সংযোগ রাস্তার প্রস্থ",
+  "Optional Incentives":"ঐচ্ছিক প্রণোদনা",
+  "Basement (optional)":"বেজমেন্ট (ঐচ্ছিক)",
+  /* field labels */
+  "Building / use category":"ভবন / ব্যবহারের শ্রেণি",
+  "Density block — type an area name to search":"ঘনত্ব ব্লক — এলাকার নাম লিখে খুঁজুন",
+  "Number of basement levels":"বেজমেন্ট লেভেলের সংখ্যা",
+  "Affordable Housing (A6)":"সাশ্রয়ী আবাসন (A6)",
+  "Parking spaces (200 m²/space)":"পার্কিং স্পেস (২০০ বর্গমি/স্পেস)",
+  "Road-side edge length / frontage (ft)":"রাস্তার পাশের প্রান্তের দৈর্ঘ্য / ফ্রন্টেজ (ফুট)",
+  /* segmented + units */
+  "Single Building":"একক ভবন",
+  "Block-Based":"ব্লকভিত্তিক",
+  "Feet":"ফুট",
+  "Metre":"মিটার",
+  "Katha":"কাঠা","Decimal":"শতাংশ","Acre":"একর","ft²":"বর্গফুট","m²":"বর্গমিটার","katha":"কাঠা",
+  /* land area */
+  "+ add plot (amalgamation)":"+ প্লট যোগ করুন (একত্রীকরণ)",
+  "Total land area":"মোট জমির পরিমাণ",
+  "— katha":"— কাঠা",
+  "area":"পরিমাণ",
+  /* road / incentives / basement */
+  "I know my frontage (road-widening bonus)":"আমি আমার ফ্রন্টেজ জানি (রাস্তা সম্প্রসারণ বোনাস)",
+  "Size building by parking (NR)":"পার্কিং দিয়ে ভবন নির্ধারণ (NR)",
+  "Green Building Certification":"গ্রিন বিল্ডিং সার্টিফিকেশন",
+  "Public Open Space (≥10 katha)":"পাবলিক উন্মুক্ত স্থান (≥১০ কাঠা)",
+  "Civic Amenity — School":"নাগরিক সুবিধা — স্কুল",
+  "Civic Amenity — Park / Playground":"নাগরিক সুবিধা — পার্ক / খেলার মাঠ",
+  "Not applicable":"প্রযোজ্য নয়",
+  "5+ A6 units on ≥10 katha → +0.50":"≥১০ কাঠায় ৫+ A6 ইউনিট → +০.৫০",
+  "5% of floor as A6 on ≥20 katha → +0.75":"≥২০ কাঠায় ৫% মেঝে A6 → +০.৭৫",
+  "Incentives apply to residential (Category A) only.":"প্রণোদনা শুধু আবাসিক (শ্রেণি A) ভবনে প্রযোজ্য।",
+  "Plot-size & road-width bonuses are automatic.":"প্লট-সাইজ ও রাস্তা-প্রস্থ বোনাস স্বয়ংক্রিয়।",
+  "Include basement(s) — parking, FAR-excluded":"বেজমেন্ট অন্তর্ভুক্ত করুন — পার্কিং, ফার-বহির্ভূত",
+  /* CTA / empty */
+  "Calculate my potential":"আমার সম্ভাবনা হিসাব করুন",
+  "Your buildable potential appears here":"আপনার নির্মাণযোগ্য সম্ভাবনা এখানে দেখানো হবে",
+  "Fill in the steps and press <b>Calculate</b>. You'll get FAR, floors, height, units, the RAJUK clearance table — each with its legal source and a transparent formula trail.":"ধাপগুলো পূরণ করে <b>হিসাব</b> চাপুন। আপনি পাবেন ফার, তলা, উচ্চতা, ইউনিট ও রাজউক ক্লিয়ারেন্স টেবিল — প্রতিটির আইনি উৎস ও স্বচ্ছ সূত্রসহ।",
+  "e.g. Uttara, Mirpur, Gulshan, Savar…":"যেমন উত্তরা, মিরপুর, গুলশান, সাভার…",
+  /* footer */
+  "Call":"কল","Email":"ইমেইল","Web":"ওয়েব",
+  "Disclaimer":"দাবিত্যাগ",
+  "Indicative only — based on Bidhimala 2025 (SRO 469) and DAP 2025 (SRO 468). Verify every figure with RAJUK before submission. Studio 16 Architects accepts no liability for decisions made on this tool.":"নির্দেশক মাত্র — বিধিমালা ২০২৫ (SRO ৪৬৯) ও ড্যাপ ২০২৫ (SRO ৪৬৮) অনুযায়ী। জমা দেওয়ার আগে প্রতিটি মান রাজউকের সাথে যাচাই করুন। এই টুলের ভিত্তিতে নেওয়া সিদ্ধান্তের জন্য স্টুডিও ১৬ আর্কিটেক্টস দায়ী নয়।",
+  "© 2026 Studio 16 Architects · Registered with RAJUK · CDA · DCBA · IAB · Self-contained build — no external dependencies":"© ২০২৬ স্টুডিও ১৬ আর্কিটেক্টস · রাজউক · সিডিএ · ডিসিবিএ · আইএবি নিবন্ধিত · স্বয়ংসম্পূর্ণ বিল্ড",
+  /* errors */
+  "Enter a valid land area.":"একটি বৈধ জমির পরিমাণ লিখুন।",
+  "Enter a valid road width.":"একটি বৈধ রাস্তার প্রস্থ লিখুন।",
+  "Select a density block.":"একটি ঘনত্ব ব্লক নির্বাচন করুন।",
+  "Density block not found.":"ঘনত্ব ব্লক পাওয়া যায়নি।",
+  "Planned":"পরিকল্পিত","Unplanned":"অপরিকল্পিত",
+  /* dynamic hint fragments */
+  "Standard single-plot development.":"সাধারণ একক-প্লট উন্নয়ন।",
+  "Block-Based Development · eligibility & bonuses per ":"ব্লকভিত্তিক উন্নয়ন · যোগ্যতা ও বোনাস — ",
+  "Area FAR":"এলাকা ফার","DU/katha":"ইউনিট/কাঠা","avg unit":"গড় ইউনিট","type":"ধরন",
+  "FAR Calculator · Bidhimala & DAP 2025":"ফার ক্যালকুলেটর · বিধিমালা ও ড্যাপ ২০২৫",
+  "Floor Area Ratio · Ground Coverage · Setbacks · Units · Incentive FAR — following the Detailed Area Plan (DAP) 2025 and Dhaka Imarat Nirman Bidhimala 2025.":"ফ্লোর এরিয়া রেশিও · গ্রাউন্ড কভারেজ · সেটব্যাক · ইউনিট · প্রণোদনা ফার — ডিটেইল্ড এরিয়া প্ল্যান (ড্যাপ) ২০২৫ ও ঢাকা ইমারত নির্মাণ বিধিমালা ২০২৫ অনুসারে।",
+  "Basis: SRO 469-Law/2025 (Bidhimala 2025) · SRO 468-Law/2025 (DAP 2nd Amendment)":"ভিত্তি: SRO ৪৬৯-আইন/২০২৫ (বিধিমালা ২০২৫) · SRO ৪৬৮-আইন/২০২৫ (ড্যাপ ২য় সংশোধনী)",
+  "DNCC":"ডিএনসিসি","DSCC":"ডিএসসিসি","All RAJUK Areas":"সকল রাজউক এলাকা",
+  "Purbachal · Uttara · Bashundhara":"পূর্বাচল · উত্তরা · বসুন্ধরা",
+  "Savar · Gazipur · Narayanganj":"সাভার · গাজীপুর · নারায়ণগঞ্জ",
+  "Not for CDA / KDA / RDA":"সিডিএ / কেডিএ / আরডিএ নয়",
+  "I know my plot's road-side edge length (frontage)":"আমি আমার প্লটের রাস্তার পাশের প্রান্তের দৈর্ঘ্য (ফ্রন্টেজ) জানি",
+  "If the road is under 20 ft it must be widened to 20 ft; you surrender a strip of land and earn <b>3× that area</b> as bonus build area (DAP 2025 cl.4). Tick and enter your frontage to quantify it.":"রাস্তা ২০ ফুটের কম হলে তা ২০ ফুটে সম্প্রসারণ করতে হবে; আপনি এক ফালি জমি ছেড়ে দিয়ে <b>সেই এলাকার ৩×</b> বোনাস নির্মাণ-এলাকা পাবেন (ড্যাপ ২০২৫ ধারা ৪)। পরিমাণ জানতে টিক দিয়ে ফ্রন্টেজ লিখুন।",
+  "Use NR (non-restricted) — size building by parking":"NR (নন-রেস্ট্রিক্টেড) ব্যবহার করুন — পার্কিং দিয়ে ভবন নির্ধারণ",
+  "Parking spaces (200 m² of floor area per space)":"পার্কিং স্পেস (প্রতি স্পেসে ২০০ বর্গমিটার মেঝে)",
+  "Plot-size & road-width bonuses are applied automatically and shown in the result.":"প্লট-সাইজ ও রাস্তা-প্রস্থ বোনাস স্বয়ংক্রিয়ভাবে প্রযোগ হয় ও ফলাফলে দেখানো হয়।",
+  "Include basement(s) — parking, FAR-excluded":"বেজমেন্ট অন্তর্ভুক্ত করুন — পার্কিং, ফার-বহির্ভূত",
+  "Each level ≈ max ground coverage + ½ the mandatory open space (5 ft road-side, 1.5 ft other setbacks). Not permitted below 4 katha.":"প্রতিটি লেভেল ≈ সর্বোচ্চ গ্রাউন্ড কভারেজ + বাধ্যতামূলক উন্মুক্ত স্থানের ½ (রাস্তার পাশে ৫ ফুট, অন্যান্য সেটব্যাকে ১.৫ ফুট)। ৪ কাঠার নিচে অনুমোদিত নয়।",
+  "Calculate Development Potential":"উন্নয়ন সম্ভাবনা হিসাব করুন",
+  "Your planning analysis appears here":"আপনার পরিকল্পনা বিশ্লেষণ এখানে দেখানো হবে",
+  "Complete the steps on the left and press <b>Calculate</b>. Every result shows its legal source and a transparent formula trail.":"বাঁ পাশের ধাপগুলো পূরণ করে <b>হিসাব</b> চাপুন। প্রতিটি ফলাফলে এর আইনি উৎস ও স্বচ্ছ সূত্র দেখানো হয়।",
+  "This calculator is a professional reference tool based on Dhaka Imarat Nirman Bidhimala 2025 (SRO 469-Law/2025) and DAP 2025 (SRO 468-Law/2025). Results are indicative only. Users must verify all calculations with RAJUK before official submission. Final approval depends on RAJUK's review of the specific application, flood-zone status, LUC conditions and the DAP map. Studio 16 Architects accepts no liability for any design, planning, approval, development or investment decision made solely on the basis of this calculator.":"এই ক্যালকুলেটরটি ঢাকা ইমারত নির্মাণ বিধিমালা ২০২৫ (SRO ৪৬৯-আইন/২০২৫) ও ড্যাপ ২০২৫ (SRO ৪৬৮-আইন/২০২৫) ভিত্তিক একটি পেশাদার রেফারেন্স টুল। ফলাফল কেবল নির্দেশক। আনুষ্ঠানিক জমার আগে ব্যবহারকারীকে সকল হিসাব রাজউকের সাথে যাচাই করতে হবে। চূড়ান্ত অনুমোদন নির্দিষ্ট আবেদন, বন্যা-অঞ্চল অবস্থা, LUC শর্ত ও ড্যাপ মানচিত্রের উপর রাজউকের পর্যালোচনার উপর নির্ভর করে। এই ক্যালকুলেটরের ভিত্তিতে নেওয়া কোনো ডিজাইন, পরিকল্পনা, অনুমোদন, উন্নয়ন বা বিনিয়োগ সিদ্ধান্তের জন্য স্টুডিও ১৬ আর্কিটেক্টস দায়ী নয়।",
+  "These are optional. Tick an item only if your project clearly meets its stated conditions — if you are unsure, leave it unchecked. (The plot-size and road-width bonuses are applied automatically regardless.)":"এগুলো ঐচ্ছিক। আপনার প্রকল্প স্পষ্টভাবে শর্ত পূরণ করলেই কেবল টিক দিন — নিশ্চিত না হলে টিক দেবেন না। (প্লট-সাইজ ও রাস্তা-প্রস্থ বোনাস স্বয়ংক্রিয়ভাবে প্রযোজ্য।)",
+  "Conditions: preliminary approval must be obtained from a nationally or internationally recognised institution, and the final certification must be submitted before the Occupancy Certificate is issued.":"শর্ত: জাতীয় বা আন্তর্জাতিকভাবে স্বীকৃত প্রতিষ্ঠান থেকে প্রাথমিক অনুমোদন নিতে হবে এবং অকুপেন্সি সার্টিফিকেট ইস্যুর আগে চূড়ান্ত সার্টিফিকেশন জমা দিতে হবে।",
+  "Public Open Space Surrender (≥10 katha)":"পাবলিক উন্মুক্ত স্থান হস্তান্তর (≥১০ কাঠা)",
+  "Conditions: 10% of the land must be surrendered for public use before submitting the plan-approval application; the surrendered space must connect with the existing road, and an easement deed is required. (Available for land ≥10 katha.)":"শর্ত: নকশা-অনুমোদনের আবেদনের আগে জমির ১০% জনসাধারণের ব্যবহারের জন্য ছেড়ে দিতে হবে; ছেড়ে দেওয়া স্থান বিদ্যমান রাস্তার সাথে যুক্ত থাকতে হবে এবং একটি ইজমেন্ট দলিল প্রয়োজন। (≥১০ কাঠা জমির জন্য প্রযোজ্য।)",
+  "Civic Amenity — School (new · Table 6.1)":"নাগরিক সুবিধা — স্কুল (নতুন · টেবিল ৬.১)",
+  "Civic Amenity — Park/Playground (new)":"নাগরিক সুবিধা — পার্ক/খেলার মাঠ (নতুন)",
+  "Tick a Civic Amenity only if your project genuinely provides a new school or park/playground in the approved plan; if you are unsure, leave it unchecked.":"অনুমোদিত নকশায় আপনার প্রকল্প প্রকৃতপক্ষে নতুন স্কুল বা পার্ক/খেলার মাঠ দিলে কেবল তখনই নাগরিক সুবিধায় টিক দিন; নিশ্চিত না হলে টিক দেবেন না।",
+  "Affordable Housing (A6) — DAP Table 3.28 Item 3":"সাশ্রয়ী আবাসন (A6) — ড্যাপ টেবিল ৩.২৮ আইটেম ৩",
+  "5+ A6 units (400–600 ft²) on ≥10 katha → +0.50":"≥১০ কাঠায় ৫+ A6 ইউনিট (৪০০–৬০০ বর্গফুট) → +০.৫০",
+  "5% of total floor as A6 on ≥20 katha → +0.75":"≥২০ কাঠায় মোট মেঝের ৫% A6 → +০.৭৫",
+  "Incentives apply to Category A (residential) only · DAP 2025 Table 3.28.":"প্রণোদনা শুধু শ্রেণি A (আবাসিক) ভবনে প্রযোজ্য · ড্যাপ ২০২৫ টেবিল ৩.২৮।"
+};
+const t=s=>(lang==='bn'&&DICT[s]!==undefined)?DICT[s]:s;
+
+/* Report HTML post-translation (ordered: longest / most specific first). */
+const REPORT_MAP=[
+  ["RAJUK Land Use Clearance — A3 (official format)","রাজউক ভূমি ব্যবহার ছাড়পত্র — A3 (অফিসিয়াল ফরম্যাট)"],
+  ["RAJUK FAR Calculator · Bidhimala &amp; DAP 2025","রাজউক ফার ক্যালকুলেটর · বিধিমালা ও ড্যাপ ২০২৫"],
+  ["within RAJUK Jurisdiction area","রাজউক অধিক্ষেত্রের মধ্যে"],
+  ["⬇ Download / Print","⬇ ডাউনলোড / প্রিন্ট"],
+  /* headline */
+  [">Base FAR<",">ভিত্তি ফার<"],[">Maximum FAR<",">সর্বোচ্চ ফার<"],[">Approved FAR<",">অনুমোদিত ফার<"],
+  [">FAR (road-based)<",">ফার (রাস্তাভিত্তিক)<"],[">Total Floor Area<",">মোট মেঝের ক্ষেত্রফল<"],
+  [">unconditional<",">শর্তহীন<"],[">minimum<",">সর্বনিম্ন<"],[">with conditions<",">শর্তসাপেক্ষে<"],
+  [">+ incentives<",">+ প্রণোদনা<"],[">capped at maximum<",">সর্বোচ্চে সীমাবদ্ধ<"],
+  [">road-based<",">রাস্তাভিত্তিক<"],[">parking-based<",">পার্কিংভিত্তিক<"],
+  /* section titles */
+  [">Planning Information<",">পরিকল্পনা তথ্য<"],
+  [">FAR Analysis<",">ফার বিশ্লেষণ<"],
+  [">Ground Coverage &amp; Open Space<",">গ্রাউন্ড কভারেজ ও উন্মুক্ত স্থান<"],
+  [">Setbacks<",">সেটব্যাক<"],
+  [">Unit Analysis · RAJUK density method<",">ইউনিট বিশ্লেষণ · রাজউক ঘনত্ব পদ্ধতি<"],
+  [">Floor Analysis · three coverage scenarios<",">তলা বিশ্লেষণ · তিনটি কভারেজ পরিস্থিতি<"],
+  [">Site Overview<",">সাইট ওভারভিউ<"],
+  [">Sectional Overview<",">সেকশনাল ওভারভিউ<"],
+  [">Relevant Density Block Details<",">প্রাসঙ্গিক ঘনত্ব ব্লকের বিবরণ<"],
+  /* planning rows */
+  ["<td>Land area / size</td>","<td>জমির পরিমাণ / আয়তন</td>"],
+  ["<td>Access road width</td>","<td>সংযোগ রাস্তার প্রস্থ</td>"],
+  ["<td>Proposed road width</td>","<td>প্রস্তাবিত রাস্তার প্রস্থ</td>"],
+  ["<td>Building / use category</td>","<td>ভবন / ব্যবহারের শ্রেণি</td>"],
+  ["<td>Development type</td>","<td>উন্নয়নের ধরন</td>"],
+  ["<td>Planning Zone</td>","<td>পরিকল্পনা অঞ্চল</td>"],
+  ["<td>Density block</td>","<td>ঘনত্ব ব্লক</td>"],
+  ["<td>DU / katha</td>","<td>ইউনিট / কাঠা</td>"],
+  ["<td>Average unit size</td>","<td>গড় ইউনিট আকার</td>"],
+  ["Single Building","একক ভবন"],["Block-Based Development","ব্লকভিত্তিক উন্নয়ন"],
+  /* FAR rows */
+  ["<td>Updated Area FAR</td>","<td>হালনাগাদ এলাকা ফার</td>"],
+  ["<td>Updated Road FAR</td>","<td>হালনাগাদ রাস্তা ফার</td>"],
+  ["<td>Approved Road FAR · average</td>","<td>অনুমোদিত রাস্তা ফার · গড়</td>"],
+  ["<td>Area FAR</td>","<td>এলাকা ফার</td>"],
+  ["<td>Base FAR · MIN</td>","<td>ভিত্তি ফার · MIN</td>"],
+  ["<td>Maximum FAR · MAX</td>","<td>সর্বোচ্চ ফার · MAX</td>"],
+  ["<td>Total incentive FAR</td>","<td>মোট প্রণোদনা ফার</td>"],
+  ["<td>Approved FAR</td>","<td>অনুমোদিত ফার</td>"],
+  ["<td>Special-case ceiling (TOD/LR)</td>","<td>বিশেষ ক্ষেত্রে সর্বোচ্চ সীমা (TOD/LR)</td>"],
+  ["Road FAR","রাস্তা ফার"],
+  /* ground rows */
+  ["<td>Minimum ground coverage</td>","<td>সর্বনিম্ন গ্রাউন্ড কভারেজ</td>"],
+  ["<td>Maximum ground coverage</td>","<td>সর্বোচ্চ গ্রাউন্ড কভারেজ</td>"],
+  ["<td>Mandatory open space</td>","<td>বাধ্যতামূলক উন্মুক্ত স্থান</td>"],
+  ["↳ Paveable open space (max)","↳ পাকা করার যোগ্য উন্মুক্ত স্থান (সর্বোচ্চ)"],
+  ["↳ For rainwater absorption (min)","↳ বৃষ্টির পানি শোষণের জন্য (সর্বনিম্ন)"],
+  ["<td>Basement (MGC + paveable)</td>","<td>বেজমেন্ট (MGC + পাকা)</td>"],
+  /* setbacks */
+  ["<td>Front setback</td>","<td>সামনের সেটব্যাক</td>"],
+  ["<td>Rear setback</td>","<td>পেছনের সেটব্যাক</td>"],
+  ["<td>Side setback (each)</td>","<td>পাশের সেটব্যাক (প্রতিটি)</td>"],
+  ["<td>Building-to-building</td>","<td>ভবন-থেকে-ভবন</td>"],
+  /* unit fc */
+  [">Permitted units<",">অনুমোদিত ইউনিট<"],
+  [">Maximum (+10% A3)<",">সর্বোচ্চ (+১০% A3)<"],
+  [">FAR-based (ref.)<",">ফারভিত্তিক (রেফ.)<"],
+  [">density × katha<",">ঘনত্ব × কাঠা<"],
+  [">apartment bonus<",">অ্যাপার্টমেন্ট বোনাস<"],[">no bonus<",">বোনাস নেই<"],
+  [">floor area ÷ avg unit<",">মেঝে ক্ষেত্রফল ÷ গড় ইউনিট<"],
+  /* floor calc */
+  ["Floor area calculation","মেঝে ক্ষেত্রফল হিসাব"],
+  ["Construction area calculation","নির্মাণ ক্ষেত্রফল হিসাব"],
+  ["Total floor area (FAR included)","মোট মেঝে ক্ষেত্রফল (ফার সহ)"],
+  ["Total Floor area incl. road benefit","রাস্তা বেনিফিটসহ মোট মেঝে ক্ষেত্রফল"],
+  ["<td>Ground floor (full plot)</td>","<td>গ্রাউন্ড ফ্লোর (সম্পূর্ণ প্লট)</td>"],
+  ["<td>Basement area</td>","<td>বেজমেন্ট ক্ষেত্রফল</td>"],
+  ["<td>Rooftop area</td>","<td>ছাদের ক্ষেত্রফল</td>"],
+  ["<td>Number of floors</td>","<td>তলার সংখ্যা</td>"],
+  ["<td>Estimated building</td>","<td>আনুমানিক ভবন</td>"],
+  ["Total construction area","মোট নির্মাণ ক্ষেত্রফল"],
+  ["Total build area (FAR + bonus)","মোট নির্মাণ ক্ষেত্রফল (ফার + বোনাস)"],
+  /* density block */
+  ["<td>Block</td>","<td>ব্লক</td>"],
+  ["<td>Areas covered</td>","<td>অন্তর্ভুক্ত এলাকা</td>"],
+  ["<td>Block type</td>","<td>ব্লকের ধরন</td>"],
+  ["<td>Base Area FAR</td>","<td>ভিত্তি এলাকা ফার</td>"],
+  ["<td>Dwelling units / katha</td>","<td>বাসস্থান ইউনিট / কাঠা</td>"],
+  ["<td>Average dwelling-unit size</td>","<td>গড় বাসস্থান-ইউনিট আকার</td>"],
+  ["<td>Population density</td>","<td>জনসংখ্যা ঘনত্ব</td>"],
+  [">Planned<",">পরিকল্পিত<"],[">Unplanned / Spontaneous<",">অপরিকল্পিত / স্বতঃস্ফূর্ত<"],
+  ["persons / acre","জন / একর"],
+  /* SVG labels */
+  [">Ground<",">গ্রাউন্ড<"],[">ground level<",">গ্রাউন্ড লেভেল<"],
+  ["Total construction area","মোট নির্মাণ ক্ষেত্রফল"],
+  ["Roof slab · ","ছাদ স্ল্যাব · "],["Basement ","বেজমেন্ট "],
+  ["FAR floor area","ফার মেঝে ক্ষেত্রফল"],["Verandah + green bonus","বারান্দা + সবুজ বোনাস"],
+  ["Parking · FAR-excluded","পার্কিং · ফার-বহির্ভূত"],
+  ["FAR-excluded area (parking, basement &amp; rooftop)","ফার-বহির্ভূত এলাকা (পার্কিং, বেজমেন্ট ও ছাদ)"],
+  ["Allowable FAR ","অনুমোদিত ফার "],["Total build ","মোট নির্মাণ "],
+  ["Floor plate ","ফ্লোর প্লেট "],["Land ","জমি "],["ROAD · ","রাস্তা · "],
+  /* audit summary */
+  ["Audit trail — formulas &amp; sources","অডিট ট্রেইল — সূত্র ও উৎস"],["steps)","ধাপ)"]
+];
+function translateReport(h){ for(var i=0;i<REPORT_MAP.length;i++){ h=h.split(REPORT_MAP[i][0]).join(REPORT_MAP[i][1]); } return h; }
+
+function localizeStatic(){
+  var i,els;
+  els=document.querySelectorAll('[data-i18n]'); for(i=0;i<els.length;i++){els[i].textContent=t(els[i].getAttribute('data-i18n'));}
+  els=document.querySelectorAll('[data-i18n-html]'); for(i=0;i<els.length;i++){els[i].innerHTML=t(els[i].getAttribute('data-i18n-html'));}
+  els=document.querySelectorAll('[data-i18n-ph]'); for(i=0;i<els.length;i++){els[i].setAttribute('placeholder',t(els[i].getAttribute('data-i18n-ph')));}
+}
+function updateLangBtn(){var b=document.getElementById('langBtn');if(b)b.textContent=(lang==='bn'?'EN':'বাংলা');}
+function setLang(l){
+  lang=l; try{localStorage.setItem('s16_lang',l);}catch(e){}
+  document.documentElement.lang=(l==='bn'?'bn':'en');
+  document.body.classList.toggle('lang-bn',l==='bn');
+  localizeStatic();
+  if(typeof rebuildIncentives==='function')rebuildIncentives();
+  if(typeof occChange==='function'){occChange();zoneHint();roadHint();modeHint();}
+  if(typeof totLand==='function')totLand();
+  updateLangBtn();
+  if(lastResult)renderReport(lastResult);
+}
+function toggleLang(){setLang(lang==='bn'?'en':'bn');}
+window.toggleLang=toggleLang;
+
+const toSqft={katha:U.kathaToSqft, decimal:435.6, acre:43560, sqft:1, sqm:1/U.sqftToSqm};
+const fmt=(n,d=2)=>Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmt0=n=>Math.round(n).toLocaleString('en-US');
+/* Bengali numerals — for the official RAJUK LUC (Land Use Clearance) table */
+const BN_DIGITS=['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+const bn=s=>String(s).replace(/[0-9]/g,d=>BN_DIGITS[+d]);
+/* number → fixed decimals → Bengali digits (keeps a trailing .0 etc) */
+const bnNum=(n,d=2)=>bn(Number(n||0).toFixed(d));
+/* integer with thousands grouping → Bengali digits */
+const bnInt=n=>bn(Math.round(n||0).toString());
+let state={mode:"single", roadUnit:"ft"};
+let audit=[];
+
+let selectedBlockId=null;
+function buildUI(){
+  const occ=$("#occ");
+  R.occupancyGroups.forEach(g=>{ const og=document.createElement('optgroup'); og.label=g.group;
+    g.items.forEach(it=>og.appendChild(new Option(it.label,it.id))); occ.appendChild(og); });
+  occ.value="A3";
+  const loc=$("#loc"); R.locations.forEach(l=>loc.add(new Option(l.label,l.id)));
+  occ.addEventListener('change',occChange);
+  if($("#loc"))$("#loc").addEventListener('change',updateNRUI);
+  if($("#incNR"))$("#incNR").addEventListener('change',updateNRUI);
+  if($("#incBasement"))$("#incBasement").addEventListener('change',function(){var w=$("#basementWrap");if(w)w.style.display=$("#incBasement").checked?"block":"none";});
+  if($("#incFront"))$("#incFront").addEventListener('change',function(){var w=$("#frontWrap");if(w)w.style.display=$("#incFront").checked?"block":"none";});
+
+  const inc=$("#incentives");
+  inc.innerHTML=
+    `<div class="hint" id="incIntro" style="margin:0 0 9px;line-height:1.45" data-i18n="These are optional. Tick an item only if your project clearly meets its stated conditions — if you are unsure, leave it unchecked. (The plot-size and road-width bonuses are applied automatically regardless.)">These are optional. Tick an item only if your project clearly meets its stated conditions — if you are unsure, leave it unchecked. (The plot-size and road-width bonuses are applied automatically regardless.)</div>
+     <label class="inc" id="lblGreen"><input type="checkbox" id="incGreen"><span data-i18n="Green Building Certification">Green Building Certification</span><span class="iv">+0.50 FAR</span></label>
+     <div class="hint" id="greenNote" style="margin:-2px 0 9px;font-size:11px;line-height:1.45" data-i18n="Conditions: preliminary approval must be obtained from a nationally or internationally recognised institution, and the final certification must be submitted before the Occupancy Certificate is issued.">Conditions: preliminary approval must be obtained from a nationally or internationally recognised institution, and the final certification must be submitted before the Occupancy Certificate is issued.</div>
+     <label class="inc" id="lblPub"><input type="checkbox" id="incPub"><span data-i18n="Public Open Space Surrender (≥10 katha)">Public Open Space Surrender (≥10 katha)</span><span class="iv">+0.50 FAR</span></label>
+     <div class="hint" id="pubNote" style="margin:-2px 0 9px;font-size:11px;line-height:1.45" data-i18n="Conditions: 10% of the land must be surrendered for public use before submitting the plan-approval application; the surrendered space must connect with the existing road, and an easement deed is required. (Available for land ≥10 katha.)">Conditions: 10% of the land must be surrendered for public use before submitting the plan-approval application; the surrendered space must connect with the existing road, and an easement deed is required. (Available for land ≥10 katha.)</div>
+     <label class="inc" id="lblSchool"><input type="checkbox" id="incSchool"><span data-i18n="Civic Amenity — School (new · Table 6.1)">Civic Amenity — School (new · Table 6.1)</span><span class="iv">+0.25 FAR</span></label>
+     <label class="inc" id="lblPark"><input type="checkbox" id="incPark"><span data-i18n="Civic Amenity — Park/Playground (new)">Civic Amenity — Park/Playground (new)</span><span class="iv">+0.25 FAR</span></label>
+     <div class="hint" id="civicNote" style="margin:-2px 0 9px;font-size:11px;line-height:1.45" data-i18n="Tick a Civic Amenity only if your project genuinely provides a new school or park/playground in the approved plan; if you are unsure, leave it unchecked.">Tick a Civic Amenity only if your project genuinely provides a new school or park/playground in the approved plan; if you are unsure, leave it unchecked.</div>
+     <div id="a6wrap" style="display:none">
+       <label class="fld" style="margin:10px 0 4px" data-i18n="Affordable Housing (A6) — DAP Table 3.28 Item 3">Affordable Housing (A6) — DAP Table 3.28 Item 3</label>
+       <select id="incA6">
+         <option value="" data-i18n="Not applicable">Not applicable</option>
+         <option value="units" data-i18n="5+ A6 units (400–600 ft²) on ≥10 katha → +0.50">5+ A6 units (400–600 ft²) on ≥10 katha → +0.50</option>
+         <option value="5pct" data-i18n="5% of total floor as A6 on ≥20 katha → +0.75">5% of total floor as A6 on ≥20 katha → +0.75</option>
+       </select>
+     </div>
+     <div id="incDisabled" class="hint" style="display:none;margin-top:6px" data-i18n="Incentives apply to Category A (residential) only · DAP 2025 Table 3.28.">Incentives apply to Category A (residential) only · DAP 2025 Table 3.28.</div>`;
+  const _scb=$("#shareCalc"); if(_scb)_scb.innerHTML=`<span class="sharebar-h">Share the calculator</span><a class="shm shm-icon" href="${SHARE_LINKS.wa}" target="_blank" rel="noopener" aria-label="Share on WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.149-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg></a><a class="shm shm-icon" href="${SHARE_LINKS.fb}" target="_blank" rel="noopener" aria-label="Share on Facebook" title="Facebook"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a><a class="shm shm-icon" href="${SHARE_LINKS.x}" target="_blank" rel="noopener" aria-label="Share on X" title="X"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a class="shm shm-icon" href="${SHARE_LINKS.li}" target="_blank" rel="noopener" aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>`;
+
+  // density-block combobox
+  const bi=$("#blockInput");
+  bi.addEventListener('focus',()=>renderBlockList(comboQuery()));
+  bi.addEventListener('input',()=>{selectedBlockId=null;zoneHint();renderBlockList(bi.value);});
+  document.addEventListener('click',e=>{ if(!e.target.closest('.combo')){const l=$("#blockList");if(l)l.style.display='none';} });
+
+  addPlotRow();
+  $("#addPlot").addEventListener('click',()=>addPlotRow());
+  $$("#roadUnit button").forEach(b=>b.addEventListener('click',()=>{$$("#roadUnit button").forEach(x=>x.classList.remove('on'));b.classList.add('on');state.roadUnit=b.dataset.u;roadHint();}));
+  $("#roadVal").addEventListener('input',roadHint);
+  $$("#modeSeg button").forEach(b=>b.addEventListener('click',()=>{ if(b.disabled)return; $$("#modeSeg button").forEach(x=>x.classList.remove('on'));b.classList.add('on');state.mode=b.dataset.mode;modeHint();}));
+  $("#calcBtn").addEventListener('click',calculate);
+  $("#themeBtn").addEventListener('click',toggleTheme);
+  occChange(); zoneHint(); roadHint(); modeHint();
+  if(typeof setLang==='function')setLang(lang);
+}
+function comboQuery(){ const v=$("#blockInput").value; return v.includes('·')?'':v; }
+function blockOptions(q){ q=(q||'').toLowerCase().trim();
+  return R.densityBlocks.filter(b=>b.areaFAR>0 && (!q ||
+    b.name.toLowerCase().includes(q)||(b.areas||'').toLowerCase().includes(q)||b.id.toLowerCase().includes(q))); }
+function renderBlockList(q){
+  const list=$("#blockList"); const opts=blockOptions(q).slice(0,60);
+  list.innerHTML = opts.length ? opts.map(b=>`<div class="combo-item" data-id="${b.id}"><span><b>${b.id}</b> · ${b.name}</span><span class="ci-meta">${t(b.type==='P'?'Planned':'Unplanned')} · FAR ${fmt(b.areaFAR)}</span></div>`).join('')
+    : `<div class="combo-empty">No matching density block</div>`;
+  list.querySelectorAll('.combo-item').forEach(el=>el.addEventListener('mousedown',e=>{e.preventDefault();selectBlock(el.dataset.id);}));
+  list.style.display='block';
+}
+function selectBlock(id){ const b=blockById(id); if(!b)return; selectedBlockId=id;
+  $("#blockInput").value=`${b.id} · ${b.name}`; const l=$("#blockList"); if(l)l.style.display='none'; zoneHint(); occChange(); }
+function currentOcc(){return ALL_OCC.find(o=>o.id===$("#occ").value)||ALL_OCC[0];}
+function currentBlock(){return blockById(selectedBlockId);}
+function occChange(){
+  const occ=$("#occ").value, isRes=RES.has(occ);
+  const blockBtn=document.querySelector('#modeSeg button[data-mode="block"]');
+  if(blockBtn){
+    if(!isRes){ blockBtn.disabled=true; blockBtn.title="Block-Based Development applies to Category A (residential) only";
+      if(state.mode==='block'){ state.mode='single';
+        $$('#modeSeg button').forEach(x=>x.classList.toggle('on',x.dataset.mode==='single')); } }
+    else { blockBtn.disabled=false; blockBtn.title=""; }
+  }
+  const b=currentBlock(), g=$("#lblGreen"), p=$("#lblPub"), a6=$("#a6wrap");
+  if(g)g.style.display=isRes?'flex':'none';
+  const gn=$("#greenNote"), cn=$("#civicNote"), intro=$("#incIntro");
+  if(gn)gn.style.display=isRes?'block':'none';
+  if(cn)cn.style.display=isRes?'block':'none';
+  if(intro)intro.style.display=isRes?'block':'none';
+  const sc=$("#lblSchool"), pk=$("#lblPark"), dn=$("#incDisabled");
+  if(sc)sc.style.display=isRes?'flex':'none';
+  if(pk)pk.style.display=isRes?'flex':'none';
+  if(dn)dn.style.display=isRes?'none':'block';
+  if(!isRes){ ['#incGreen','#incPub','#incSchool','#incPark'].forEach(id=>{ if($(id))$(id).checked=false; }); }
+  const showA6 = isRes && (occ==='A6' || (b && b.type==='S'));
+  if(a6){ a6.style.display=showA6?'block':'none'; if(!showA6&&$("#incA6"))$("#incA6").value=''; }
+  incAvail();
+  updateNRUI();
+  modeHint();
+}
+function updateNRUI(){
+  const occEl=$("#occ"), locEl=$("#loc"); if(!occEl||!locEl) return;
+  const occ=occEl.value, loc=locEl.value;
+  const nropt=$("#nropt"); if(!nropt) return;
+  const roadM=(typeof roadFt==="function"?roadFt():0)*U.ftToM;
+  const elig=!!(occ&&loc&&roadFARisNR(loc,occ,roadM));
+  if(elig){
+    nropt.style.display="block";
+    const num=getRoadFAR(loc,occ,roadM,0);
+    const note=$("#nrnote"); if(note) note.innerHTML=`This is a <b>non-restricted (NR)</b> field — the figure used is the reference FAR <b>${fmt(num)}</b>. If you prefer, tick the option below to size the building from parking (200 m² per space) instead.`;
+  } else {
+    nropt.style.display="none";
+    if($("#incNR"))$("#incNR").checked=false;
+  }
+  const wrap=$("#nrwrap"); if(wrap) wrap.style.display=(elig&&$("#incNR")&&$("#incNR").checked)?"block":"none";
+}
+function incAvail(){
+  const occEl=$("#occ"); if(!occEl) return;
+  const isRes=RES.has(occEl.value);
+  const katha=totalLandSqft()/U.kathaToSqft;
+  const show = isRes && katha>=10;
+  const pub=$("#lblPub"), note=$("#pubNote");
+  if(pub) pub.style.display=show?'flex':'none';
+  if(note) note.style.display=show?'block':'none';
+  if(!show && $("#incPub")) $("#incPub").checked=false;
+}
+function modeHint(){
+  const h=$("#modeHint");
+  if(state.mode==="block"){ h.innerHTML=t("Block-Based Development · eligibility & bonuses per ")+`<span class="mono">DAP Table 3.31</span>.`; }
+  else h.textContent=t("Standard single-plot development.");
+}
+function zoneHint(){
+  const b=currentBlock(); if(!b){$("#zoneHint").textContent="";return;}
+  $("#zoneHint").innerHTML=`${t("Area FAR")} <b>${fmt(b.areaFAR)}</b> · ${fmt(b.katha,1)} ${t("DU/katha")} · ${t("avg unit")} ${fmt0(b.avgDU)} ft² · ${t("type")} ${b.type}`;
+}
+function addPlotRow(){
+  const n=$("#plots").children.length+1;
+  const div=document.createElement('div'); div.className='plot';
+  div.innerHTML=`<span class="pn">${String.fromCharCode(64+n)}</span>
+    <input type="number" min="0" step="0.01" placeholder="${t('area')}" value="${n===1?5:''}" class="pv">
+    <select class="pu"><option value="katha" data-i18n="Katha">Katha</option><option value="decimal" data-i18n="Decimal">Decimal</option><option value="acre" data-i18n="Acre">Acre</option><option value="sqft" data-i18n="ft²">ft²</option><option value="sqm" data-i18n="m²">m²</option></select>
+    <button class="rm" title="remove">×</button>`;
+  div.querySelector('.pv').addEventListener('input',totLand);
+  div.querySelector('.pu').addEventListener('change',totLand);
+  div.querySelector('.rm').addEventListener('click',()=>{div.remove();relabel();totLand();});
+  $("#plots").appendChild(div); relabel(); totLand(); if(typeof localizeStatic==='function')localizeStatic();
+}
+function relabel(){$$("#plots .plot .pn").forEach((e,i)=>e.textContent=String.fromCharCode(65+i));}
+function plotCount(){return $$("#plots .plot").length;}
+function totalLandSqft(){let s=0;$$("#plots .plot").forEach(p=>{const v=parseFloat(p.querySelector('.pv').value)||0;s+=v*toSqft[p.querySelector('.pu').value];});return s;}
+function totLand(){const sf=totalLandSqft();$("#totLand").textContent=`${fmt(sf/U.kathaToSqft)} ${t("katha")} · ${fmt0(sf)} ${t("ft²")}`; if(typeof incAvail==="function")incAvail();}
+function roadFt(){const v=parseFloat($("#roadVal").value)||0;return state.roadUnit==='m'?v/U.ftToM:v;}
+function roadHint(){const ft=roadFt();$("#roadHint").innerHTML=`${fmt(ft,1)} ft · ${fmt(ft*U.ftToM,2)} m`; if(typeof updateNRUI==="function")updateNRUI();}
+
+function calculate(){
+  const err=$("#errbox"); err.style.display='none';
+  const sqft=totalLandSqft(); const ft=roadFt();
+  const problems=[];
+  if(sqft<=0)problems.push(t("Enter a valid land area."));
+  if(ft<=0)problems.push(t("Enter a valid road width."));
+  if(((($("#occ").value||"").charAt(0))==="A") && !selectedBlockId)problems.push(t("Select a density block."));
+  if(problems.length){err.innerHTML=problems.join('<br>');err.style.display='block';return;}
+  const a6vis = $("#a6wrap") && $("#a6wrap").style.display!=='none';
+  const I={occType:$("#occ").value, location:$("#loc").value, blockId:selectedBlockId,
+    sqft, roadFt:ft, frontageFt:($("#incFront")&&$("#incFront").checked?parseFloat($("#frontageFt").value)||0:0), multiPlot:plotCount()>1,
+    hasA6:a6vis?$("#incA6").value:"",
+    hasGreen:$("#incGreen").checked, hasPub:$("#incPub").checked,
+    hasSchool:!!($("#incSchool")&&$("#incSchool").checked), hasPark:!!($("#incPark")&&$("#incPark").checked),
+    parking:($("#nrParking")?parseFloat($("#nrParking").value)||0:0), nrMode:!!($("#incNR")&&$("#incNR").checked), basement:!!($("#incBasement")&&$("#incBasement").checked), basementCount:($("#basementCount")?Math.max(0,parseInt($("#basementCount").value)||0):0)};
+  const res = state.mode==="block"?computeBlock(I):computeSingle(I);
+  if(res.error){err.innerHTML=t(res.error);err.style.display='block';return;}
+  lastResult=res; buildAudit(res); renderReport(res);
+}
+
+function buildAudit(r){
+  audit=[];
+  const A=audit;
+  if(r.mode==="single"){
+    A.push(`Area FAR (block ${r.block.id}) = <span class="num">${fmt(r.areaFAR)}</span> [DAP Table 3.6]`);
+    A.push(`Road FAR @ ${fmt(r.roadFt,1)}ft = <span class="num">${fmt(r.roadFAR)}</span> [${R.roadFARRef}]`);
+    A.push(`Base = MIN(${fmt(r.areaFAR)},${fmt(r.roadFAR)}) = <span class="num">${fmt(r.baseFAR)}</span> · Max = MAX = <span class="num">${fmt(r.maxFAR)}</span> [§47(3)]`);
+    r.incentives.forEach(i=>A.push(`Incentive “${i.label}” → +${fmt(i.val)} [${i.ref}]`));
+    A.push(`Approved = MIN(Base ${fmt(r.baseFAR)} + Inc ${fmt(r.totalInc)}, Max ${fmt(r.maxFAR)}) = <span class="num">${fmt(r.approvedFAR)}</span>`);
+    A.push(`Floor Area = ${fmt(r.approvedFAR)} × ${fmt0(r.sqft)} ft² = <span class="num">${fmt0(r.floorAreaApproved)}</span> ft² [§2(81)]`);
+    A.push(`MGC: ${r.mgc.minMGC?fmt(r.mgc.minMGC,1)+'–':''}${fmt(r.mgc.maxMGC,1)}% · open ${fmt(r.mgc.minOpen,1)}% [${r.mgc.ref}]`);
+    A.push(`Floors: (${fmt0(r.floorAreaApproved)} FAR − ${fmt0(r.liftLobby)} lift lobby) ÷ ${fmt0(r.minGroundA)} (45% min cover) = G+${r.farFloorsApproved} · ${r.totalStoreysApproved} storeys · ${fmt0(r.platePrimary)} ft²/floor (kept within 45–60% cover)`);
+    A.push(`Build area = ${fmt0(r.floorAreaApproved)} FAR + ${fmt0(r.bonusArea)} bonus (7.5%/floor verandah + green, FAR-excluded) = ${fmt0(r.totalBuildArea)} ft²`);
+    if(r.units)A.push(`Units = ⌈${fmt(r.katha)} katha × ${fmt(r.units.duKatha,2)} DU/katha⌉ = <span class="num">${r.units.base}</span>${r.occType==="A3"?` (+10% A3 → ${r.units.max})`:''} [DAP App.3.6]`);
+    A.push(`Setbacks @ ${r.totalStoreysApproved} storeys: side ${fmt(r.setbacks.side)} · rear ${fmt(r.setbacks.rear)} · between ${fmt(r.setbacks.between)} m [${r.setbacks.ref}]`);
+  } else {
+    A.push(`Block ${r.block.id} · ${fmt(r.katha)} katha (${fmt(r.acres,3)} ac) → ${r.row.label} [${R.block3_31.ref}]`);
+    A.push(`Density +${(r.row.densityPct*100)}% → DU/katha ${fmt(r.rawDUkatha,2)} → <span class="num">${fmt(r.newDUkatha,3)}</span>`);
+    A.push(`Area FAR: ${fmt(r.rawAreaFAR)} → step1 ${fmt(r.step1AreaFAR,3)} → +${(r.row.areaFARPct*100)}% → <span class="num">${fmt(r.finalAreaFAR,3)}</span>`);
+    A.push(`Plot-FAR bonus +${fmt(r.row.plotFARBonus)} → Road FAR ${fmt(r.oldRoadFAR)} → <span class="num">${fmt(r.newRoadFAR,3)}</span>`);
+    A.push(`Base = MIN = <span class="num">${fmt(r.baseFAR)}</span> · Max = MAX = <span class="num">${fmt(r.maxFAR)}</span>`);
+    r.incentives.forEach(i=>A.push(`Incentive “${i.label}” → +${fmt(i.val)} [${i.ref}]`));
+    A.push(`Approved = <span class="num">${fmt(r.approvedFAR)}</span> · Net buildable (60%) = ${fmt0(r.netBuildSqFt)} ft²`);
+    A.push(`Floor Area = ${fmt(r.approvedFAR)} × ${fmt0(r.sqft)} ft² (total land) = <span class="num">${fmt0(r.tfa)}</span> ft² [§2(81)]`);
+    A.push(`Units = ⌈${fmt(r.katha)} × ${fmt(r.newDUkatha,3)}⌉ = <span class="num">${r.units}</span>${r.occType==="A3"?` (+10% → ${r.unitsA3})`:''}`);
+  }
+}
+
+function badge(t){return `<span class="badge" title="Source: ${t}">${t}</span>`;}
+const SHARE_URL="";
+const SHARE_TXT="RAJUK FAR Calculator 2025 — free DAP 2025 / Bidhimala 2025 FAR & coverage calculator by Studio 16 Architects";
+const STANDALONE_URL="";  /* optional: set to a hosted URL to enable mobile print */
+const SHARE_LINKS={wa:"",fb:"",x:"",li:""};
+function toggleShareMenu(force){var m=document.getElementById("shareMenu");if(!m)return;m.style.display=(force===true)?"flex":(m.style.display==="flex"?"none":"flex");}
+function doShare(){try{if(navigator.share){navigator.share({title:"RAJUK FAR Calculator 2025",text:SHARE_TXT,url:SHARE_URL}).catch(function(){toggleShareMenu(true);});return;}}catch(e){}toggleShareMenu();}
+function copyShareLink(ev){try{navigator.clipboard.writeText(SHARE_URL);}catch(e){}var b=ev&&(ev.currentTarget||ev.target);if(b){var t=b.textContent;b.textContent="Copied!";setTimeout(function(){b.textContent=t;},1400);}}
+function inIframe(){try{return window.self!==window.top;}catch(e){return true;}}
+function doPrint(){var rep=document.getElementById("report");var w=null;var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent||"")||(navigator.platform==="MacIntel"&&(navigator.maxTouchPoints||0)>1);try{if(rep){var css=Array.prototype.map.call(document.querySelectorAll("style"),function(s){return s.textContent;}).join(String.fromCharCode(10));var foot=document.querySelector(".print-foot");var footHTML=foot?foot.outerHTML:"";var banner=isIOS?'<div class="printbanner" style="position:sticky;top:0;z-index:9;background:#1A1916;color:#F4F2EB;padding:11px 14px;font:600 13px -apple-system,Helvetica,Arial,sans-serif;text-align:center">To save as PDF: tap the Share button, then <b>Print</b>.</div>':"";var auto=isIOS?"":'<scr'+'ipt>setTimeout(function(){try{window.focus();window.print();}catch(e){}},450);</scr'+'ipt>';w=window.open("","_blank");if(w){w.document.open();w.document.write('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RAJUK FAR Calculator · Bidhimala &amp; DAP 2025</title><style>'+css+'</style><style>@media print{.printbanner{display:none!important}}</style></head><body>'+banner+'<div class="wrap"><div class="report" id="report">'+rep.innerHTML+'</div>'+footHTML+'</div>'+auto+'</body></html>');w.document.close();return;}}}catch(e){}try{if(!inIframe())window.print();}catch(e){}if(!w&&inIframe())printHint();}
+function reportSummaryText(r,ref,tfa){
+  var occLabel=(ALL_OCC.find(o=>o.id===r.occType)||{}).label||r.occType;
+  var units=r.isRes?("Units: "+(r.mode==="single"?(r.units?r.units.max:'-'):r.unitsA3)+"\n"):"";
+  var floors=(r.mode==="block"?r.farFloors:r.farFloorsApproved);
+  var storeys=(r.mode==="block"?r.totStoreys:r.totalStoreysApproved);
+  return "STUDIO 16 ARCHITECTS — FAR Report "+ref+"\n"+"Occupancy: "+occLabel+" ("+r.mode+")\n"+"Location: "+r.block.name+" ("+r.block.id+")\n"+"Land: "+fmt(r.katha)+" katha | Road: "+fmt(r.roadFt,1)+" ft\n"+"Base "+fmt(r.baseFAR)+" | Max "+fmt(r.maxFAR)+" | Incentive +"+fmt(r.totalInc)+" | APPROVED "+fmt(r.approvedFAR)+"\n"+"Floor Area: "+fmt0(tfa)+" ft²\n"+units+"Building: G+"+floors+" ("+storeys+" storied)\n"+"Calculator: "+SHARE_URL+"\n"+"— Indicative only. Verify with RAJUK. Basis: SRO 469/2025 & SRO 468/2025.";
+}
+function revealReportShare(txt){var box=document.getElementById("reportShareBox");if(!box)return;var wa="https://wa.me/?text="+encodeURIComponent(txt);box.innerHTML='<textarea readonly style="width:100%;height:132px;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;padding:8px;border:1px solid var(--line);border-radius:5px;background:var(--card);color:var(--ink);resize:vertical">'+txt.replace(/&/g,"&amp;").replace(/</g,"&lt;")+'</textarea><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:7px"><a class="shm" href="'+wa+'" target="_blank" rel="noopener">Send on WhatsApp</a><button class="shm" type="button" onclick="copyReportText(this)">Copy text</button></div>';box.style.display="block";var ta=box.querySelector("textarea");if(ta){try{ta.focus();ta.select();}catch(e){}}}
+function copyReportText(btn){var box=document.getElementById("reportShareBox");var ta=box&&box.querySelector("textarea");try{if(ta){ta.focus();ta.select();}var ok=false;try{ok=document.execCommand("copy");}catch(e){}if(!ok&&navigator.clipboard&&ta){navigator.clipboard.writeText(ta.value).catch(function(){});}}catch(e){}if(btn){var o=btn.textContent;btn.textContent="Copied";setTimeout(function(){btn.textContent=o;},1400);}}
+function shareReport(r,ref,tfa){var txt=reportSummaryText(r,ref,tfa);try{if(navigator.share){navigator.share({title:"RAJUK FAR result — Studio 16 Architects",text:txt}).catch(function(){revealReportShare(txt);});return;}}catch(e){}revealReportShare(txt);}
+function printHint(){var box=document.getElementById("reportShareBox");if(!box)return;box.innerHTML='<div class="hint" style="line-height:1.55">'+(STANDALONE_URL?('To save a PDF on mobile, open the full (non-embedded) calculator: <a class="shm" href="'+STANDALONE_URL+'" target="_blank" rel="noopener">Open full calculator ↗</a>'):'On mobile the embedded calculator cannot open the print dialog. Open the calculator on its own page (hosted outside Wix) to save a PDF.')+'</div>';box.style.display="block";}
+window.doPrint=doPrint;window.doShare=doShare;window.copyShareLink=copyShareLink;window.shareReport=shareReport;window.copyReportText=copyReportText;
+// Programmatic entry point — lets the proposal app auto-fill inputs and calculate.
+// params: {occ:"A3", area:"Aftabnagar" (or a full address), roadFt:30, katha:5, blockId?, loc?}
+window.S16_FAR_AUTORUN=function(p){
+  p=p||{};
+  var out={ok:false,matched:null,error:"",occ:""};
+  try{
+    if(p.occ && ALL_OCC.some(function(o){return o.id===p.occ;})) $("#occ").value=p.occ;
+    var matched=null;
+    if(p.area){
+      var atext=String(p.area);
+      var direct=blockOptions(atext);
+      if(direct&&direct.length){ matched=direct[0]; }
+      else {
+        var noise=/^(block|sector|road|plot|holding|house|flat|floor|project|the|near|opposite|beside|main|avenue|lane|no|number|dhaka|bangladesh|at|in|of|and)$/i;
+        var cand=[];
+        atext.split(/[,;/]| at | in /i).forEach(function(seg){ seg=(seg||"").trim(); if(seg) cand.push(seg); });
+        atext.split(/[^A-Za-z]+/).forEach(function(w){ if(w&&w.length>=4 && !noise.test(w)) cand.push(w); });
+        cand.sort(function(a,b){ return b.length-a.length; }).forEach(function(t){ if(matched) return; var o=blockOptions(t); if(o&&o.length) matched=o[0]; });
+      }
+    }
+    if(!matched && p.blockId){ var bb=blockById(p.blockId); if(bb) matched=bb; }
+    if(matched) selectBlock(matched.id);
+    if(p.katha!=null && String(p.katha)!==""){ var pv=document.querySelector("#plots .plot .pv"), pu=document.querySelector("#plots .plot .pu"); if(pv) pv.value=String(p.katha); if(pu) pu.value="katha"; if(typeof totLand==="function") totLand(); }
+    if(p.roadFt!=null && String(p.roadFt)!==""){ var rv=$("#roadVal"); if(rv) rv.value=String(p.roadFt); state.roadUnit="ft"; $$("#roadUnit button").forEach(function(x){ x.classList.toggle("on", x.dataset.u==="ft"); }); if(typeof roadHint==="function") roadHint(); }
+    if(p.loc){ var le=$("#loc"); if(le) le.value=p.loc; }
+    if(typeof occChange==="function") occChange();
+    calculate();
+    var err=$("#errbox"); var failed=!!(err && err.style.display!=="none" && (err.textContent||"").trim());
+    var hasReport=!!document.querySelector("#report .hl, #report table, #report tr");
+    out.ok=!failed && hasReport;
+    out.error=failed?(err.textContent||"").trim():"";
+    out.matched=matched?{id:matched.id,name:matched.name,areas:matched.areas||""}:null;
+    out.occ=$("#occ").value;
+  }catch(e){ out.ok=false; out.error=String(e&&e.message||e); }
+  return out;
+};
+/* ----------------------------------------------------------------
+   OFFICIAL RAJUK LAND USE CLEARANCE (LUC) TABLE — "A3" format.
+   Reproduces the government worksheet (LUC_A3_New_2025.xls) row-for-row:
+   serial 0–19, Bengali numerals, clause notes and the same cell colours.
+   All figures are read from the engine result `r`.
+----------------------------------------------------------------- */
+function lucTable(r){
+  const KATHA_TO_DECIMAL = 1.65;            // RAJUK sheet uses 1 katha = 1.65 shatangsho
+
+  // ── source figures ────────────────────────────────────────────
+  const katha        = r.katha;                                   // 1
+  const decimal      = katha * KATHA_TO_DECIMAL;                  // 0
+  const surrenderRd  = r.roadGiveawayArea || 0;                   // 2(ক) — land surrendered for proposed road
+  const damaged      = 0;                                         // 2(খ) — land lost to new road/open space/water (not modelled → 0)
+  const netSqft      = Math.max(0, r.sqft - surrenderRd - damaged);
+  const netKatha     = netSqft / U.kathaToSqft;                  // 3
+  const areaFAR      = r.areaFAR || 0;                            // 4
+  const plotExisting = (r.roadFARexisting!=null?r.roadFARexisting:r.roadFAR) || 0; // 5
+  const plotProposed = (r.roadFARproposed!=null?r.roadFARproposed:r.roadFAR) || 0; // 6
+  const plotAvg      = r.roadFAR || 0;                            // 7  (5+6)/2 when widened, else existing
+  const baseFAR      = r.baseFAR || 0;                            // 8
+  const maxFAR       = r.maxFAR || 0;                             // 9
+
+  // 10 — incentive FAR mapped to the 8 official slots i…viii
+  const slot={i:0,ii:0,iii:0,iv:0,v:0,vi:0,vii:0,viii:0};
+  (r.incentives||[]).forEach(it=>{
+    const L=(it.label||'').toLowerCase();
+    if(/plot size|amalgam/.test(L))                       slot.i   += it.val;
+    else if(/road width/.test(L))                         slot.ii  += it.val;
+    else if(/green/.test(L))                              slot.iii += it.val;
+    else if(/public|open space/.test(L))                  slot.iv  += it.val;
+    else if(/\btod\b/.test(L))                            slot.v   += it.val;
+    else if(/tdr|far purchase/.test(L))                   slot.vi  += it.val;
+    else if(/civic|amenity|school|park|playground/.test(L)) slot.vii += it.val;
+    else if(/a6|affordable/.test(L))                      slot.viii+= it.val;
+    else                                                  slot.i   += it.val;
+  });
+  const disincentive = 0;                                         // 11 — plot subdivision (not modelled → 0)
+  const approvedFAR  = r.approvedFAR || 0;                        // 12
+  const floorArea    = Math.round(netKatha * approvedFAR * U.kathaToSqft); // 13
+  const incFloor     = r.roadBenefit || 0;                        // 14
+  const totalFloor   = floorArea + incFloor;                      // 15
+  const density      = r.mode==='block'
+                         ? (r.newDUkatha||0)
+                         : (r.units&&r.units.duKatha ? r.units.duKatha : (r.block?r.block.katha:0)); // 16
+  const maxUnits     = Math.ceil(netKatha * density);             // 17 (round up)
+  const maxUnitsInc  = Math.ceil(maxUnits * 1.10);                // 18 (+10%, round up)
+  const nonResPct    = r.isRes ? 0 : 100;                         // 19
+
+  // ── tiny cell helpers ─────────────────────────────────────────
+  const C='luc-c', V='luc-v';                                     // generic cell / value cell
+  const sl=t=>`<td class="luc-sl">${bn(t)}</td>`;                 // serial cell
+  const note=t=>`<td class="luc-note">${t}</td>`;                 // clause / formula note (already Bengali text)
+  const desc=(t,span)=>`<td class="luc-d"${span?` colspan="${span}"`:''}>${t}</td>`;
+  const val=(t,cls)=>`<td class="${V}${cls?' '+cls:''}">${t}</td>`;
+
+  // ── build rows ────────────────────────────────────────────────
+  let h=`<table class="luc">
+    <colgroup><col style="width:6%"><col style="width:34%"><col style="width:18%"><col style="width:13%"><col style="width:29%"></colgroup>
+    <thead><tr>
+      <th class="luc-h luc-sl">ক্র নং</th>
+      <th class="luc-h" colspan="2">প্রস্তাবিত জমি সংশ্লিষ্ট সূচকসমূহ</th>
+      <th class="luc-h">পরিমাণ</th>
+      <th class="luc-h"></th>
+    </tr></thead><tbody>`;
+
+  // 0,1
+  h+=`<tr>${sl(0)}${desc('জমির পরিমাণ (শতাংশ)',2)}${val(bnNum(decimal,2))}${note('')}</tr>`;
+  h+=`<tr>${sl(1)}${desc('জমির পরিমাণ (কাঠা)',2)}${val(bnNum(katha,2),'luc-tan')}${note('')}</tr>`;
+
+  // 2 (a,b)
+  h+=`<tr>`
+    +`<td class="luc-sl" rowspan="2">${bn(2)}</td>`
+    +desc('ক) প্রস্তাবিত রাস্তার জন্য সমর্পিত জমি (প্রযোজ্য ক্ষেত্রে) (বর্গফুট)',2)
+    +val(bnNum(surrenderRd,1))+note('')+`</tr>`;
+  h+=`<tr>`
+    +desc('খ) নতুন রাস্তা/ওপেন স্পেস/জলাশয় ইত্যাদি দ্বারা ক্ষতিগ্রস্থ জমির পরিমাণ (বর্গফুট)',2)
+    +val(bnNum(damaged,1))+note('')+`</tr>`;
+
+  // 3,4,5,6,7,8,9
+  h+=`<tr>${sl(3)}${desc('জমির পরিমান (কাঠা) (প্রস্তাবিত রাস্তা ও অন্যান্য প্রস্তাবনার জন্য সমর্পিত জমি বাদে, প্রযোজ্য ক্ষেত্রে)',2)}${val(bnNum(netKatha,2),'luc-blue')}${note('')}</tr>`;
+  h+=`<tr>${sl(4)}${desc('এলাকাভিত্তিক FAR',2)}${val(bnNum(areaFAR,2),'luc-green')}${note('')}</tr>`;
+  h+=`<tr>${sl(5)}${desc('প্লট ভিত্তিক FAR (বিদ্যমান রাস্তা)',2)}${val(bnNum(plotExisting,2))}${note('')}</tr>`;
+  h+=`<tr>${sl(6)}${desc('প্লট ভিত্তিক FAR (প্রস্তাবিত রাস্তা)',2)}${val(bnNum(plotProposed,3))}${note('')}</tr>`;
+  h+=`<tr>${sl(7)}${desc('প্লট ভিত্তিক  FAR (গড়)',2)}${val(bnNum(plotAvg,2),'luc-red')}${note('ক্র.নং (৫+৬)/২')}</tr>`;
+  h+=`<tr>${sl(8)}${desc('ভিত্তি  FAR',2)}${val(bnNum(baseFAR,2))}${note('অনুচ্ছেদ ৩.৬.৪.১ অনুযায়ী')}</tr>`;
+  h+=`<tr>${sl(9)}${desc('সর্বোচ্চ  FAR',2)}${val(bnNum(maxFAR,2),'luc-gray')}${note('অনুচ্ছেদ ৩.৬.৪.১ অনুযায়ী')}</tr>`;
+
+  // 10 — incentive FAR, 8 sub-rows
+  const incRows=[
+    [slot.i,   'i) প্লটের আয়তন',                  ''],
+    [slot.ii,  'ii) ৩০ ফুটের অধিক রাস্তা',          ''],
+    [slot.iii, 'iii) Green Building',                ''],
+    [slot.iv,  'iv) পাবলিক স্পেস বা উন্মুক্ত স্থান',  ''],
+    [slot.v,   'v) TOD',                              ''],
+    [slot.vi,  'vi) TDR/FAR purchase',               ''],
+    [slot.vii, 'vii) নাগরিক সুবিধাদি',               ''],
+    [slot.viii,'viii) A3 এর সাথে A6 এর মিশ্রণ',      'luc-blue']
+  ];
+  incRows.forEach((row,i)=>{
+    h+='<tr>';
+    if(i===0){
+      h+=`<td class="luc-sl" rowspan="8">${bn(10)}</td>`;
+      h+=`<td class="luc-d" colspan="2" rowspan="8">প্রণোদনা (Incentive) FAR</td>`;
+    }
+    h+=val(bnNum(row[0],2),row[2])+note(row[1])+'</tr>';
+  });
+
+  // 11
+  h+=`<tr>${sl(11)}${desc('FAR Disincentive',2)}${val(bnNum(disincentive,2))}${note('প্লট বিভাজন (প্রযোজ্য ক্ষেত্রে)')}</tr>`;
+
+  // 12,13 (split description: main + "applicable subject to incentive conditions")
+  const SUB='প্রণোদনার শর্তপূরণ সাপেক্ষে প্রযোজ্য';
+  h+=`<tr>${sl(12)}`
+    +`<td class="luc-d">অনুমোদিত FAR (অনুমোদিত FAR ≤ সর্বোচ্চ FAR)</td>`
+    +`<td class="luc-sub">${SUB}</td>`
+    +val(bnNum(approvedFAR,2),'luc-red')
+    +note('ক্র.নং {৮+১০(i+ii+iii+iv+v+vi+vii+viii)-১১}')+`</tr>`;
+  h+=`<tr>${sl(13)}`
+    +`<td class="luc-d">অনুমোদিত FAR অনুযায়ী প্রাপ্ত মেঝের ক্ষেত্রফল (বর্গফুট)</td>`
+    +`<td class="luc-sub">${SUB}</td>`
+    +val(bnInt(floorArea))
+    +note('ক্র.নং ৩ x ১২ x ৭২০')+`</tr>`;
+
+  // 14
+  h+=`<tr>${sl(14)}${desc('প্রণোদনা (Incentive) মেঝের ক্ষেত্রফল (বর্গফুট) (প্রযোজ্য ক্ষেত্রে)',2)}${val(bnInt(incFloor))}${note('প্রস্তাবিত রাস্তার জন্য সমর্পিত জমির তিনগুন পরিমাণ')}</tr>`;
+
+  // 15 (split description)
+  h+=`<tr>${sl(15)}`
+    +`<td class="luc-d">অনুমোদিত মোট মেঝের ক্ষেত্রফল (বর্গফুট)</td>`
+    +`<td class="luc-sub">${SUB}</td>`
+    +val(bnInt(totalFloor))
+    +note('ক্র.নং (১৩+১৪)')+`</tr>`;
+
+  // 16,17,18,19
+  h+=`<tr>${sl(16)}${desc('এলাকার জনঘনত্ব (ইউনিট/কাঠা)',2)}${val(bnNum(density,1),'luc-green')}${note('পরিশিষ্ট ৩.৬')}</tr>`;
+  h+=`<tr>${sl(17)}${desc('সর্বোচ্চ আবাসিক ইউনিট সংখ্যা',2)}${val(bnNum(maxUnits,1))}${note('ক্র.নং (৩ x ১৬)')}</tr>`;
+  h+=`<tr>${sl(18)}${desc('প্রণোদনাসহ সর্বোচ্চ আবাসিক ইউনিট সংখ্যা',2)}${val(bnNum(maxUnitsInc,1))}${note('১০% প্রণোদনাসহ [ক্র.নং ১৭ + ক্র.নং ১৭ x ১০%]')}</tr>`;
+  h+=`<tr>${sl(19)}${desc('অনুমোদিত সর্বোচ্চ অ-আবাসিক ব্যবহার (মেঝের ক্ষেত্রফল %) প্রযোজ্য ক্ষেত্রে',2)}${val(bn(nonResPct)+'%')}${note('')}</tr>`;
+
+  h+=`</tbody></table>`;
+  return h;
+}
+
+function renderReport(r){
+  const now=new Date();
+  const ref=`S16A-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${Math.floor(Math.random()*9000+1000)}`;
+  const occLabel=(ALL_OCC.find(o=>o.id===r.occType)||{}).label||r.occType;
+  const locLabel=(R.locations.find(l=>l.id===r.location)||{}).label||r.location;
+  const modeLabel=r.mode==="block"?"Block-Based Development":"Single Building";
+  const tfa = r.mode==="block"?r.tfa:r.floorAreaApproved;
+  const tfaSqm = tfa*U.sqftToSqm;
+  const logo=(document.querySelector('header .logo-svg')||{}).outerHTML||'<b style="font-size:15px">Studio 16 Architects</b>';
+
+  let h=`
+  <div class="print-only print-head">
+    <div class="pl">${logo}</div>
+    <div class="pr"><b>RAJUK FAR Calculator · Bidhimala &amp; DAP 2025</b><br>Ref ${ref} · ${now.toLocaleString()}<br>+880-1717-222-907 · studio16architectsbd.com</div>
+  </div>
+  <div class="rep-head">
+    <div>
+      <div class="rep-actions"><button onclick="doPrint()">⬇ Download / Print</button></div>
+      <div id="reportShareBox" style="display:none;margin:8px 0 14px"></div>
+      <div class="ttl">RAJUK FAR Calculator · Bidhimala &amp; DAP 2025</div>
+      <div class="rep-sub">within RAJUK Jurisdiction area</div>
+    </div>
+    <div class="meta">Ref ${ref}<br>${now.toLocaleDateString()} ${now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
+  </div>
+
+  <div class="headline">
+    <div class="hl res-only"><div class="k">Base FAR</div><div class="v">${fmt(r.baseFAR)}</div><div class="mono" style="font-size:10px;color:var(--muted)">${r.mode==="single"&&r.unconditional?'unconditional':'minimum'}</div></div>
+    <div class="hl res-only"><div class="k">Maximum FAR</div><div class="v">${fmt(r.maxFAR)}</div><div class="mono" style="font-size:10px;color:var(--muted)">with conditions</div></div>
+    <div class="hl accent"><div class="k">${r.isRes?'Approved FAR':'FAR (road-based)'}</div><div class="v">${r.nrMode?'NR':fmt(r.approvedFAR)}</div>
+      <div class="mono" style="font-size:10px">${!r.isRes?(r.nrMode?'parking-based':'road-based'):(r.approvedFAR>=r.maxFAR&&r.totalInc>0?'capped at maximum':'+ incentives')}</div></div>
+    <div class="hl"><div class="k">Total Floor Area</div><div class="v">${fmt0(tfa)}<small> ft²</small></div>
+      <div class="mono" style="font-size:10px;color:var(--muted)">${fmt0(tfaSqm)} m²</div></div>
+  </div>
+
+  <div class="rep-body">
+  <section class="sec sec-planning"><h2>Planning Information</h2>
+    <table class="kv">
+      <tr><td>Land area / size</td><td>${fmt(r.katha)} katha · ${fmt0(r.sqft)} ft²</td></tr>
+      <tr><td>Access road width</td><td>${fmt(r.roadFt,1)} ft · ${fmt(r.roadFt*U.ftToM,2)} m</td></tr>
+      <tr><td>Proposed road width</td><td>${fmt(r.proposedRoadFt,1)} ft · ${fmt(r.proposedRoadFt*U.ftToM,2)} m${r.roadWidened?' · widened to 20 ft / 6 m future minimum':' · already ≥ 20 ft / 6 m'}</td></tr>
+      <tr><td>Building / use category</td><td>${occLabel}</td></tr>
+      <tr class="res-only"><td>Development type</td><td>${modeLabel}</td></tr>
+      <tr><td>Planning Zone</td><td>${locLabel}</td></tr>
+      <tr><td>Density block</td><td>${r.block.id} — ${r.block.name}${badge('DAP 2025 · App. 3.6')}</td></tr>`;
+  if(r.isRes)h+=`<tr><td>DU / katha</td><td>${fmt(r.block.katha,1)}${r.mode==="block"?` → <b>${fmt(r.newDUkatha,3)}</b>`:''}</td></tr>
+      <tr><td>Average unit size</td><td>${fmt0(r.block.avgDU)} ft²</td></tr>`;
+  h+=`</table></section>
+
+  <section class="sec sec-far"><h2>FAR Analysis</h2>
+    <table class="kv">`;
+  if(r.mode==="single"){
+    h+=`${r.nrMode?`<tr><td>${r.isRes?'Road FAR':'FAR (road-based)'}</td><td>NR (Non-restricted)${badge(r.isRes?R.roadFARRef:'Bidhimala 2025 · §47 Table 3')}</td></tr>`:r.roadWidened?`<tr><td>Road FAR · existing road (${fmt(r.roadFt,1)} ft)</td><td>${fmt(r.roadFARexisting)}${badge(r.isRes?R.roadFARRef:'Bidhimala 2025 · §47 Table 3')}</td></tr>
+        <tr><td>Road FAR · proposed road (${fmt(r.proposedRoadFt,1)} ft)</td><td>${fmt(r.roadFARproposed)}${badge('min 20 ft / 6 m future road')}</td></tr>
+        <tr><td>Approved Road FAR · average</td><td>${fmt(r.roadFAR)}${badge('(existing + proposed) ÷ 2')}</td></tr>`:`<tr><td>${r.isRes?'Road FAR':'FAR (road-based)'}</td><td>${fmt(r.roadFAR)}${badge(r.isRes?R.roadFARRef:'Bidhimala 2025 · §47 Table 3')}</td></tr>`}
+        <tr class="res-only"><td>Area FAR</td><td>${fmt(r.areaFAR)}${badge('DAP 2025 · Table 3.6')}</td></tr>`;
+  } else {
+    h+=`<tr><td>Updated Area FAR</td><td>${fmt(r.finalAreaFAR,3)} <span class="mono" style="color:var(--muted);font-size:11px">(raw ${fmt(r.rawAreaFAR)})</span>${badge('DAP Table 3.31')}</td></tr>
+        <tr><td>Updated Road FAR</td><td>${fmt(r.newRoadFAR,3)} <span class="mono" style="color:var(--muted);font-size:11px">(raw ${fmt(r.oldRoadFAR)} +${fmt(r.row.plotFARBonus)})</span></td></tr>`;
+  }
+  h+=`<tr class="res-only"><td>Base FAR · MIN</td><td>${fmt(r.baseFAR)}${badge('Bidhimala §47(3)')}</td></tr>
+      <tr class="res-only"><td>Maximum FAR · MAX</td><td>${fmt(r.maxFAR)}</td></tr>${r.isNR?('<tr><td style="color:var(--brass)">Non-restricted (NR)</td><td>'+(r.nrMode?('build area by parking @ 200 m²/space'+(r.parking>0?(': '+r.parking+' × 200 m² = '+fmt0(r.nrFloorSqft)+' ft²'):' (enter a parking count)')):('reference FAR '+fmt(r.roadFAR)+' used; tick the NR option to size by parking instead'))+badge('DAP 2025 App.3.5 *NR')+'</td></tr>'):''}`;
+  r.incentives.forEach(i=>{h+=`<tr><td style="padding-left:14px;color:var(--brass)">+ ${i.label}</td><td>+${fmt(i.val)}${badge(i.ref)}</td></tr>`;});
+  h+=`<tr class="res-only"><td>Total incentive FAR</td><td>+${fmt(r.totalInc)}${badge(R.incentives.ref)}</td></tr>
+      <tr class="res-only kv-hi"><td>Approved FAR</td><td class="${r.approvedFAR>=r.maxFAR&&r.totalInc>0?'capped':''}">${fmt(r.approvedFAR)}${r.approvedFAR>=r.maxFAR&&r.totalInc>0?' (capped)':''}</td></tr>
+      <tr class="res-only"><td>Special-case ceiling (TOD/LR)</td><td>${fmt(r.superMax)}</td></tr>
+    </table></section>
+
+  <section class="sec sec-ground"><h2>Ground Coverage &amp; Open Space</h2>
+    <table class="kv">`;
+  if(r.mode==="single"){
+    const pave=r.mgc.minOpen/2, rain=r.mgc.minOpen/2, basePct=r.mgc.maxMGC+pave;
+    h+=`${r.mgc.minMGC?`<tr><td>Minimum ground coverage</td><td>${fmt(r.mgc.minMGC,1)}% · ${fmt0(r.gcSqftMin)} ft²</td></tr>`:''}
+        <tr><td>Maximum ground coverage</td><td>${fmt(r.mgc.maxMGC,1)}% · ${fmt0(r.gcSqft)} ft²</td></tr>
+        <tr><td>Mandatory open space</td><td>${fmt(r.mgc.minOpen,1)}% · ${fmt0(r.sqft*r.mgc.minOpen/100)} ft²</td></tr>
+        <tr><td style="padding-left:13px">↳ Paveable open space (max)</td><td>${fmt(pave,2)}% · ${fmt0(r.sqft*pave/100)} ft²</td></tr>
+        <tr><td style="padding-left:13px">↳ For rainwater absorption (min)</td><td>${fmt(rain,2)}% · ${fmt0(r.sqft*rain/100)} ft²</td></tr>
+        <tr><td>Basement (MGC + paveable)</td><td>${fmt(basePct,2)}% · ${fmt0(r.sqft*basePct/100)} ft²</td></tr>`;
+  } else {
+    h+=`<tr><td>Min. mandatory open space — park / playground / green (excl. setbacks)</td><td>40% · ${fmt0(r.openSpaceSqFt)} ft²</td></tr>
+        <tr><td style="padding-left:13px">↳ Min. as a single contiguous space (≥50%)</td><td>${fmt0(r.openSpaceSqFt*0.5)} ft²</td></tr>
+        <tr><td style="padding-left:13px">↳ Max. as voids &amp; other green space (≤50%)</td><td>${fmt0(r.openSpaceSqFt*0.5)} ft²</td></tr>
+        <tr><td>Max ground coverage — MGC ${fmt(r.blockMGCpct,0)}% of land</td><td>${fmt0(r.buildableFootprint)} ft²</td></tr>
+        <tr><td>Basement (MGC + 10% of land)</td><td>${fmt0(r.basementSqft)} ft²</td></tr>
+        <tr><td>Net buildable land (60%)</td><td>${fmt0(r.netBuildSqFt)} ft²</td></tr>`;
+  }
+  h+=`</table>
+    <div class="refnote" style="padding-left:0">Source: ${r.mode==="single"
+      ? `${R.mgcRef} — ${r.mgc.ref}. Paveable &amp; rainwater-absorption open space = ½ each of mandatory open space (cols 6–7). Basement per Bidhimala 2025 §42 (col 4 + col 6).`
+      : `DAP 2025 (SRO 468/2025) p.13394–13395. ≥40% of block land preserved as open space (≥50% contiguous, balance as voids/greenery; setbacks excluded). MGC ≤40% for land up to 2 acre, ≤45% above 2 acre. Basement may extend an additional 10% of block land.`}</div>
+  </section>`;
+
+  h+=`<section class="sec sec-setbacks"><h2>Setbacks</h2>
+    <table class="kv">
+      <tr><td>Front setback</td><td>≥1.5 m</td></tr>
+      <tr><td>Rear setback</td><td>${fmt(r.setbacks.rear)} m · ${fmt(r.setbacks.rear/U.ftToM,1)} ft</td></tr>
+      <tr><td>Side setback (each)</td><td>${fmt(r.setbacks.side)} m · ${fmt(r.setbacks.side/U.ftToM,1)} ft</td></tr>
+      <tr><td>Building-to-building</td><td>${fmt(r.setbacks.between)} m · ${fmt(r.setbacks.between/U.ftToM,1)} ft</td></tr>
+    </table>
+    <div class="refnote" style="padding-left:0">Front: ${R.frontSetbackRef}. Rear, side &amp; building-to-building: ${r.setbacks.ref}.</div>
+  </section>`;
+
+  if(r.isRes){
+    const u=r.mode==="single"?r.units:null;
+    h+=`<section class="sec sec-unit"><h2>Unit Analysis · RAJUK density method</h2>
+      <div class="floors">
+        <div class="fc"><div class="lab">Permitted units</div><div class="gn">${r.mode==="single"?(u?u.base:'—'):r.units}</div><div class="st">density × katha</div></div>
+        <div class="fc mid"><div class="lab">Maximum${r.occType==="A3"?" (+10% A3)":""}</div><div class="gn">${r.mode==="single"?(u?u.max:'—'):r.unitsA3}</div><div class="st">${r.occType==="A3"?'apartment bonus':'no bonus'}</div></div>
+        <div class="fc"><div class="lab">FAR-based (ref.)</div><div class="gn">${r.mode==="single"&&u&&u.farRef!=null?u.farRef:'—'}</div><div class="st">floor area ÷ avg unit</div></div>
+      </div>
+      <div class="refnote" style="padding-left:0">Primary method: katha × DU/katha (fractions round up). ${badge('DAP 2025 §3.6.4.1 · App. 3.6')}</div>${r.occType==="A3"?'<div class="refnote" style="padding-left:0;margin-top:4px">Note: under DAP 2025 §3.6.4.1(d), up to <b>+10%</b> additional A3 units (the “Maximum” figure) may be approved at RAJUK’s discretion when the allowable floor area is otherwise unused — reduced from 30% under DAP 2022; the extra units must fit within the maximum permissible floor area.</div>':''}
+    </section>`;
+  }
+
+  h+=`<section class="sec sec-floor"><h2>Floor Analysis · three coverage scenarios</h2>
+    <div class="floors">${r.scenarios.map((s,i)=>`
+      <div class="fc ${i===1?'mid':''}"><div class="lab">${s.label}</div>
+        <div class="gn">G+${s.farFlrs}</div><div class="st">${s.totFlrs} storied</div>
+        <div class="pl">${s.plate!=null?`${fmt0(s.plate)} ft²/floor<br><span style="opacity:.65">net (excl. bonus) · ${fmt(s.coverPct,1)}%</span>`:`${fmt0(s.gcArea)} ft² plate`}<br>≈ ${fmt(s.htM,1)} m tall${s.upf!=null?`<br>~${s.upf}/floor`:''}</div></div>`).join('')}
+    </div>
+    <table class="kv" style="margin-top:13px">
+      ${r.totalBuildArea!=null?`
+      <tr><td colspan="2" style="text-align:right;padding-bottom:4px;font-weight:600;color:var(--ink);border-bottom:1px solid var(--line)">Floor area calculation</td></tr>
+      ${(r.roadWidened&&r.roadBenefit>0)?`<tr class="kv-hi"><td>Total floor area (FAR included)</td><td>${fmt0(r.floorAreaApproved)} ft² · ${fmt0(tfaSqm)} m²${badge('Bidhimala §2(81)')}</td></tr>`:`<tr class="kv-hi"><td><b>Total floor area (FAR included)</b></td><td><b>${fmt0(r.floorAreaApproved)} ft² · ${fmt0(tfaSqm)} m²</b>${badge('Bidhimala §2(81)')}</td></tr>`}
+      ${r.roadWidened&&r.roadBenefit>0?`<tr><td>Land surrendered for 20 ft road (DAP 2025 cl.4)</td><td>${fmt(r.roadGiveawayWidth,1)} ft × ${fmt0(r.roadFrontage)} ft = ${fmt0(r.roadGiveawayArea)} ft²</td></tr>
+      <tr><td>Road-widening build benefit (3× surrendered)</td><td>+ ${fmt0(r.roadBenefit)} ft²</td></tr>
+      <tr><td><b>Total Floor area incl. road benefit</b></td><td><b>${fmt0(r.floorAreaApproved + r.roadBenefit)} ft²</b></td></tr>`:''}
+      ${r.roadWidened&&!(r.roadBenefit>0)?`<tr><td colspan="2" style="padding:6px 0;color:var(--muted);line-height:1.45;white-space:normal;text-align:left;word-break:break-word">Road widened to 20 ft — you surrender a ${fmt(r.roadGiveawayWidth,1)} ft strip along your frontage to the Government by easement deed, and gain <b>3× that surrendered area</b> as extra build area (DAP 2025 cl.4). Add your road-side edge (frontage) length above to quantify it.</td></tr>`:''}
+      <tr><td>Ground-floor lift lobby (FAR-included area)</td><td>${fmt0(r.liftLobby)} ft² · ${r.katha>10?'land &gt; 10 katha':'land ≤ 10 katha'}</td></tr>
+      <tr><td>Average net floor size (FAR-included area)</td><td>${fmt0(r.avgNetFloor)} ft²</td></tr>
+      <tr><td>Bonus verandah &amp; green area (FAR excluded)</td><td>+ ${fmt0(r.bonusArea)} ft²${badge('2.5% side + 2.5% front + 2.5% green / floor')}</td></tr>
+      <tr><td><b>Total build area (FAR + bonus)</b></td><td><b>${fmt0(r.totalBuildArea + (r.roadBenefit||0))} ft²</b></td></tr>
+      <tr><td>Estimated building</td><td>G+${r.farFloorsApproved} · ${r.totalStoreysApproved} storied · ≈ ${fmt(r.htM,1)} m (${fmt(r.htM/U.ftToM,1)} ft)</td></tr>
+      <tr><td colspan="2" style="text-align:right;padding-top:16px;padding-bottom:4px;font-weight:600;color:var(--ink);border-bottom:1px solid var(--line)">Construction area calculation</td></tr>
+      <tr><td>Average gross floor size (FAR + bonus)</td><td>${fmt0(r.avgNetFloor)} + ${fmt0(r.perFloorBonus)} = <b>${fmt0(r.floorBuild)} ft²</b></td></tr>
+      <tr><td>Number of floors</td><td>${r.farFloorsApproved} × ${fmt0(r.floorBuild)} ft² = ${fmt0(r.farFloorsApproved*r.floorBuild)} ft²</td></tr>
+      <tr><td>Ground floor (full plot)</td><td>${fmt0(r.groundArea)} ft²</td></tr>
+      <tr><td>Basement area</td><td>${r.basementCount>0?`${r.basementCount} × ${fmt0(r.basementEach)} = ${fmt0(r.totalBasement)} ft²`:(r.basementBlocked?'— needs ≥ 4 katha':'— none')}</td></tr>
+      <tr><td>Rooftop area</td><td>${fmt0(r.roofArea)} ft²</td></tr>
+      <tr><td><b>Total construction area</b></td><td><b>${fmt0(r.totalConstruction)} ft²</b>${badge('floors + roof + ground + basements')}</td></tr>
+      `:`
+      <tr><td>Total floor area</td><td>${fmt0(tfa)} ft² · ${fmt0(tfaSqm)} m²${badge('Bidhimala §2(81)')}</td></tr>
+      <tr><td>Estimated building</td><td>G+${r.mode==="block"?r.farFloors:r.farFloorsApproved} · ${(r.mode==="block"?r.totStoreys:r.totalStoreysApproved)} storied · ≈ ${fmt(r.htM,1)} m (${fmt(r.htM/U.ftToM,1)} ft)</td></tr>
+      `}
+    </table>
+    <div class="refnote" style="padding-left:0">G = ground floor (parking${r.liftLobby!=null?` + ${fmt0(r.liftLobby)} ft² lift lobby`:""}). Floor counts are rounded so every upper floor stays between the minimum (${fmt0(r.minGroundA||0)} ft²) and maximum (${fmt0(r.maxGroundA||r.gcSqft)} ft²) ground-coverage limits. Heights approximate at ${U.floorHeightM} m floor-to-floor.</div>
+    <div class="refnote" style="padding-left:0;border-top:0;padding-top:0"><b style="color:var(--ink);font-weight:600">Bonus area (FAR-excluded):</b> each upper floor may add a side verandah (2.5%), a front / road-side verandah (2.5%) and green space (2.5%) — 7.5% of the floor area — over and above the FAR. The Total build area above includes this bonus. Balconies, terraces, ducts and other permissible features under Bidhimala 2025 &amp; DAP 2025 may increase the constructed area further.</div>
+  </section>
+
+  <section class="sec sec-site"><h2>Site Overview</h2>
+    <div class="siteoverview">
+      ${setbackSVG(r)}
+    </div>
+  </section>
+
+  ${r.totalConstruction!=null?`<section class="sec sec-section"><h2>Sectional Overview</h2>
+    <div class="siteoverview">${sectionSVG(r)}</div>
+    <div class="refnote" style="padding-left:0">By level — basements (FAR-excluded parking) below ground level, ground floor (full plot), each upper floor (FAR area + verandah &amp; green bonus) and roof. Their sum is the total construction area, ${fmt0(r.totalConstruction)} ft².</div>
+  </section>`:''}
+
+    <section class="sec sec-density res-only"><h2>Relevant Density Block Details</h2>
+    <table class="kv">
+      <tr><td>Block</td><td>${r.block.id} — ${r.block.name}${badge('DAP 2025 · App. 3.6')}</td></tr>
+      <tr><td>Areas covered</td><td style="white-space:normal;text-align:right;font-family:var(--sans);color:var(--muted);font-size:12px;font-variant-numeric:normal">${r.block.areas||'—'}</td></tr>
+      <tr><td>Block type</td><td>${r.block.type==='P'?'Planned':'Unplanned / Spontaneous'}</td></tr>
+      <tr><td>Base Area FAR</td><td>${fmt(r.block.areaFAR)}${r.mode==='block'?` → ${fmt(r.finalAreaFAR,3)} (block dev.)`:''}</td></tr>
+      <tr><td>Dwelling units / katha</td><td>${fmt(r.block.katha,1)}${r.mode==='block'?` → ${fmt(r.newDUkatha,3)} (block dev.)`:''}</td></tr>
+      <tr><td>Average dwelling-unit size</td><td>${fmt0(r.block.avgDU)} ft²</td></tr>
+      <tr><td>Population density</td><td>${r.block.ppa?fmt0(r.block.ppa)+' persons / acre':'—'}</td></tr>
+    </table>
+    <div class="refnote" style="padding-left:0">“Planned” blocks are pre-planned residential areas. “Unplanned / Spontaneous” blocks are organically developed areas, eligible for additional affordable-housing (A6) incentives under DAP 2025 Table 3.28 Item 3.</div>
+  </section>
+  </div>
+
+  <section class="sec sec-luc"><h2>RAJUK Land Use Clearance — A3 (official format)</h2>
+    ${lucTable(r)}
+    <div class="refnote" style="padding-left:0">প্রস্তাবিত জমি সংশ্লিষ্ট সূচকসমূহ — generated in the RAJUK DAP&nbsp;2025 Land Use Clearance worksheet format (ref. <span style="font-variant-numeric:normal">LUC_A3_New_2025</span>). Figures are computed from your inputs; clause references (অনুচ্ছেদ ৩.৬.৪.১ · পরিশিষ্ট ৩.৬) follow DAP&nbsp;2025. Indicative only — verify with RAJUK before submission.</div>
+  </section>
+
+  <details class="audit"><summary>▸ Audit trail — formulas &amp; sources (${audit.length} steps)</summary>
+    <div class="auditlist">${audit.map((a,i)=>`<div><span class="step-a">${String(i+1).padStart(2,'0')}.</span> ${a}</div>`).join('')}</div>
+  </details>
+
+  `;
+
+  /* section numbers rendered via CSS counter (skips display:none per medium) */
+  if(lang==='bn'&&typeof translateReport==='function')h=translateReport(h);
+  $("#report").innerHTML=h;
+  $("#report").classList.toggle('nonres', !r.isRes);
+  const cb=$("#shareReportBtn"); if(cb)cb.addEventListener('click',()=>shareReport(r,ref,tfa));
+  $("#report").scrollIntoView({behavior:'smooth',block:'start'});
+}
+function setbackSVG(r){
+  const sb=r.setbacks;
+  const footprint=r.mode==="block"?r.buildableFootprint:(r.floorBuild||r.platePrimary||r.gcSqft);
+  const floors=r.mode==="block"?r.farFloors:r.farFloorsApproved;
+  const build=r.mode==="block"?r.tfa:((r.totalBuildArea||r.floorAreaApproved) + (r.roadBenefit||0));
+  const far=r.approvedFAR, road=r.roadFt;
+  const occLabel=(ALL_OCC.find(o=>o.id===r.occType)||{}).label||r.occType;
+  const occShort=occLabel.replace(/\s*\([^)]*\)\s*/g,'').trim();
+  const modeLabel=r.mode==="block"?"Block-Based Development":"Single Building";
+  const land=`${fmt(r.katha)} katha · ${fmt0(r.sqft)} ft²${r.mode==="block"?` · ${fmt(r.acres,3)} ac`:''}`;
+  const mut='fill:var(--muted)', ink='fill:var(--ink)';
+  return `<svg viewBox="0 0 300 250" width="100%" style="max-width:340px;border:1px solid var(--line);background:var(--paper-2)">
+    <rect x="30" y="24" width="240" height="196" style="fill:none;stroke:var(--line)" stroke-dasharray="5 4"/>
+    <rect x="66" y="56" width="168" height="142" style="fill:color-mix(in srgb,var(--ink) 8%,transparent);stroke:var(--ink)"/>
+    <text x="150" y="44" text-anchor="middle" font-size="10" style="${mut}">Rear ${fmt(sb.rear)} m</text>
+    <text x="150" y="212" text-anchor="middle" font-size="10" style="${mut}">Front ≥1.5 m</text>
+    <text x="46" y="128" text-anchor="middle" font-size="10" style="${mut}" transform="rotate(-90 46 128)">Side ${fmt(sb.side)} m</text>
+    <text x="254" y="128" text-anchor="middle" font-size="10" style="${mut}" transform="rotate(90 254 128)">Side ${fmt(sb.side)} m</text>
+    <text x="150" y="75" text-anchor="middle" font-size="8.5" font-weight="600" style="${ink}">${occShort}</text>
+    <text x="150" y="89" text-anchor="middle" font-size="8" style="${mut}">${modeLabel}</text>
+    <line x1="82" y1="97" x2="218" y2="97" style="stroke:var(--line)"/>
+    <text x="150" y="125" text-anchor="middle" font-size="23" font-weight="700" style="${ink}">G+${floors}</text>
+    <text x="150" y="143" text-anchor="middle" font-size="10" style="${ink}">Allowable FAR ${fmt(far)}</text>
+    <text x="150" y="159" text-anchor="middle" font-size="9.5" style="${ink}">Total build ${fmt0(build)} ft²</text>
+    <text x="150" y="173" text-anchor="middle" font-size="8.5" style="${mut}">Floor plate ${fmt0(footprint)} ft²</text>
+    <text x="150" y="189" text-anchor="middle" font-size="8.5" style="${ink}">Land ${land}</text>
+    <rect x="85" y="230" width="130" height="16" style="fill:color-mix(in srgb,var(--brass) 32%,transparent)"/>
+    <text x="150" y="241" text-anchor="middle" font-size="9" font-weight="600" style="${ink}">ROAD · ${fmt0(road)} ft</text>
+  </svg>`;
+}
+
+function sectionSVG(r){
+  if(r.totalConstruction==null) return '';
+  const ord=n=>{const s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);};
+  const net=r.platePrimary, bon=r.platePrimaryBonus, gross=r.floorBuild;
+  const ground=r.groundArea, lift=r.liftLobby, baseEach=r.basementEach, nB=r.basementCount, nF=r.farFloorsApproved;
+  const maxA=Math.max(ground,gross,baseEach)||1;
+  const W=400, barMax=168, cx=W*0.42, rowH=16, gap=3;
+  const C={far:'color-mix(in srgb,var(--brass) 34%,transparent)', bonus:'color-mix(in srgb,var(--good) 26%,transparent)', excl:'color-mix(in srgb,var(--muted) 15%,transparent)', ink:'var(--ink)'};
+  const bw=a=>Math.max(16, a/maxA*barMax);
+  let y=16, body='';
+  const gw=bw(gross);
+  body+=`<polygon points="${(cx-gw/2-5).toFixed(1)},${y+7} ${cx},${y} ${(cx+gw/2+5).toFixed(1)},${y+7}" style="fill:${C.ink};opacity:.5"/>`;
+  body+=`<rect x="${(cx-gw/2).toFixed(1)}" y="${y+7}" width="${gw.toFixed(1)}" height="3.5" style="fill:${C.ink}"/>`;
+  body+=`<text x="${cx+barMax/2+12}" y="${y+9}" font-size="8.5" style="fill:var(--ink)">Roof slab · ${fmt0(gross)} ft²</text>`;
+  y+=16;
+  for(let i=nF;i>=1;i--){
+    const g=bw(gross), nW=g*(net/gross);
+    body+=`<rect x="${(cx-g/2).toFixed(1)}" y="${y}" width="${g.toFixed(1)}" height="${rowH}" style="fill:${C.bonus};stroke:var(--line)"/>`;
+    body+=`<rect x="${(cx-nW/2).toFixed(1)}" y="${y}" width="${nW.toFixed(1)}" height="${rowH}" style="fill:${C.far}"/>`;
+    body+=`<text x="${cx}" y="${y+rowH/2+3}" text-anchor="middle" font-size="8.5" style="fill:var(--ink)">${ord(i)}</text>`;
+    body+=`<text x="${cx+barMax/2+12}" y="${y+rowH/2+3}" font-size="8.5" style="fill:var(--ink)">${fmt0(gross)} (${fmt0(net)}+${fmt0(bon)})</text>`;
+    y+=rowH+gap;
+  }
+  const gnd=bw(ground), lw=Math.max(7, gnd*(lift/ground));
+  body+=`<rect x="${(cx-gnd/2).toFixed(1)}" y="${y}" width="${gnd.toFixed(1)}" height="${rowH}" style="fill:${C.excl};stroke:var(--line)"/>`;
+  body+=`<rect x="${(cx-lw/2).toFixed(1)}" y="${y}" width="${lw.toFixed(1)}" height="${rowH}" style="fill:${C.far}"/>`;
+  body+=`<text x="${cx}" y="${y+rowH/2+3}" text-anchor="middle" font-size="8" style="fill:var(--ink)">Ground</text>`;
+  body+=`<text x="${cx+barMax/2+12}" y="${y+rowH/2+3}" font-size="8.5" style="fill:var(--ink)">${fmt0(ground)} · lobby ${fmt0(lift)}</text>`;
+  y+=rowH+gap;
+  body+=`<line x1="6" y1="${(y-gap/2).toFixed(1)}" x2="${W-6}" y2="${(y-gap/2).toFixed(1)}" style="stroke:var(--ink)" stroke-width="1.2"/>`;
+  body+=`<text x="6" y="${(y-gap/2-2).toFixed(1)}" font-size="7.5" style="fill:var(--ink)">ground level</text>`;
+  for(let b=1;b<=nB;b++){
+    const bb=bw(baseEach);
+    body+=`<rect x="${(cx-bb/2).toFixed(1)}" y="${y}" width="${bb.toFixed(1)}" height="${rowH}" style="fill:${C.excl};stroke:var(--line)" stroke-dasharray="3 2"/>`;
+    body+=`<text x="${cx}" y="${y+rowH/2+3}" text-anchor="middle" font-size="8" style="fill:var(--ink)">Basement ${b}</text>`;
+    body+=`<text x="${cx+barMax/2+12}" y="${y+rowH/2+3}" font-size="8.5" style="fill:var(--ink)">${fmt0(baseEach)} ft²</text>`;
+    y+=rowH+gap;
+  }
+  y+=10;
+  const lg=[['FAR floor area',C.far],['Verandah + green bonus',C.bonus],['Parking · FAR-excluded',C.excl]];
+  let lx=10;
+  lg.forEach(it=>{ body+=`<rect x="${lx.toFixed(1)}" y="${y-7}" width="9" height="9" style="fill:${it[1]};stroke:var(--line)"/>`; body+=`<text x="${(lx+13).toFixed(1)}" y="${y}" font-size="8" style="fill:var(--ink)">${it[0]}</text>`; lx+=24+it[0].length*4.3; });
+  y+=16;
+  body+=`<line x1="6" y1="${(y-6).toFixed(1)}" x2="${W-6}" y2="${(y-6).toFixed(1)}" style="stroke:var(--line)"/>`;
+  let fy=y+5;
+  const footRows=[["Total FAR-included area", r.floorAreaApproved]];
+  if(r.roadWidened&&r.roadBenefit>0){ footRows.push(["Total Floor area incl. road benefit", r.floorAreaApproved + r.roadBenefit]); }
+  footRows.push(["Total FAR + "+((r.roadWidened&&r.roadBenefit>0)?"road bonus + ":"")+"bonus (build) area", r.totalBuildArea + (r.roadBenefit||0)]);
+  footRows.push(["FAR-excluded area (parking, basement &amp; rooftop)", r.farExcludedArea + r.roofArea]);
+  footRows.forEach(rw=>{ body+=`<text x="10" y="${fy}" font-size="9" style="fill:var(--ink)">${rw[0]}</text><text x="${W-10}" y="${fy}" text-anchor="end" font-size="9.5" font-weight="600" style="fill:var(--ink)">${fmt0(rw[1])} ft²</text>`; fy+=16; });
+  fy+=1;
+  body+=`<text x="10" y="${fy}" font-size="9.5" font-weight="700" style="fill:var(--ink)">Total construction area</text><text x="${W-10}" y="${fy}" text-anchor="end" font-size="11" font-weight="700" style="fill:var(--ink)">${fmt0(r.totalConstruction)} ft²</text>`;
+  const HH=fy+12;
+  return `<svg viewBox="0 0 ${W} ${HH}" width="100%" style="max-width:400px;border:1px solid var(--line);background:var(--paper-2)">${body}</svg>`;
+}
+function copySummary(r,ref,tfa){
+  const occLabel=(ALL_OCC.find(o=>o.id===r.occType)||{}).label||r.occType;
+  const t=`STUDIO 16 ARCHITECTS — FAR Report ${ref}
+Occupancy: ${occLabel} (${r.mode})
+Location: ${r.block.name} (${r.block.id})
+Land: ${fmt(r.katha)} katha | Road: ${fmt(r.roadFt,1)} ft
+Base ${fmt(r.baseFAR)} | Max ${fmt(r.maxFAR)} | Incentive +${fmt(r.totalInc)} | APPROVED ${fmt(r.approvedFAR)}
+Floor Area: ${fmt0(tfa)} ft²
+${r.isRes?`Units: ${r.mode==="single"?(r.units?r.units.max:'-'):r.unitsA3}\n`:''}Building: G+${r.mode==="block"?r.farFloors:r.farFloorsApproved} (${r.mode==="block"?r.totStoreys:r.totalStoreysApproved} storied)
+Setbacks: front ≥1.5 / side ${fmt(r.setbacks.side)} / rear ${fmt(r.setbacks.rear)} m
+— Indicative only. Verify with RAJUK. Basis: SRO 469/2025 & SRO 468/2025.`;
+  navigator.clipboard.writeText(t).then(()=>{const b=$("#copyBtn");b.textContent='✓ Copied';setTimeout(()=>b.textContent='⧉ Copy summary',1600);});
+}
+function toggleTheme(){const h=document.documentElement;h.dataset.theme=h.dataset.theme==='dark'?'light':'dark';$("#themeBtn").textContent=h.dataset.theme==='dark'?'◑':'◐';}
+
+buildUI();
+</script>
+</body>
+</html>
