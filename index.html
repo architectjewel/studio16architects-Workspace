@@ -625,7 +625,7 @@ function receiptEmailHTML(pmt){
         if(!fr||!fr.html) return "";
         var heading=((fr.mode||p.farMode)==="2025")?"RAJUK FAR Calculator \u00b7 Bidhimala &amp; DAP 2025":"RAJUK FAR Calculator \u00b7 Bidhimala 2008";
         var css=scopeCss(fr.styles||"","#far-block");
-        return '<div style="page-break-before:always"><div style="font-family:Archivo,Arial,sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#52525b;border-bottom:1px solid #d4d4d8;padding-bottom:3px;margin:0 0 6px">'+heading+'</div><div id="far-block"><style>'+css+'</style>'+fr.html+'</div></div>';
+        return '<div style="page-break-before:always"><div style="font-family:Archivo,Arial,sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#52525b;border-bottom:1px solid #d4d4d8;padding-bottom:3px;margin:0 0 6px">'+heading+'</div><div id="far-block"><style>'+css+'</style><style>@media print{#far-block section.sec.sec-luc{break-before:auto!important;page-break-before:auto!important;border-top:1px solid #d4d4d4!important;padding-top:7px!important;margin-top:7px!important}}</style>'+fr.html+'</div></div>';
       }
       function printBill(it){
         const num=v=>Number(v||0); const lt=r=>num(r.qty)*num(r.rate);
