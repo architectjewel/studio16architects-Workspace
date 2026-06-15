@@ -1437,13 +1437,13 @@ function printProposal(p){
                 </div>
               </div>
               <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
-                <iframe title="FAR calculator" src={resTab==="2025"?"/far-calculator-2025-resource.html":"/far-calculator-2008-resource.html"} className="w-full" style={{height:"80vh",minHeight:"560px",border:"0"}} />
+                <iframe title="FAR calculator" src={resTab==="2025"?"/far-calculator-2026-resource.html":"/far-calculator-2008-resource.html"} className="w-full" style={{height:"80vh",minHeight:"560px",border:"0"}} />
               </div>
               <p className="mt-2 text-[11px] text-zinc-400">Built-in tools for the team. More resources can be added here over time.</p>
             </>)}
 
             {area==="sales" && has("sales") && (<>
-              {salesTab!=="leads" && salesTab!=="overview" && <div className="mb-3 flex flex-wrap gap-1">{[["proposals","Proposals"],["catalog","Scope catalogue"],["terms","Terms"]].map(([k,l])=><button key={k} onClick={()=>setSalesTab(k)} className={`rounded-md px-2.5 py-1 text-[11px] font-medium ${salesTab===k?"bg-zinc-800 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}<button onClick={()=>window.open("/far-calculator-2025-resource.html","_blank")} className="rounded-md border border-zinc-300 px-2.5 py-1 text-[11px] font-medium text-zinc-600 hover:bg-zinc-50">FAR 2025 ↗</button><button onClick={()=>window.open("/far-calculator-2008-resource.html","_blank")} className="rounded-md border border-zinc-300 px-2.5 py-1 text-[11px] font-medium text-zinc-600 hover:bg-zinc-50">FAR 2008 ↗</button></div>}
+              {salesTab!=="leads" && salesTab!=="overview" && <div className="mb-3 flex flex-wrap gap-1">{[["proposals","Proposals"],["catalog","Scope catalogue"],["terms","Terms"]].map(([k,l])=><button key={k} onClick={()=>setSalesTab(k)} className={`rounded-md px-2.5 py-1 text-[11px] font-medium ${salesTab===k?"bg-zinc-800 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}<button onClick={()=>window.open("/far-calculator-2026-resource.html","_blank")} className="rounded-md border border-zinc-300 px-2.5 py-1 text-[11px] font-medium text-zinc-600 hover:bg-zinc-50">FAR 2025 ↗</button><button onClick={()=>window.open("/far-calculator-2008-resource.html","_blank")} className="rounded-md border border-zinc-300 px-2.5 py-1 text-[11px] font-medium text-zinc-600 hover:bg-zinc-50">FAR 2008 ↗</button></div>}
               {salesTab==="overview" && (()=>{
                 const lt=r=>Number(r.qty||0)*Number(r.rate||0);
                 const grand=p=>{ const sv=(p.items||[]).filter(x=>x.on&&x.sumOn!==false).reduce((s,x)=>s+lt(x),0)+(p.customLines||[]).filter(r=>r.sumOn!==false).reduce((s,r)=>s+lt(r),0); const vv=(p.vat&&p.vat.on)?Math.round(sv*Number(p.vat.pct||0)/100):0; const tv=(p.tax&&p.tax.on)?Math.round((sv+vv)*Number(p.tax.pct||0)/100):0; return sv+vv+tv; };
@@ -1698,7 +1698,7 @@ function printProposal(p){
                   {(e.farMode==="2025"||e.farMode==="2008") ? (
                     <div className="overflow-hidden rounded-lg border border-zinc-300 bg-white">
                       <div className="border-b border-zinc-200 px-4 py-2 text-[13px] font-semibold text-zinc-800">{e.farMode==="2025"?"RAJUK FAR Calculator \u00b7 Bidhimala & DAP 2025":"RAJUK FAR Calculator \u00b7 Bidhimala 2008"}</div>
-                      <iframe key={e.farMode} ref={farRef} src={e.farMode==="2025"?"/far-calculator-2025-resource.html":"/far-calculator-2008-resource.html"} title="FAR calculator" className="block w-full" style={{height:"760px",border:"0"}} />
+                      <iframe key={e.farMode} ref={farRef} src={e.farMode==="2025"?"/far-calculator-2026-resource.html":"/far-calculator-2008-resource.html"} title="FAR calculator" className="block w-full" style={{height:"760px",border:"0"}} />
                       <div className="border-t border-zinc-200 px-4 py-2 text-[11px] text-zinc-500">{e.farReport?"A saved FAR calculation will be included in Print / PDF. Recalculate and press Save to update it.":"Calculate above, then press \u201cSave FAR calculation\u201d to include it in Print / PDF."}</div>
                     </div>
                   ) : (
