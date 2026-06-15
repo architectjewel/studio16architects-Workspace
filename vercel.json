@@ -1,11 +1,10 @@
 {
-  "rewrites": [
+  "routes": [
     {
-      "source": "/",
-      "has": [
-        { "type": "host", "value": "construction.studio16architectsbd.com" }
-      ],
-      "destination": "/construction.html"
-    }
+      "src": "/",
+      "has": [{ "type": "host", "value": "construction.studio16architectsbd.com" }],
+      "dest": "/construction.html"
+    },
+    { "handle": "filesystem" }
   ]
 }
