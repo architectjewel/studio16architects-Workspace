@@ -188,7 +188,7 @@
       const realAdmin = profile?.role==="admin";
       const isAdmin = realAdmin && viewAs==="admin";
       const memberMode = realAdmin && viewAs==="member";
-      const has = k => k==="sales" ? isAdmin : (memberMode ? viewKeys.includes(k) : (realAdmin || (profile?.keys||["design"]).includes(k)));
+      const has = k => { const pk=Array.isArray(profile?.keys)?profile.keys:["design"]; const vk=Array.isArray(viewKeys)?viewKeys:["design"]; return k==="sales" ? isAdmin : (memberMode ? vk.includes(k) : (realAdmin || pk.includes(k))); };
       const areas = ALL_KEYS.filter(([k])=>has(k));
 
       useEffect(()=>{ if(!db) return; db.auth.getSession().then(({data})=>setSession(data.session)); const {data:sub}=db.auth.onAuthStateChange((_e,s)=>setSession(s)); return ()=>sub.subscription.unsubscribe(); },[]);
