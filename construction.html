@@ -35,7 +35,7 @@
     const STATUS_OPTS = Object.keys(STATUS).map(k=>({value:k,label:STATUS[k]}));
     const TS_OPTS = Object.keys(TS).map(k=>({value:k,label:TS[k]}));
     const DEPARTMENTS = ["Design","Finance","Sales","Construction","Engineering","Site","Coordination","Admin/HR","Management","Marketing"];
-    const POSITIONS = ["Manager","Architect","Lead Architect","Junior Architect","3D Visualizer","Draftsman","Structural Engineer","Lead Structural Engineer","Junior Structural Engineer","Cost Estimator","MEP Engineer","Plumbing Engineer","Electrical Engineer","Coordinator","Project Site Engineer","Project Manager","Project Store Manager","Project Caretaker","Accountant","Marketing Executive","Intern"];
+    const POSITIONS = ["Manager","Architect","Lead Architect","Junior Architect","3D Visualizer","Draftsman","Structural Engineer","Lead Structural Engineer","Junior Structural Engineer","Cost Estimator","MEP Engineer","Plumbing Engineer","Electrical Engineer","Coordinator","Project Site Engineer","Project Manager","Project Store Keeper","Project Caretaker","Accountant","Marketing Executive","Intern"];
     const canon = (v,list)=>{const t=String(v||"").trim().toLowerCase(); return list.find(x=>x.toLowerCase()===t)||v||"";};
     const ROLES = POSITIONS;
     const ROLE_PALETTE = [
@@ -88,7 +88,8 @@
     const monthName = ym=>{ const [y,m]=ym.split("-").map(Number); return new Date(y,m-1,1).toLocaleDateString("en-GB",{month:"long",year:"numeric"}); };
     const CON_CATS = ["Materials","Labour","Equipment","Transport","Subcontractor","Permit & fees","Utilities","Other"];
     const VENDOR_TYPES = ["Material supplier","Labour contractor","Subcontractor","Equipment","Service","Other"];
-    const mapVendor = r=>({id:r.id,name:r.name||"",type:r.type||"",phone:r.phone||"",note:r.note||"",sortOrder:r.sort_order});
+    const mapVendor = r=>({id:r.id,name:r.name||"",type:r.type||"",phone:r.phone||"",note:r.note||"",sortOrder:r.sort_order})
+    const mapCat = r=>({id:r.id,kind:r.kind||"material",code:r.code||"",name:r.name||"",parent:r.parent_code||null,level:r.level||1,note:r.note||""});
     const mapConProject = r=>({id:r.id,code:r.code||"",nickname:r.nickname||"",client:r.client||"",location:r.location||"",type:r.type||"building",status:r.status||"active",designProjectId:r.design_project_id,startDate:r.start_date,note:r.note||"",portalToken:r.portal_token||"",progressPct:r.progress_pct==null?0:Number(r.progress_pct),shareExpenditure:!!r.share_expenditure,sortOrder:r.sort_order});
     const mapConCost = r=>({id:r.id,projectId:r.project_id,category:r.category||"material",item:r.item||"",itemCategory:r.item_category||"",vendorId:r.vendor_id||"",qty:r.qty==null?"":Number(r.qty),unit:r.unit||"",rate:r.rate==null?"":Number(r.rate),amount:Number(r.amount||0),date:r.date,paidBy:r.paid_by||"",note:r.note||"",recordedBy:r.recorded_by,verified:!!r.verified,verifiedBy:r.verified_by||null,verifiedAt:r.verified_at||null,sortOrder:r.sort_order});
     const mapConRcv = r=>({id:r.id,projectId:r.project_id,title:r.title||"",amount:Number(r.amount||0),dueDate:r.due_date,date:r.date,note:r.note||"",collections:Array.isArray(r.collections)?r.collections:[],recordedBy:r.recorded_by,verified:!!r.verified,verifiedBy:r.verified_by||null,verifiedAt:r.verified_at||null,sortOrder:r.sort_order});
@@ -180,6 +181,7 @@
       const [shareOpen,setShareOpen]=useState(false); const [copied,setCopied]=useState(false);
       const [showAddM,setShowAddM]=useState(false); const [nm,setNm]=useState({name:"",role:"Architect",teamId:"",department:"Design"}); const blankHr=()=>({name:"",code:"",role:"Architect",type:"salaried",salary:"",join:"",dept:"Design",onBoard:true,mobile:"",nid:"",emergency:"",address:"",blood:"",study:"",institute:"",district:""}); const [hrForm,setHrForm]=useState(blankHr()); const [hrOpen,setHrOpen]=useState(false); const [hrEditId,setHrEditId]=useState(null); const [hrGroup,setHrGroup]=useState("position"); const [hrArch,setHrArch]=useState(false); const [hrProfile,setHrProfile]=useState(null);
       const [editM,setEditM]=useState(null);
+      const [cat,setCat]=useState([]); const [catExpand,setCatExpand]=useState({}); const [catAdd,setCatAdd]=useState(null); const [catForm,setCatForm]=useState({name:"",code:""}); const [catEdit,setCatEdit]=useState(null); const [catEditForm,setCatEditForm]=useState({name:"",code:""}); const [catQ,setCatQ]=useState("");
       const [removeM,setRemoveM]=useState(false); const [reassign,setReassign]=useState("");
       const [boardCfg,setBoardCfg]=useState(false); const [addBoardOpen,setAddBoardOpen]=useState(false); const [nb,setNb]=useState({name:"",desc:"",leadId:""});
       const [showAddP,setShowAddP]=useState(false); const [np,setNp]=useState({raw:"",code:"",nickname:"",client:"",location:"",size:"",address:"",priority:"medium",status:"live",lead:"__none"});
@@ -201,7 +203,7 @@
         try{
           let prof = profile;
           if(initial){ const {data:p,error:pe}=await db.from("profiles").select("*, companies(*)").eq("id",session.user.id).single(); if(pe) throw pe; prof=p; setProfile(p); try{ await db.rpc("touch_last_seen"); }catch(e){} }
-          const [mb,bd,pr,tk,pf,ld,rc,ex,vn,cb,iv,st,sc,tc,pp,pm,oh,cp,cc,cr]=await Promise.all([
+          const [mb,bd,pr,tk,pf,ld,rc,ex,vn,cb,iv,st,sc,tc,pp,pm,oh,cp,cc,cr,clg]=await Promise.all([
             db.from("members").select("*").order("sort_order"),
             db.from("boards").select("*").order("sort_order"),
             db.from("projects").select("*").order("sort_order"),
@@ -222,6 +224,7 @@
             db.from("construction_projects").select("*").order("sort_order"),
             db.from("construction_costs").select("*").order("date",{ascending:false}),
             db.from("construction_receivables").select("*").order("date",{ascending:false}),
+            db.from("construction_catalog").select("*").order("code"),
           ]);
           for(const r of [mb,bd,pr,tk]) if(r.error) throw r.error;
           if(!pf.error) setAllProfiles(pf.data||[]);
@@ -235,6 +238,7 @@
           if(cp&&!cp.error) setConProjects((cp.data||[]).map(mapConProject));
           if(cc&&!cc.error) setConCosts((cc.data||[]).map(mapConCost));
           if(cr&&!cr.error) setConRcv((cr.data||[]).map(mapConRcv));
+          if(clg&&!clg.error) setCat((clg.data||[]).map(mapCat));
           if(!iv.error) setInvestments((iv.data||[]).map(mapInv)); try{ const itx=await db.from("investment_txns").select("*"); if(!itx.error) setInvTxns((itx.data||[]).map(mapInvTxn)); }catch(_e){}
           if(!st.error) setSiteTasks((st.data||[]).map(mapSite));
           if(!sc.error) setCatalog((sc.data||[]).map(mapScope));
@@ -253,6 +257,12 @@
       const refresh = ()=>load(false);
       const cid = ()=>profile.company_id;
       const fail = (e)=>{ if(e){ setErr(e.message||String(e)); return true; } return false; };
+      const catKids = code => cat.filter(c=>c.parent===code).slice().sort((a,b)=>(a.code<b.code?-1:1));
+      function catDesc(code){ let out=[]; for(const k of cat.filter(c=>c.parent===code)){ out.push(k); out=out.concat(catDesc(k.code)); } return out; }
+      function nextCatCode(parentCode, level){ const sibs=cat.filter(c=>c.parent===parentCode).map(c=>parseInt(c.code,10)).filter(n=>!isNaN(n)); const step=level===2?100:10; const base=parseInt(parentCode,10)||0; return String(sibs.length? Math.max.apply(null,sibs)+step : base+step); }
+      async function addCat(){ if(!catAdd) return; const name=catForm.name.trim(); if(!name) return; const code=(catForm.code.trim()||nextCatCode(catAdd.parentCode,catAdd.level)); if(cat.some(c=>c.code===code)){ setErr("Code "+code+" already exists."); return; } if(fail((await db.from("construction_catalog").insert({company_id:cid(),kind:"material",code,name,parent_code:catAdd.parentCode,level:catAdd.level})).error)) return; setCatAdd(null); setCatForm({name:"",code:""}); await refresh(); }
+      async function saveCat(node){ const name=catEditForm.name.trim(); if(!name) return; const code=catEditForm.code.trim()||node.code; if(code!==node.code && cat.some(c=>c.code===code)){ setErr("Code "+code+" already exists."); return; } if(fail((await db.from("construction_catalog").update({name,code}).eq("id",node.id)).error)) return; setCatEdit(null); await refresh(); }
+      async function delCat(node){ const kids=catDesc(node.code); if(!window.confirm("Delete "+node.name+(kids.length?(" and "+kids.length+" item(s) under it"):"")+"?")) return; const ids=[node.id,...kids.map(k=>k.id)]; if(fail((await db.from("construction_catalog").delete().in("id",ids)).error)) return; await refresh(); }
 
       async function signIn(e){ e.preventDefault(); setBusy(true); setErr(""); const raw=email.trim(); const id=raw.includes("@")?raw.toLowerCase():raw.toLowerCase()+"@"+LOGIN_DOMAIN; const {error}=await db.auth.signInWithPassword({email:id,password:pw}); if(error) setErr(error.message==="Invalid login credentials"?"Wrong Team ID or password.":error.message); setBusy(false); }
       async function signOut(){ await db.auth.signOut(); setSession(null); setProfile(null); setMembers([]); setBoards([]); setProjects([]); }
@@ -1084,7 +1094,7 @@ function printProposal(p){
             <div className="mx-auto max-w-[1100px] px-4 py-3 sm:px-8">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-3">
                 <div className="flex flex-wrap items-center gap-3">
-                  <img src={"data:image/svg+xml;base64,"+LOGO_B64} alt={profile?.companies?.name||"Studio 16 Architects"} className="h-6 w-auto sm:h-7" /><span className="rounded bg-zinc-900 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">Site Office</span>
+                  <img src={"data:image/svg+xml;base64,"+LOGO_B64} alt={profile?.companies?.name||"Studio 16 Architects"} className="h-6 w-auto sm:h-7" /><span className="rounded-full border border-zinc-300 bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-400">Construction</span>
                   <div className="flex flex-wrap gap-1">{[...areas, ...(isAdmin?[["admin","Admin"]]:[])].map(([k,l])=><button key={k} onClick={()=>setArea(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${area===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
                 </div>
                 <div className="flex items-center gap-2 text-[12px]">
@@ -2198,7 +2208,7 @@ function printProposal(p){
             </>)}
 
             {area==="construction" && has("construction") && (<>
-              <div className="mb-3 flex flex-wrap gap-1">{[["projects","Projects"],["costs","Costs"],["billing","Client billing"],["reports","Reports"],["site","Site schedule"],["bills","Bills & purchases"],["vendors","Vendors"]].map(([k,l])=><button key={k} onClick={()=>setConTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${conTab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
+              <div className="mb-3 flex flex-wrap gap-1">{[["projects","Projects"],["costs","Costs"],["billing","Client billing"],["reports","Reports"],["site","Site schedule"],["bills","Bills & purchases"],["vendors","Vendors"],["matlist","Material list"]].map(([k,l])=><button key={k} onClick={()=>setConTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${conTab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
               {conTab==="projects" && (()=>{
                 const TYPES=[["building","Building"],["interior","Interior"],["landscape","Landscape"]];
                 const STAT=[["active","Active"],["on_hold","On hold"],["done","Completed"],["archived","Archived"]];
@@ -2626,6 +2636,57 @@ function printProposal(p){
                 ); })}
                 {!bills.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No bills yet. Add a vendor bill or purchase to track construction spend per project.</div>}
               </>); })()}
+              {conTab==="matlist" && (()=>{
+                const disc = cat.filter(c=>c.level===1 && c.kind==="material").slice().sort((a,b)=>(a.code<b.code?-1:1));
+                const ql = catQ.trim().toLowerCase();
+                const match = n => !ql || (n.name.toLowerCase().includes(ql) || (n.code||"").includes(ql));
+                return (<>
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                    <h2 className="text-base font-semibold">Material list <span className="mono text-[11px] text-zinc-400">{cat.filter(c=>c.kind==="material").length}</span></h2>
+                    <input value={catQ} onChange={e=>setCatQ(e.target.value)} placeholder="Search code or name" className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] outline-none focus:border-zinc-500" />
+                  </div>
+                  <p className="mb-3 text-[11px] text-zinc-400">Coded catalog: discipline (11000) {"\u2192"} group (11100) {"\u2192"} item (11110). New entries get the next code automatically; you can override a code if you need a specific one. Vendors attach under each item later.</p>
+                  {disc.length===0 ? <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No material catalog yet {"\u2014"} run construction-catalog.sql to seed it.</div> : <div className="space-y-2">
+                    {disc.map(d=>{ const open=catExpand[d.code]; const groups=catKids(d.code); return (
+                      <div key={d.id} className="rounded-lg border border-zinc-200 bg-white">
+                        <div className="flex flex-wrap items-center gap-2 px-3 py-2">
+                          <button onClick={()=>setCatExpand(x=>({...x,[d.code]:!x[d.code]}))} className="flex flex-1 items-center gap-2 text-left">
+                            <span className="mono w-3 text-[11px] text-zinc-400">{open?"\u25be":"\u25b8"}</span>
+                            <span className="mono rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] text-zinc-500">{d.code}</span>
+                            <span className="text-[13px] font-semibold text-zinc-800">{d.name}</span>
+                            <span className="mono text-[10px] text-zinc-400">{groups.length}</span>
+                          </button>
+                          {isAdmin && <React.Fragment><button onClick={()=>{setCatEdit(d.id);setCatEditForm({name:d.name,code:d.code});}} className="text-[11px] text-zinc-400 hover:text-zinc-700">edit</button><button onClick={()=>{setCatAdd({parentCode:d.code,level:2});setCatForm({name:"",code:""});setCatExpand(x=>({...x,[d.code]:true}));}} className="rounded border border-zinc-300 px-2 py-0.5 text-[11px] text-zinc-600 hover:bg-zinc-50">+ group</button></React.Fragment>}
+                        </div>
+                        {catEdit===d.id && <div className="flex flex-wrap items-center gap-2 border-t border-zinc-100 px-3 py-2"><input value={catEditForm.code} onChange={e=>setCatEditForm(f=>({...f,code:e.target.value}))} className="mono w-24 rounded border border-zinc-300 px-2 py-1 text-[12px]" /><input value={catEditForm.name} onChange={e=>setCatEditForm(f=>({...f,name:e.target.value}))} className="flex-1 rounded border border-zinc-300 px-2 py-1 text-[12px]" /><button onClick={()=>saveCat(d)} className="rounded bg-zinc-900 px-2 py-1 text-[11px] text-white">Save</button><button onClick={()=>setCatEdit(null)} className="text-[11px] text-zinc-500">Cancel</button>{groups.length===0 && <button onClick={()=>delCat(d)} className="ml-auto text-[11px] text-red-500">Delete</button>}</div>}
+                        {open && <div className="space-y-2 border-t border-zinc-100 px-3 py-2">
+                          {catAdd && catAdd.parentCode===d.code && catAdd.level===2 && <div className="flex flex-wrap items-center gap-2 rounded bg-zinc-50 px-2 py-1.5"><span className="mono text-[11px] text-zinc-400">{catForm.code.trim()||nextCatCode(d.code,2)}</span><input autoFocus value={catForm.name} onChange={e=>setCatForm(f=>({...f,name:e.target.value}))} placeholder="Group name (e.g. Cement)" className="flex-1 rounded border border-zinc-300 px-2 py-1 text-[12px]" /><button onClick={addCat} className="rounded bg-zinc-900 px-2 py-1 text-[11px] text-white">Add</button><button onClick={()=>setCatAdd(null)} className="text-[11px] text-zinc-500">Cancel</button></div>}
+                          {groups.length===0 && !(catAdd&&catAdd.parentCode===d.code) && <div className="text-[11px] text-zinc-400">No groups yet.</div>}
+                          {groups.map(g=>{ const items=catKids(g.code); if(ql && !match(g) && !items.some(match)) return null; return (
+                            <div key={g.id} className="rounded border border-zinc-100 bg-zinc-50">
+                              <div className="flex flex-wrap items-center gap-2 px-2 py-1.5">
+                                <span className="mono rounded border border-zinc-200 bg-white px-1.5 py-0.5 text-[10px] text-zinc-500">{g.code}</span>
+                                <span className="flex-1 text-[12px] font-medium text-zinc-700">{g.name}</span>
+                                <span className="mono text-[10px] text-zinc-400">{items.length}</span>
+                                {isAdmin && <React.Fragment><button onClick={()=>{setCatEdit(g.id);setCatEditForm({name:g.name,code:g.code});}} className="text-[11px] text-zinc-400 hover:text-zinc-700">edit</button><button onClick={()=>{setCatAdd({parentCode:g.code,level:3});setCatForm({name:"",code:""});}} className="rounded border border-zinc-300 px-1.5 py-0.5 text-[10px] text-zinc-600 hover:bg-white">+ item</button></React.Fragment>}
+                              </div>
+                              {catEdit===g.id && <div className="flex flex-wrap items-center gap-2 border-t border-zinc-100 px-2 py-1.5"><input value={catEditForm.code} onChange={e=>setCatEditForm(f=>({...f,code:e.target.value}))} className="mono w-24 rounded border border-zinc-300 px-2 py-1 text-[12px]" /><input value={catEditForm.name} onChange={e=>setCatEditForm(f=>({...f,name:e.target.value}))} className="flex-1 rounded border border-zinc-300 px-2 py-1 text-[12px]" /><button onClick={()=>saveCat(g)} className="rounded bg-zinc-900 px-2 py-1 text-[11px] text-white">Save</button><button onClick={()=>setCatEdit(null)} className="text-[11px] text-zinc-500">Cancel</button><button onClick={()=>delCat(g)} className="ml-auto text-[11px] text-red-500">Delete</button></div>}
+                              {(items.length>0 || (catAdd&&catAdd.parentCode===g.code)) && <div className="border-t border-zinc-100 px-2 py-1.5">
+                                <div className="flex flex-wrap gap-1.5">
+                                  {items.map(it=> catEdit===it.id
+                                    ? <div key={it.id} className="flex w-full flex-wrap items-center gap-2"><input value={catEditForm.code} onChange={e=>setCatEditForm(f=>({...f,code:e.target.value}))} className="mono w-24 rounded border border-zinc-300 px-2 py-1 text-[12px]" /><input value={catEditForm.name} onChange={e=>setCatEditForm(f=>({...f,name:e.target.value}))} className="flex-1 rounded border border-zinc-300 px-2 py-1 text-[12px]" /><button onClick={()=>saveCat(it)} className="rounded bg-zinc-900 px-2 py-1 text-[11px] text-white">Save</button><button onClick={()=>setCatEdit(null)} className="text-[11px] text-zinc-500">Cancel</button><button onClick={()=>delCat(it)} className="ml-auto text-[11px] text-red-500">Delete</button></div>
+                                    : <div key={it.id} className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-2 py-1 text-[11px]"><span className="mono text-[10px] text-zinc-400">{it.code}</span><span className="text-zinc-700">{it.name}</span>{isAdmin && <button onClick={()=>{setCatEdit(it.id);setCatEditForm({name:it.name,code:it.code});}} className="text-[10px] text-zinc-300 hover:text-zinc-600">edit</button>}</div>
+                                  )}
+                                </div>
+                                {catAdd && catAdd.parentCode===g.code && catAdd.level===3 && <div className="mt-1.5 flex flex-wrap items-center gap-2"><span className="mono text-[11px] text-zinc-400">{catForm.code.trim()||nextCatCode(g.code,3)}</span><input autoFocus value={catForm.name} onChange={e=>setCatForm(f=>({...f,name:e.target.value}))} placeholder="Item name (e.g. OPC / PPC Cement)" className="flex-1 rounded border border-zinc-300 px-2 py-1 text-[12px]" /><button onClick={addCat} className="rounded bg-zinc-900 px-2 py-1 text-[11px] text-white">Add</button><button onClick={()=>setCatAdd(null)} className="text-[11px] text-zinc-500">Cancel</button></div>}
+                              </div>}
+                            </div>
+                          ); })}
+                        </div>}
+                      </div>
+                    ); })}
+                  </div>}
+                </>); })()}
               {conTab==="vendors" && (()=>{ return (<>
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                   <h2 className="text-base font-semibold">Vendors <span className="mono text-[11px] text-zinc-400">{vendors.length}</span></h2>
