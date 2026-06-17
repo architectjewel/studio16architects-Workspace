@@ -36,7 +36,7 @@
     const STATUS_OPTS = Object.keys(STATUS).map(k=>({value:k,label:STATUS[k]}));
     const TS_OPTS = Object.keys(TS).map(k=>({value:k,label:TS[k]}));
     const DEPARTMENTS = ["Design","Finance","Sales","Construction","Engineering","Site","Coordination","Admin/HR","Management","Marketing"];
-    const POSITIONS = ["Manager","Architect","Lead Architect","Junior Architect","3D Visualizer","Draftsman","Structural Engineer","Lead Structural Engineer","Junior Structural Engineer","Cost Estimator","MEP Engineer","Plumbing Engineer","Electrical Engineer","Coordinator","Site Engineer","Accountant","Marketing Executive","Intern"];
+    const POSITIONS = ["Manager","Architect","Lead Architect","Junior Architect","3D Visualizer","Draftsman","Structural Engineer","Lead Structural Engineer","Junior Structural Engineer","Cost Estimator","MEP Engineer","Plumbing Engineer","Electrical Engineer","Coordinator","Project Site Engineer","Project Manager","Project Store Manager","Project Caretaker","Accountant","Marketing Executive","Intern"];
     const canon = (v,list)=>{const t=String(v||"").trim().toLowerCase(); return list.find(x=>x.toLowerCase()===t)||v||"";};
     const ROLES = POSITIONS;
     const ROLE_PALETTE = [
