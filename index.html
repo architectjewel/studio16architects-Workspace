@@ -837,8 +837,8 @@ function printExpenditure(){
             const out=it.billed?Math.max(0,amt-paid):0;
             tContract+=amt; tRecv+=paid; pRecv+=paid;
             if(it.billed){ tBilled+=amt; pBill+=amt; pOut+=out; } else { tPending+=amt; }
-            const st=rcvStatus(it); const label=(st&&st[1])?st[1]:(it.billed?"Unpaid":"Pending");
-            return '<tr><td class="c">'+(i+1)+'</td><td>'+esc(it.title||"")+'</td><td class="r">'+tk(amt)+'</td><td class="r">'+(paid?tk(paid):"\u2014")+'</td><td class="r">'+(it.billed?tk(out):"\u2014")+'</td><td class="c"><span class="pill">'+esc(label)+'</span></td></tr>';
+            const st=rcvStatus(it); const label=(st&&st[1])?st[1]:(it.billed?"Unpaid":"Pending"); const tnames=(it.taskIds||[]).map(id=>{ const tt=(p.tasks||[]).find(x=>x.id===id); return tt?tt.label:null; }).filter(Boolean);
+            return '<tr><td class="c">'+(i+1)+'</td><td>'+esc(it.title||"")+(tnames.length?'<div style="font-size:8.5px;color:#555;margin-top:1px">Covers: '+esc(tnames.join(", "))+'</div>':'')+'</td><td class="r">'+tk(amt)+'</td><td class="r">'+(paid?tk(paid):"\u2014")+'</td><td class="r">'+(it.billed?tk(out):"\u2014")+'</td><td class="c"><span class="pill">'+esc(label)+'</span></td></tr>';
           }).join("");
           tOut+=pOut;
           const pmeta=[p.client?("Client: "+esc(p.client)):"",p.occupancy?("Type: "+esc(p.occupancy)):"",p.size?("Land size: "+esc(p.size)):"",p.location?("Location: "+esc(p.location)):"",p.address?("Address: "+esc(p.address)):""].filter(Boolean).join(" \u00b7 "); const head='<div class="proj"><span class="code mono">'+esc(p.code||"")+'</span> '+esc(p.nickname||p.client||p.location||"Project")+'</div>'+(pmeta?('<div style="font-size:10px;color:#555;margin:1px 0 8px;line-height:1.5">'+pmeta+'</div>'):'');
