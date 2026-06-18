@@ -839,7 +839,7 @@ function printExpenditure(){
             return '<tr><td class="c">'+(i+1)+'</td><td>'+esc(it.title||"")+'</td><td class="r">'+tk(amt)+'</td><td class="r">'+(paid?tk(paid):"\u2014")+'</td><td class="r">'+(it.billed?tk(out):"\u2014")+'</td><td class="c"><span class="pill">'+esc(label)+'</span></td></tr>';
           }).join("");
           tOut+=pOut;
-          const head='<div class="proj"><span class="code mono">'+esc(p.code||"")+'</span> '+esc(p.nickname||p.client||p.location||"Project")+'</div>';
+          const pmeta=[p.client?("Client: "+esc(p.client)):"",p.occupancy?("Type: "+esc(p.occupancy)):"",p.size?("Land size: "+esc(p.size)):"",p.location?("Location: "+esc(p.location)):"",p.address?("Address: "+esc(p.address)):""].filter(Boolean).join(" \u00b7 "); const head='<div class="proj"><span class="code mono">'+esc(p.code||"")+'</span> '+esc(p.nickname||p.client||p.location||"Project")+'</div>'+(pmeta?('<div style="font-size:10px;color:#555;margin:1px 0 8px;line-height:1.5">'+pmeta+'</div>'):'');
           const tbl='<table><thead><tr><td class="c">#</td><td>Instalment</td><td class="r">Bill</td><td class="r">Received</td><td class="r">Outstanding</td><td class="c">Status</td></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="empty">No instalments.</td></tr>')+'<tr class="sub"><td></td><td>Subtotal</td><td class="r">'+tk(pBill)+'</td><td class="r">'+tk(pRecv)+'</td><td class="r">'+tk(pOut)+'</td><td></td></tr></tbody></table>';
           return head+tbl;
         }).join("");
