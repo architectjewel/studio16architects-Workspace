@@ -91,7 +91,8 @@
     const mapVendor = r=>({id:r.id,name:r.name||"",type:r.type||"",phone:r.phone||"",note:r.note||"",itemCode:r.item_code||"",code:r.code||"",blacklisted:!!r.blacklisted,disciplineCode:r.discipline_code||"",groupCode:r.group_code||"",itemCodes:Array.isArray(r.item_codes)?r.item_codes:[],location:r.location||"",sortOrder:r.sort_order})
     const mapCat = r=>({id:r.id,kind:r.kind||"material",code:r.code||"",name:r.name||"",parent:r.parent_code||null,level:r.level||1,note:r.note||""})
     const mapReq = r=>({id:r.id,projectId:r.project_id||"",ref:r.ref||"",title:r.title||"",raisedBy:r.raised_by||"",date:r.date||"",status:r.status||"draft",budget:r.budget==null?"":Number(r.budget),note:r.note||"",lines:Array.isArray(r.lines)?r.lines:[]})
-    const mapAdvance = r=>({id:r.id,memberId:r.member_id||"",toMember:r.to_member||"",type:r.type||"give",amount:Number(r.amount||0),category:r.category||"",method:r.method||"",date:r.date||"",note:r.note||"",projectId:r.project_id||"",vendorId:r.vendor_id||"",requisitionId:r.requisition_id||""});
+    const mapAdvance = r=>({id:r.id,memberId:r.member_id||"",toMember:r.to_member||"",type:r.type||"give",amount:Number(r.amount||0),category:r.category||"",method:r.method||"",date:r.date||"",note:r.note||"",projectId:r.project_id||"",vendorId:r.vendor_id||"",requisitionId:r.requisition_id||""})
+    const mapConProposal = r=>({id:r.id,ref:r.ref||"",clientName:r.client_name||"",clientPhone:r.client_phone||"",clientEmail:r.client_email||"",siteAddress:r.site_address||"",projectTitle:r.project_title||"",contractType:r.contract_type||"sft",area:r.area==null?"":Number(r.area),rate:r.rate==null?"":Number(r.rate),monthlyFee:r.monthly_fee==null?"":Number(r.monthly_fee),durationMonths:r.duration_months==null?"":Number(r.duration_months),lumpSum:r.lump_sum==null?"":Number(r.lump_sum),scopeNote:r.scope_note||"",lines:Array.isArray(r.lines)?r.lines:[],terms:Array.isArray(r.terms)?r.terms:[],status:r.status||"draft",date:r.date||"",validUntil:r.valid_until||"",note:r.note||"",designProjectId:r.design_project_id||"",convertedProjectId:r.converted_project_id||""});
     const mapConProject = r=>({id:r.id,code:r.code||"",nickname:r.nickname||"",client:r.client||"",location:r.location||"",type:r.type||"building",status:r.status||"active",designProjectId:r.design_project_id,startDate:r.start_date,note:r.note||"",portalToken:r.portal_token||"",progressPct:r.progress_pct==null?0:Number(r.progress_pct),shareExpenditure:!!r.share_expenditure,contractType:r.contract_type||"",contractValue:r.contract_value==null?"":Number(r.contract_value),endDate:r.end_date,pm:r.pm_member_id,storeKeeper:r.storekeeper_member_id,siteEngineer:r.site_engineer_member_id,caretaker:r.caretaker_member_id,sortOrder:r.sort_order});
     const mapConCost = r=>({id:r.id,projectId:r.project_id,category:r.category||"material",item:r.item||"",itemCategory:r.item_category||"",vendorId:r.vendor_id||"",qty:r.qty==null?"":Number(r.qty),unit:r.unit||"",rate:r.rate==null?"":Number(r.rate),amount:Number(r.amount||0),date:r.date,paidBy:r.paid_by||"",note:r.note||"",recordedBy:r.recorded_by,verified:!!r.verified,verifiedBy:r.verified_by||null,verifiedAt:r.verified_at||null,sortOrder:r.sort_order});
     const mapConRcv = r=>({id:r.id,projectId:r.project_id,title:r.title||"",amount:Number(r.amount||0),dueDate:r.due_date,date:r.date,note:r.note||"",collections:Array.isArray(r.collections)?r.collections:[],recordedBy:r.recorded_by,verified:!!r.verified,verifiedBy:r.verified_by||null,verifiedAt:r.verified_at||null,sortOrder:r.sort_order});
@@ -188,7 +189,7 @@
       const [boardCfg,setBoardCfg]=useState(false); const [addBoardOpen,setAddBoardOpen]=useState(false); const [nb,setNb]=useState({name:"",desc:"",leadId:""});
       const [showAddP,setShowAddP]=useState(false); const [np,setNp]=useState({raw:"",code:"",nickname:"",client:"",location:"",size:"",address:"",priority:"medium",status:"live",lead:"__none"});
       const [addTaskFor,setAddTaskFor]=useState(null); const [td,setTd]=useState({workType:"production",type:PROD_GROUPS[0].items[0][0],label:"",contact:"",assignee:"__none"});
-      const [tab,setTab]=useState("overview"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [viewKeys,setViewKeys]=useState(["design"]); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("construction"); const [myCheckin,setMyCheckin]=useState(null); const [leads,setLeads]=useState([]); const [showAddLead,setShowAddLead]=useState(false); const [nl,setNl]=useState({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); const [leadEdit,setLeadEdit]=useState(null); const [convFor,setConvFor]=useState(null); const [convDraft,setConvDraft]=useState({code:"",priority:"medium"}); const [receivables,setReceivables]=useState([]); const [showAddRcv,setShowAddRcv]=useState(false); const [rcvProj,setRcvProj]=useState([]); const [rcvPickOpen,setRcvPickOpen]=useState(false); const [reportMonth,setReportMonth]=useState("all"); const [reportYr,setReportYr]=useState("all"); const [nr,setNr]=useState({projectId:"",title:"",amount:"",dueDate:""}); const [rcvEdit,setRcvEdit]=useState(null); const [finTab,setFinTab]=useState("overview"); const [profitOpen,setProfitOpen]=useState(null); const [finPeriod,setFinPeriod]=useState("all"); const [expenses,setExpenses]=useState([]); const [overhead,setOverhead]=useState([]); const [runMonth,setRunMonth]=useState(dayStr().slice(0,7)); const [runEdits,setRunEdits]=useState({}); const [ohNew,setOhNew]=useState({label:"",amount:"",category:"Rent",variable:false}); const [showAddExp,setShowAddExp]=useState(false); const [ne,setNe]=useState({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:"",kind:"overhead",projectId:"",memberId:"",taskId:"",clientPrice:"",billable:false}); const [expEdit,setExpEdit]=useState(null); const [expMonth,setExpMonth]=useState(dayStr().slice(0,7)); const [expScope,setExpScope]=useState("month"); const [profitScope,setProfitScope]=useState("all"); const [conTab,setConTab]=useState("projects"); const [vendors,setVendors]=useState([]); const [bills,setBills]=useState([]); const [showAddVendor,setShowAddVendor]=useState(false); const [nvend,setNvend]=useState({name:"",type:"Material supplier",phone:"",note:"",disciplineCode:"",groupCode:"",itemCodes:[],location:"",code:""}); const [vendorEdit,setVendorEdit]=useState(null); const [vendorShowBL,setVendorShowBL]=useState(false); const [vendorQ,setVendorQ]=useState(""); const [boardSel,setBoardSel]=useState(""); const [reqs,setReqs]=useState([]); const [reqForm,setReqForm]=useState(null); const [rqLine,setRqLine]=useState({code:"",vendorId:"",qty:"",rate:"",extra:""}); const [advances,setAdvances]=useState([]); const [hdlr,setHdlr]=useState(""); const [showFund,setShowFund]=useState(false); const [fundForm,setFundForm]=useState({amount:"",date:dayStr(),projectId:"",note:""}); const [showPay,setShowPay]=useState(false); const [hPayForm,setHPayForm]=useState({amount:"",date:dayStr(),projectId:"",payTo:"vendor",vendorId:"",category:"Transport",requisitionId:"",note:""}); const [showAddBill,setShowAddBill]=useState(false); const [nbill,setNbill]=useState({projectId:"",vendorId:"",category:"Materials",title:"",amount:"",date:dayStr(),dueDate:"",note:""}); const [billEdit,setBillEdit]=useState(null); const [siteTasks,setSiteTasks]=useState([]); const [showAddSite,setShowAddSite]=useState(false); const [ns,setNs]=useState({projectId:"",title:"",startDate:"",endDate:"",status:"not_started",progress:"0"}); const [siteEdit,setSiteEdit]=useState(null); const [salesTab,setSalesTab]=useState("overview"); const [salesPeriod,setSalesPeriod]=useState("all"); const [salesQ,setSalesQ]=useState(""); const [emailing,setEmailing]=useState(false); const [pdfFile,setPdfFile]=useState(null); const [billEmailFor,setBillEmailFor]=useState(null); const [billPdf,setBillPdf]=useState(null); const [receiptEmailFor,setReceiptEmailFor]=useState(null); const [receiptPdf,setReceiptPdf]=useState(null); const [payments,setPayments]=useState([]); const [payForm,setPayForm]=useState({amount:"",date:"",payMode:"",txnRef:"",bankName:"",chequeNo:"",chequeDate:"",fromAcct:"",txnDate:"",note:""}); const [farSaving,setFarSaving]=useState(false); const farRef=React.useRef(null); const [catalog,setCatalog]=useState([]); const [showAddScope,setShowAddScope]=useState(false); const [nsc,setNsc]=useState({code:"",name:"",detail:""}); const [scopeEdit,setScopeEdit]=useState(null); const [tcs,setTcs]=useState([]); const [showAddTc,setShowAddTc]=useState(false); const [ntc,setNtc]=useState({title:"",body:""}); const [tcEdit,setTcEdit]=useState(null); const [resTab,setResTab]=useState("2025"); const [investments,setInvestments]=useState([]); const [showAddInv,setShowAddInv]=useState(false); const [ni,setNi]=useState({business:"",type:"Equity stake",amount:"",date:dayStr(),status:"active"}); const [invEdit,setInvEdit]=useState(null); const [invTxns,setInvTxns]=useState([]); const [invSel,setInvSel]=useState(null); const [invForm,setInvForm]=useState(null); const [invTxnForm,setInvTxnForm]=useState(null); const [invGroupBy,setInvGroupBy]=useState("category"); const [invPick,setInvPick]=useState([]); const [proposals,setProposals]=useState([]); const [propEdit,setPropEdit]=useState(null); const [propNewOpen,setPropNewOpen]=useState(false); const [acceptDraft,setAcceptDraft]=useState(null); const [conProjects,setConProjects]=useState([]); const [showAddCP,setShowAddCP]=useState(false); const [ncp,setNcp]=useState({code:"",nickname:"",client:"",location:"",type:"building",status:"active",startDate:"",note:"",contractType:"",contractValue:"",endDate:"",pm:"",storeKeeper:"",siteEngineer:"",caretaker:""}); const [cpEdit,setCpEdit]=useState(null); const [cpFrom,setCpFrom]=useState(""); const [conCosts,setConCosts]=useState([]); const [showAddCost,setShowAddCost]=useState(false); const [ncost,setNcost]=useState({projectId:"",category:"material",item:"",itemCategory:"",vendorId:"",qty:"",unit:"",rate:"",amount:"",date:dayStr(),paidBy:"",note:""}); const [costEdit,setCostEdit]=useState(null); const [costProj,setCostProj]=useState("all"); const [repScope,setRepScope]=useState("all"); const [repProj,setRepProj]=useState("all"); const [conRcv,setConRcv]=useState([]);  const [billProj,setBillProj]=useState("all"); const [collectFor,setCollectFor]=useState(null); const [ncoll,setNcoll]=useState({amount:"",date:dayStr(),mode:"Cash",note:""});
+      const [tab,setTab]=useState("overview"); const [q,setQ]=useState(""); const [regStatus,setRegStatus]=useState("all"); const [editP,setEditP]=useState(null); const [delP,setDelP]=useState(null); const [showRegAdd,setShowRegAdd]=useState(false); const [showBoardShare,setShowBoardShare]=useState(false); const [boardCopied,setBoardCopied]=useState(false); const [subOpen,setSubOpen]=useState({}); const [printUpcoming,setPrintUpcoming]=useState(false); const [viewAs,setViewAs]=useState("admin"); const [viewKeys,setViewKeys]=useState(["design"]); const [allProfiles,setAllProfiles]=useState([]); const [pEdit,setPEdit]=useState(null); const [showSeen,setShowSeen]=useState(false); const [area,setArea]=useState("construction"); const [myCheckin,setMyCheckin]=useState(null); const [leads,setLeads]=useState([]); const [showAddLead,setShowAddLead]=useState(false); const [nl,setNl]=useState({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); const [leadEdit,setLeadEdit]=useState(null); const [convFor,setConvFor]=useState(null); const [convDraft,setConvDraft]=useState({code:"",priority:"medium"}); const [receivables,setReceivables]=useState([]); const [showAddRcv,setShowAddRcv]=useState(false); const [rcvProj,setRcvProj]=useState([]); const [rcvPickOpen,setRcvPickOpen]=useState(false); const [reportMonth,setReportMonth]=useState("all"); const [reportYr,setReportYr]=useState("all"); const [nr,setNr]=useState({projectId:"",title:"",amount:"",dueDate:""}); const [rcvEdit,setRcvEdit]=useState(null); const [finTab,setFinTab]=useState("overview"); const [profitOpen,setProfitOpen]=useState(null); const [finPeriod,setFinPeriod]=useState("all"); const [expenses,setExpenses]=useState([]); const [overhead,setOverhead]=useState([]); const [runMonth,setRunMonth]=useState(dayStr().slice(0,7)); const [runEdits,setRunEdits]=useState({}); const [ohNew,setOhNew]=useState({label:"",amount:"",category:"Rent",variable:false}); const [showAddExp,setShowAddExp]=useState(false); const [ne,setNe]=useState({date:dayStr(),category:"Rent",payee:"",amount:"",method:"",note:"",kind:"overhead",projectId:"",memberId:"",taskId:"",clientPrice:"",billable:false}); const [expEdit,setExpEdit]=useState(null); const [expMonth,setExpMonth]=useState(dayStr().slice(0,7)); const [expScope,setExpScope]=useState("month"); const [profitScope,setProfitScope]=useState("all"); const [conTab,setConTab]=useState("projects"); const [vendors,setVendors]=useState([]); const [bills,setBills]=useState([]); const [showAddVendor,setShowAddVendor]=useState(false); const [nvend,setNvend]=useState({name:"",type:"Material supplier",phone:"",note:"",disciplineCode:"",groupCode:"",itemCodes:[],location:"",code:""}); const [vendorEdit,setVendorEdit]=useState(null); const [vendorShowBL,setVendorShowBL]=useState(false); const [vendorQ,setVendorQ]=useState(""); const [boardSel,setBoardSel]=useState(""); const [reqs,setReqs]=useState([]); const [reqForm,setReqForm]=useState(null); const [rqLine,setRqLine]=useState({code:"",vendorId:"",qty:"",rate:"",extra:""}); const [advances,setAdvances]=useState([]); const [hdlr,setHdlr]=useState(""); const [showFund,setShowFund]=useState(false); const [fundForm,setFundForm]=useState({amount:"",date:dayStr(),projectId:"",note:""}); const [showPay,setShowPay]=useState(false); const [hPayForm,setHPayForm]=useState({amount:"",date:dayStr(),projectId:"",payTo:"vendor",vendorId:"",category:"Transport",requisitionId:"",note:""}); const [stmtVendor,setStmtVendor]=useState(""); const [stmtProj,setStmtProj]=useState(""); const [clProj,setClProj]=useState(""); const [conProposals,setConProposals]=useState([]); const [propForm,setPropForm]=useState(null); const [propLine,setPropLine]=useState({desc:"",code:"",qty:"",unit:"",rate:""}); const [termLine,setTermLine]=useState(""); const [showAddBill,setShowAddBill]=useState(false); const [nbill,setNbill]=useState({projectId:"",vendorId:"",category:"Materials",title:"",amount:"",date:dayStr(),dueDate:"",note:""}); const [billEdit,setBillEdit]=useState(null); const [siteTasks,setSiteTasks]=useState([]); const [showAddSite,setShowAddSite]=useState(false); const [ns,setNs]=useState({projectId:"",title:"",startDate:"",endDate:"",status:"not_started",progress:"0"}); const [siteEdit,setSiteEdit]=useState(null); const [salesTab,setSalesTab]=useState("overview"); const [salesPeriod,setSalesPeriod]=useState("all"); const [salesQ,setSalesQ]=useState(""); const [emailing,setEmailing]=useState(false); const [pdfFile,setPdfFile]=useState(null); const [billEmailFor,setBillEmailFor]=useState(null); const [billPdf,setBillPdf]=useState(null); const [receiptEmailFor,setReceiptEmailFor]=useState(null); const [receiptPdf,setReceiptPdf]=useState(null); const [payments,setPayments]=useState([]); const [payForm,setPayForm]=useState({amount:"",date:"",payMode:"",txnRef:"",bankName:"",chequeNo:"",chequeDate:"",fromAcct:"",txnDate:"",note:""}); const [farSaving,setFarSaving]=useState(false); const farRef=React.useRef(null); const [catalog,setCatalog]=useState([]); const [showAddScope,setShowAddScope]=useState(false); const [nsc,setNsc]=useState({code:"",name:"",detail:""}); const [scopeEdit,setScopeEdit]=useState(null); const [tcs,setTcs]=useState([]); const [showAddTc,setShowAddTc]=useState(false); const [ntc,setNtc]=useState({title:"",body:""}); const [tcEdit,setTcEdit]=useState(null); const [resTab,setResTab]=useState("2025"); const [investments,setInvestments]=useState([]); const [showAddInv,setShowAddInv]=useState(false); const [ni,setNi]=useState({business:"",type:"Equity stake",amount:"",date:dayStr(),status:"active"}); const [invEdit,setInvEdit]=useState(null); const [invTxns,setInvTxns]=useState([]); const [invSel,setInvSel]=useState(null); const [invForm,setInvForm]=useState(null); const [invTxnForm,setInvTxnForm]=useState(null); const [invGroupBy,setInvGroupBy]=useState("category"); const [invPick,setInvPick]=useState([]); const [proposals,setProposals]=useState([]); const [propEdit,setPropEdit]=useState(null); const [propNewOpen,setPropNewOpen]=useState(false); const [acceptDraft,setAcceptDraft]=useState(null); const [conProjects,setConProjects]=useState([]); const [showAddCP,setShowAddCP]=useState(false); const [ncp,setNcp]=useState({code:"",nickname:"",client:"",location:"",type:"building",status:"active",startDate:"",note:"",contractType:"",contractValue:"",endDate:"",pm:"",storeKeeper:"",siteEngineer:"",caretaker:""}); const [cpEdit,setCpEdit]=useState(null); const [cpFrom,setCpFrom]=useState(""); const [conCosts,setConCosts]=useState([]); const [showAddCost,setShowAddCost]=useState(false); const [ncost,setNcost]=useState({projectId:"",category:"material",item:"",itemCategory:"",vendorId:"",qty:"",unit:"",rate:"",amount:"",date:dayStr(),paidBy:"",note:""}); const [costEdit,setCostEdit]=useState(null); const [costProj,setCostProj]=useState("all"); const [repScope,setRepScope]=useState("all"); const [repProj,setRepProj]=useState("all"); const [conRcv,setConRcv]=useState([]);  const [billProj,setBillProj]=useState("all"); const [collectFor,setCollectFor]=useState(null); const [ncoll,setNcoll]=useState({amount:"",date:dayStr(),mode:"Cash",note:""});
 
       const realAdmin = profile?.role==="admin";
       const isAdmin = realAdmin && viewAs==="admin";
@@ -205,7 +206,7 @@
         try{
           let prof = profile;
           if(initial){ const {data:p,error:pe}=await db.from("profiles").select("*, companies(*)").eq("id",session.user.id).single(); if(pe) throw pe; prof=p; setProfile(p); try{ await db.rpc("touch_last_seen"); }catch(e){} }
-          const [mb,bd,pr,tk,pf,ld,rc,ex,vn,cb,iv,st,sc,tc,pp,pm,oh,cp,cc,cr,clg,creq,cadv]=await Promise.all([
+          const [mb,bd,pr,tk,pf,ld,rc,ex,vn,cb,iv,st,sc,tc,pp,pm,oh,cp,cc,cr,clg,creq,cadv,cprop]=await Promise.all([
             db.from("members").select("*").order("sort_order"),
             db.from("boards").select("*").order("sort_order"),
             db.from("projects").select("*").order("sort_order"),
@@ -229,6 +230,7 @@
             db.from("construction_catalog").select("*").order("code"),
             db.from("construction_requisitions").select("*").order("created_at",{ascending:false}),
             db.from("cash_advances").select("*").order("date",{ascending:false}),
+            db.from("construction_proposals").select("*").order("created_at",{ascending:false}),
           ]);
           for(const r of [mb,bd,pr,tk]) if(r.error) throw r.error;
           if(!pf.error) setAllProfiles(pf.data||[]);
@@ -245,6 +247,7 @@
           if(clg&&!clg.error) setCat((clg.data||[]).map(mapCat));
           if(creq&&!creq.error) setReqs((creq.data||[]).map(mapReq));
           if(cadv&&!cadv.error) setAdvances((cadv.data||[]).map(mapAdvance));
+          if(cprop&&!cprop.error) setConProposals((cprop.data||[]).map(mapConProposal));
           if(!iv.error) setInvestments((iv.data||[]).map(mapInv)); try{ const itx=await db.from("investment_txns").select("*"); if(!itx.error) setInvTxns((itx.data||[]).map(mapInvTxn)); }catch(_e){}
           if(!st.error) setSiteTasks((st.data||[]).map(mapSite));
           if(!sc.error) setCatalog((sc.data||[]).map(mapScope));
@@ -501,6 +504,60 @@ function receiptEmailHTML(pmt){
       async function fundHandler(){ const f=fundForm; if(!hdlr){ alert("Pick a handler."); return; } if(!(Number(f.amount)>0)){ alert("Enter an amount."); return; } const row={company_id:cid(),member_id:hdlr,type:"give",amount:Number(f.amount),method:"Cash",date:f.date||dayStr(),note:(f.note||"").trim(),project_id:f.projectId||null,recorded_by:session.user.id,sort_order:advances.length}; if(fail((await db.from("cash_advances").insert(row)).error)) return; setShowFund(false); setFundForm({amount:"",date:dayStr(),projectId:"",note:""}); await refresh(); }
       async function handlerPay(){ const f=hPayForm; if(!hdlr){ alert("Pick a handler."); return; } if(!(Number(f.amount)>0)){ alert("Enter an amount."); return; } const cat=f.payTo==="vendor"?"Vendor payment":(f.category||"Site overhead"); const row={company_id:cid(),member_id:hdlr,type:"spend",amount:Number(f.amount),category:cat,method:"Cash",date:f.date||dayStr(),note:(f.note||"").trim(),project_id:f.projectId||null,vendor_id:f.payTo==="vendor"?(f.vendorId||null):null,requisition_id:f.requisitionId||null,recorded_by:session.user.id,sort_order:advances.length}; if(fail((await db.from("cash_advances").insert(row)).error)) return; setShowPay(false); setHPayForm({amount:"",date:dayStr(),projectId:"",payTo:"vendor",vendorId:"",category:"Transport",requisitionId:"",note:""}); await refresh(); }
       async function delAdvance(id){ if(!window.confirm("Delete this entry?")) return; if(fail((await db.from("cash_advances").delete().eq("id",id)).error)) return; await refresh(); }
+      function blankProp(){ return {id:null,ref:"",clientName:"",clientPhone:"",clientEmail:"",siteAddress:"",projectTitle:"",contractType:"sft",area:"",rate:"",monthlyFee:"",durationMonths:"",lumpSum:"",scopeNote:"",status:"draft",date:dayStr(),validUntil:"",note:"",lines:[],terms:[]}; }
+      async function saveConProposal(){ const f=propForm; if(!f) return; if(!(f.clientName||"").trim() && !(f.projectTitle||"").trim()){ alert("Add a client name or project title."); return; } const row={company_id:cid(),ref:(f.ref||"").trim(),client_name:(f.clientName||"").trim(),client_phone:(f.clientPhone||"").trim(),client_email:(f.clientEmail||"").trim(),site_address:(f.siteAddress||"").trim(),project_title:(f.projectTitle||"").trim(),contract_type:f.contractType||"sft",area:f.area===""?null:Number(f.area),rate:f.rate===""?null:Number(f.rate),monthly_fee:f.monthlyFee===""?null:Number(f.monthlyFee),duration_months:f.durationMonths===""?null:Number(f.durationMonths),lump_sum:f.lumpSum===""?null:Number(f.lumpSum),scope_note:(f.scopeNote||"").trim(),lines:Array.isArray(f.lines)?f.lines:[],terms:Array.isArray(f.terms)?f.terms:[],status:f.status||"draft",date:f.date||dayStr(),valid_until:f.validUntil||null,note:(f.note||"").trim()}; let err; if(f.id){ err=(await db.from("construction_proposals").update(row).eq("id",f.id)).error; } else { err=(await db.from("construction_proposals").insert(row)).error; } if(fail(err)) return; setPropForm(null); await refresh(); }
+      async function setPropStatus(pr,st){ if(fail((await db.from("construction_proposals").update({status:st}).eq("id",pr.id)).error)) return; await refresh(); }
+      async function delProposal(id){ if(!window.confirm("Delete this proposal?")) return; if(fail((await db.from("construction_proposals").delete().eq("id",id)).error)) return; setPropForm(null); await refresh(); }
+      async function convertProposalToProject(pr){ if(pr.convertedProjectId){ alert("This proposal is already linked to a project."); return; } const ct=pr.contractType; let v; if(ct==="pmc"){ const m=Number(pr.monthlyFee||0),n=Number(pr.durationMonths||0); v=n>0?m*n:m; } else if(ct==="turnkey"){ v=Number(pr.lumpSum||0); } else { v=Number(pr.area||0)*Number(pr.rate||0); } const code=window.prompt("Enter a project code for the new construction project:", pr.ref||""); if(code===null) return; if(!code.trim()){ alert("A project code is required."); return; } const ins=await db.from("construction_projects").insert({company_id:cid(),code:code.trim(),nickname:(pr.projectTitle||"").trim(),client:(pr.clientName||"").trim(),location:(pr.siteAddress||"").trim(),type:"building",status:"active",note:(pr.scopeNote||"").trim(),contract_type:pr.contractType||null,contract_value:(v>0?v:null),sort_order:conProjects.length}).select().single(); if(fail(ins.error)) return; if(fail((await db.from("construction_proposals").update({status:"accepted",converted_project_id:ins.data.id}).eq("id",pr.id)).error)) return; await refresh(); alert("Project \""+code.trim()+"\" created from this proposal."); }
+      function printConProposal(pr){
+        const esc=v=>String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        const tk=n=>"Tk "+Number(n||0).toLocaleString("en-IN")+"/-";
+        const dt=d=>{ if(!d) return ""; try{ return new Date(d).toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"}); }catch(e){ return d; } };
+        const CTL={sft:"Sft rate",pmc:"PMC (monthly)",turnkey:"Turnkey / lump-sum"};
+        const ct=pr.contractType; let v=0,priceRows="";
+        if(ct==="pmc"){ const m=Number(pr.monthlyFee||0),n=Number(pr.durationMonths||0); v=n>0?m*n:m; priceRows='<tr><td>Monthly fee</td><td class="r">'+tk(m)+'</td></tr>'+(n>0?'<tr><td>Duration</td><td class="r">'+n+' month'+(n>1?"s":"")+'</td></tr>':''); }
+        else if(ct==="turnkey"){ v=Number(pr.lumpSum||0); priceRows='<tr><td>Lump-sum total</td><td class="r">'+tk(v)+'</td></tr>'; }
+        else { const a=Number(pr.area||0),r=Number(pr.rate||0); v=a*r; priceRows='<tr><td>Built area</td><td class="r">'+esc(a)+' sft</td></tr><tr><td>Rate</td><td class="r">'+tk(r)+' / sft</td></tr>'; }
+        const lines=Array.isArray(pr.lines)?pr.lines:[]; let scope="";
+        if(lines.length){ let sub=0; const rows=lines.map((l,i)=>{ const amt=Number(l.qty||0)*Number(l.rate||0); sub+=amt; return '<tr><td class="c">'+(i+1)+'</td><td>'+(l.code?'<span class="mono">'+esc(l.code)+'</span> ':"")+esc(l.desc||"")+'</td><td class="c">'+esc(l.qty||"")+(l.unit?" "+esc(l.unit):"")+'</td><td class="r">'+tk(l.rate||0)+'</td><td class="r">'+tk(amt)+'</td></tr>'; }).join(""); scope='<div class="sec"><h2>Scope of work</h2><table class="lines"><thead><tr><td class="c">#</td><td>Item</td><td class="c">Qty</td><td class="r">Rate</td><td class="r">Amount</td></tr></thead><tbody>'+rows+'<tr class="sub"><td colspan="4" class="r">Subtotal</td><td class="r">'+tk(sub)+'</td></tr></tbody></table></div>'; }
+        const terms=Array.isArray(pr.terms)?pr.terms:[]; const termsHtml=terms.length?'<div class="sec"><h2>Terms &amp; conditions</h2><ol class="terms">'+terms.map(t=>'<li>'+esc(t)+'</li>').join("")+'</ol></div>':"";
+        const noteHtml=(pr.scopeNote||"").trim()?'<div class="sec"><h2>Scope summary</h2><p>'+esc(pr.scopeNote)+'</p></div>':"";
+        const html='<!doctype html><html><head><meta charset="utf-8"><title>Construction Proposal'+(pr.ref?" "+esc(pr.ref):"")+'</title>'
+          +'<style>*{box-sizing:border-box}body{font-family:Archivo,Arial,sans-serif;color:#18181b;margin:0;padding:32px 40px;font-size:12px;line-height:1.5}'
+          +'.mono{font-family:monospace}'
+          +'.hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #18181b;padding-bottom:10px;margin-bottom:6px}'
+          +'.bn{font-size:20px;font-weight:800;letter-spacing:-.5px}.bs{font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.18em}'
+          +'.co{font-size:9px;color:#555;text-align:right;line-height:1.6}'
+          +'.title{font-size:15px;font-weight:700;margin:14px 0 2px}.meta{font-size:10px;color:#666;margin-bottom:14px}'
+          +'.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;margin-bottom:14px}'
+          +'.kv{font-size:11px}.kv b{display:block;font-size:8.5px;color:#888;text-transform:uppercase;letter-spacing:.1em;font-weight:600}'
+          +'.sec{margin:14px 0}.sec h2{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#444;border-bottom:1px solid #ddd;padding-bottom:3px;margin:0 0 6px}'
+          +'table{width:100%;border-collapse:collapse}td{padding:4px 6px;border-bottom:1px solid #eee;vertical-align:top}.c{text-align:center}.r{text-align:right}'
+          +'.lines thead td{font-size:8.5px;text-transform:uppercase;letter-spacing:.08em;color:#888;border-bottom:1px solid #ccc}'
+          +'.sub td{font-weight:700;border-top:1px solid #ccc;border-bottom:none}'
+          +'.total{display:flex;justify-content:space-between;align-items:center;background:#18181b;color:#fff;padding:10px 14px;border-radius:6px;margin:8px 0 4px}.total .v{font-size:18px;font-weight:800}'
+          +'.terms li{margin-bottom:4px}.sign{display:flex;justify-content:space-between;margin-top:54px}.sl{width:42%;border-top:1px solid #999;padding-top:4px;font-size:10px;color:#555;text-align:center}'
+          +'@media print{body{padding:0}}</style></head><body>'
+          +'<div class="hd"><div><div class="bn">STUDIO 16 ARCHITECTS</div><div class="bs">Construction</div></div>'
+          +'<div class="co">'+esc(STUDIO.address)+'<br>'+esc(STUDIO.phone)+' \u00b7 '+esc(STUDIO.email)+'<br>'+esc(STUDIO.web)+'</div></div>'
+          +'<div class="title">Construction Proposal &amp; Agreement</div>'
+          +'<div class="meta">'+(pr.ref?'Ref: '+esc(pr.ref)+' \u00b7 ':"")+(pr.date?'Date: '+dt(pr.date):"")+(pr.validUntil?' \u00b7 Valid until: '+dt(pr.validUntil):"")+'</div>'
+          +'<div class="grid">'
+          +'<div class="kv"><b>Client</b>'+esc(pr.clientName||"\u2014")+'</div>'
+          +'<div class="kv"><b>Contact</b>'+esc([pr.clientPhone,pr.clientEmail].filter(Boolean).join(" \u00b7 ")||"\u2014")+'</div>'
+          +'<div class="kv"><b>Project</b>'+esc(pr.projectTitle||"\u2014")+'</div>'
+          +'<div class="kv"><b>Site</b>'+esc(pr.siteAddress||"\u2014")+'</div>'
+          +'<div class="kv"><b>Contract type</b>'+esc(CTL[ct]||ct||"\u2014")+'</div>'
+          +'</div>'
+          +noteHtml
+          +'<div class="sec"><h2>Contract '+(ct==="pmc"?"fee":"value")+'</h2><table><tbody>'+priceRows+'</tbody></table>'
+          +'<div class="total"><span>'+(ct==="pmc"?("Total fee"+(Number(pr.durationMonths||0)>0?" (fee \u00d7 months)":"")):"Contract value")+'</span><span class="v">'+tk(v)+'</span></div></div>'
+          +scope+termsHtml
+          +'<div class="sign"><div class="sl">For Studio 16 Architects</div><div class="sl">Accepted by Client</div></div>'
+          +'<scr'+'ipt>setTimeout(function(){try{window.print();}catch(e){}},400)</scr'+'ipt></body></html>';
+        const w=window.open("","_blank"); if(!w){ alert("Please allow pop-ups to print the proposal."); return; } w.document.write(html); w.document.close();
+      }
+
       const canEditCost=x=>isAdmin||(x.recordedBy===session.user.id && !x.verified);
       async function addConCost(){ const n=ncost; if(!n.projectId){ alert("Pick a construction project."); return; } const amt=costAmt(n); if(!(amt>0)){ alert("Enter an amount, or a quantity and rate."); return; } if(fail((await db.from("construction_costs").insert({company_id:cid(),project_id:n.projectId,category:n.category,item:n.item.trim(),item_category:n.itemCategory.trim(),vendor_id:n.vendorId||null,qty:n.qty===""?null:Number(n.qty),unit:n.unit.trim(),rate:n.rate===""?null:Number(n.rate),amount:amt,date:n.date||dayStr(),paid_by:n.paidBy.trim(),note:n.note.trim(),recorded_by:session.user.id,sort_order:conCosts.length})).error)) return; setNcost({projectId:n.projectId,category:n.category,item:"",itemCategory:"",vendorId:"",qty:"",unit:"",rate:"",amount:"",date:n.date||dayStr(),paidBy:"",note:""}); await refresh(); }
       async function saveConCost(){ const e=costEdit; const amt=costAmt(e); if(fail((await db.from("construction_costs").update({project_id:e.projectId,category:e.category,item:(e.item||"").trim(),item_category:(e.itemCategory||"").trim(),vendor_id:e.vendorId||null,qty:e.qty===""?null:Number(e.qty),unit:(e.unit||"").trim(),rate:e.rate===""?null:Number(e.rate),amount:amt,date:e.date||dayStr(),paid_by:(e.paidBy||"").trim(),note:(e.note||"").trim()}).eq("id",e.id)).error)) return; setCostEdit(null); await refresh(); }
@@ -2275,7 +2332,15 @@ function printProposal(p){
             </>)}
 
             {area==="construction" && has("construction") && (<>
-              <div className="mb-3 flex flex-wrap gap-1">{[["projects","Projects"],["board","Project Board"],["requisition","Requisition"],["handler","Handler"],["costs","Costs"],["billing","Client billing"],["reports","Reports"],["site","Site schedule"],["bills","Bills & purchases"],["vendors","Vendor list"],["matlist","Material list"],["tasklist","Task list"]].map(([k,l])=><button key={k} onClick={()=>setConTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${conTab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
+              {(()=>{
+                const G=[["agreement","Proposal & Agreement"],["projects","Projects"],["money","Money & Billing"],["catalog","Catalog & Vendors"]];
+                const T={agreement:[["proposal","Proposal"]],projects:[["projects","Projects"],["board","Project Board"],["site","Site schedule"],["reports","Reports"]],money:[["billing","Client billing"],["clientacct","Client account"],["costs","Costs"],["handler","Handler"],["bills","Bills & purchases"],["statements","Statements"],["requisition","Requisition"]],catalog:[["vendors","Vendor list"],["matlist","Material list"],["tasklist","Task list"]]};
+                const curG=(G.find(([g])=>T[g].some(t=>t[0]===conTab))||G[0])[0];
+                return (<div className="mb-3">
+                  <div className="flex flex-wrap gap-1.5">{G.map(([g,gl])=><button key={g} onClick={()=>{ if(!T[g].some(t=>t[0]===conTab)) setConTab(T[g][0][0]); }} className={`rounded-md px-3 py-1.5 text-[12px] font-semibold ${g===curG?"bg-zinc-900 text-white":"bg-zinc-100 text-zinc-600 hover:bg-zinc-200"}`}>{gl}</button>)}</div>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5 border-t border-zinc-100 pt-1.5">{T[curG].map(([k,l])=><button key={k} onClick={()=>setConTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${conTab===k?"bg-zinc-700 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
+                </div>);
+              })()}
               {conTab==="projects" && (()=>{
                 const TYPES=[["building","Building"],["interior","Interior"],["landscape","Landscape"]];
                 const STAT=[["active","Active"],["on_hold","On hold"],["done","Completed"],["archived","Archived"]];
@@ -2377,12 +2442,15 @@ function printProposal(p){
                 const due = invoiced-received;
                 const costs = conCosts.filter(c=>c.projectId===p.id);
                 const spent = costs.reduce((s,c)=>s+Number(c.amount||0),0);
+                const handlerTx = advances.filter(a=>a.type==="spend"&&a.projectId===p.id);
+                const handlerSpent = handlerTx.reduce((s,a)=>s+a.amount,0);
+                const totalOut = spent + handlerSpent;
                 const pbills = bills.filter(b=>b.projectId===p.id);
                 const billed = pbills.reduce((s,b)=>s+Number(b.amount||0),0);
                 const billPaid = pbills.reduce((s,b)=>s+Number(b.paidAmount||0),0);
                 const billDue = billed-billPaid;
                 const cv = Number(p.contractValue||0);
-                const position = received-spent;
+                const position = received-totalOut;
                 return (<>
                   <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                     <h2 className="text-base font-semibold">Project Board</h2>
@@ -2402,7 +2470,7 @@ function printProposal(p){
                   <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
                     <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[16px] font-semibold">{money(cv)}</div><div className="text-[11px] text-zinc-400">Contract value</div></div>
                     <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[16px] font-semibold text-sky-700">{money(received)}</div><div className="text-[11px] text-zinc-400">Received{due>0?" · due "+money(due):""}</div></div>
-                    <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[16px] font-semibold">{money(spent)}</div><div className="text-[11px] text-zinc-400">Expenditure</div></div>
+                    <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[16px] font-semibold">{money(totalOut)}</div><div className="text-[11px] text-zinc-400">Expenditure{handlerSpent>0?" · incl "+money(handlerSpent)+" cash":""}</div></div>
                     <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className={"text-[16px] font-semibold "+(position>=0?"text-emerald-700":"text-red-600")}>{money(position)}</div><div className="text-[11px] text-zinc-400">Position (received − spent)</div></div>
                   </div>
                   <div className="grid gap-3 lg:grid-cols-3">
@@ -2417,6 +2485,10 @@ function printProposal(p){
                     <div className="rounded-lg border border-zinc-200 bg-white">
                       <div className="flex items-center justify-between border-b border-zinc-100 px-3 py-2"><span className="text-[12px] font-semibold">Vendor bills</span><span className="mono text-[11px] text-zinc-500">{money(billPaid)} / {money(billed)}{billDue>0?" · due "+money(billDue):""}</span></div>
                       {pbills.length===0 ? <div className="px-3 py-5 text-center text-[11px] text-zinc-400">None yet · add in Bills & purchases</div> : <div className="divide-y divide-zinc-50">{pbills.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))).slice(0,12).map(b=>{ const owe=Number(b.amount||0)-Number(b.paidAmount||0); return (<div key={b.id} className="flex items-center gap-2 px-3 py-1.5 text-[12px]"><span className="min-w-0 flex-1 truncate">{b.title||"Bill"}{b.vendorId&&<span className="text-zinc-400"> · {vName(b.vendorId)}</span>}</span><span className="mono shrink-0 text-zinc-500">{money(b.paidAmount)}/{money(b.amount)}{owe>0&&<span className="text-red-500"> ·{money(owe)}</span>}</span></div>); })}{pbills.length>12&&<div className="px-3 py-1.5 text-[10px] text-zinc-400">+{pbills.length-12} more in Bills</div>}</div>}
+                    </div>
+                    <div className="rounded-lg border border-zinc-200 bg-white">
+                      <div className="flex items-center justify-between border-b border-zinc-100 px-3 py-2"><span className="text-[12px] font-semibold">Site cash (handler)</span><span className="mono text-[11px] text-zinc-500">{money(handlerSpent)}</span></div>
+                      {handlerTx.length===0 ? <div className="px-3 py-5 text-center text-[11px] text-zinc-400">None yet · pay via Handler</div> : <div className="divide-y divide-zinc-50">{handlerTx.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))).slice(0,12).map(a=>(<div key={a.id} className="flex items-center gap-2 px-3 py-1.5 text-[12px]"><span className="min-w-0 flex-1 truncate">{a.vendorId?vName(a.vendorId):(a.category||"Payment")}{a.note&&<span className="text-zinc-400"> · {a.note}</span>}</span><span className="mono shrink-0 text-zinc-500">{money(a.amount)}</span></div>))}{handlerTx.length>12&&<div className="px-3 py-1.5 text-[10px] text-zinc-400">+{handlerTx.length-12} more in Handler</div>}</div>}
                     </div>
                   </div>
                 </>); })()}
@@ -2560,6 +2632,209 @@ function printProposal(p){
                         ); })}</div>}
                     </div>
                   </>)}
+                </>); })()}
+              {conTab==="statements" && (()=>{
+                const vName=id=>{ const v=vendors.find(z=>z.id===id); return v?v.name:""; };
+                const projName = pid => { const p=conProjects.find(x=>x.id===pid); return p?((p.code?p.code+" ":"")+(p.nickname||p.client||"Project")):""; };
+                const vendorOpts=[{value:"",label:"— pick a vendor —"}].concat(vendors.slice().sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""))).map(v=>({value:v.id,label:v.name})));
+                const projOpts=[{value:"",label:"All projects"}].concat(conProjects.slice().map(p=>({value:p.id,label:(p.code?p.code+" ":"")+(p.nickname||p.client||"Project")})));
+                const vid=stmtVendor; const pfil=stmtProj;
+                const inProj = x => !pfil || x.projectId===pfil;
+                const billCharges = bills.filter(b=>b.vendorId===vid && inProj(b)).map(b=>({id:"b"+b.id,date:b.date,kind:"charge",label:b.title||"Bill",projectId:b.projectId,amount:Number(b.amount||0),src:"Bill"}));
+                const costCharges = conCosts.filter(c=>c.vendorId===vid && inProj(c)).map(c=>({id:"c"+c.id,date:c.date,kind:"charge",label:c.item||c.category||"Purchase",projectId:c.projectId,amount:Number(c.amount||0),src:"Cost"}));
+                const handlerPays = advances.filter(a=>a.type==="spend"&&a.vendorId===vid && inProj(a)).map(a=>({id:"h"+a.id,date:a.date,kind:"payment",label:a.note||"Cash payment",projectId:a.projectId,amount:Number(a.amount||0),src:"Handler"}));
+                const billPays = bills.filter(b=>b.vendorId===vid && inProj(b) && Number(b.paidAmount||0)>0).map(b=>({id:"bp"+b.id,date:b.paidDate||b.date,kind:"payment",label:(b.title||"Bill")+" payment",projectId:b.projectId,amount:Number(b.paidAmount||0),src:"Bill paid"}));
+                const charges=[...billCharges,...costCharges]; const payments=[...handlerPays,...billPays];
+                const billedTot=charges.reduce((s,x)=>s+x.amount,0); const paidTot=payments.reduce((s,x)=>s+x.amount,0); const balance=billedTot-paidTot;
+                const tx=[...charges,...payments].sort((a,b)=>String(a.date||"").localeCompare(String(b.date||"")));
+                let run=0; const rows=tx.map(t=>{ run += t.kind==="charge"?t.amount:-t.amount; return {...t,run}; });
+                return (<>
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                    <h2 className="text-base font-semibold">Vendor statements</h2>
+                    <div className="flex gap-2"><div className="w-44"><Select value={stmtVendor} onChange={v=>setStmtVendor(v)} className="w-full" options={vendorOpts} /></div><div className="w-36"><Select value={stmtProj} onChange={v=>setStmtProj(v)} className="w-full" options={projOpts} /></div></div>
+                  </div>
+                  {!vid ? <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">Pick a vendor to see their running statement — billed, paid, and balance.</div> : (<>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[11px] text-zinc-400">Billed</div><div className="mono text-[15px] font-semibold text-zinc-700">{money(billedTot)}</div></div>
+                      <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[11px] text-zinc-400">Paid</div><div className="mono text-[15px] font-semibold text-emerald-600">{money(paidTot)}</div></div>
+                      <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[11px] text-zinc-400">{balance>=0?"Balance owed":"Advance paid"}</div><div className={"mono text-[15px] font-semibold "+(balance>0?"text-red-600":"text-emerald-600")}>{money(Math.abs(balance))}</div></div>
+                    </div>
+                    <div className="mt-4 overflow-hidden rounded-lg border border-zinc-200 bg-white">
+                      {rows.length===0 ? <div className="px-3 py-8 text-center text-[12px] text-zinc-400">No bills, costs or payments recorded for this vendor yet.</div> : <div className="divide-y divide-zinc-50">{rows.map(t=>(
+                        <div key={t.id} className="flex items-center gap-2 px-3 py-2 text-[12px]">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5"><span className={"shrink-0 rounded px-1 py-0.5 text-[9px] font-medium "+(t.kind==="charge"?"bg-zinc-100 text-zinc-500":"bg-emerald-50 text-emerald-600")}>{t.src}</span><span className="truncate">{t.label}</span></div>
+                            <div className="mono text-[10px] text-zinc-400">{t.date||"—"}{(!pfil&&t.projectId)?" · "+projName(t.projectId):""}</div>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <div className={"mono text-[12px] font-medium "+(t.kind==="charge"?"text-zinc-700":"text-emerald-600")}>{t.kind==="charge"?"+":"−"}{money(t.amount)}</div>
+                            <div className={"mono text-[10px] "+(t.run>0?"text-red-500":"text-zinc-400")}>bal {money(t.run)}</div>
+                          </div>
+                        </div>
+                      ))}</div>}
+                    </div>
+                    <p className="mt-2 text-[10px] leading-relaxed text-zinc-400">Billed = vendor bills + recorded costs. Paid = handler cash payments + amounts marked paid on bills. Record each payment once (through the Handler or on the bill) to avoid double counting.</p>
+                  </>)}
+                </>); })()}
+              {conTab==="clientacct" && (()=>{
+                const CT=[["sft","Sft rate"],["pmc","PMC (monthly)"],["turnkey","Turnkey / lump-sum"]];
+                const ctLabel=t=>(CT.find(x=>x[0]===t)||["","—"])[1];
+                const mName=id=>{ const m=members.find(x=>x.id===id); return m?m.name:""; };
+                const projOpts=[{value:"",label:"— pick a project —"}].concat(conProjects.slice().sort((a,b)=>(a.sortOrder||0)-(b.sortOrder||0)).map(p=>({value:p.id,label:(p.code?p.code+" ":"")+(p.nickname||p.client||"Project")})));
+                const pid=clProj; const p=conProjects.find(x=>x.id===pid);
+                const head=(<div className="mb-3 flex flex-wrap items-center justify-between gap-2"><h2 className="text-base font-semibold">Client account</h2><div className="w-56"><Select value={clProj} onChange={v=>setClProj(v)} className="w-full" options={projOpts} /></div></div>);
+                if(!pid||!p) return (<>{head}<div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">Pick a project to see the client account — what the client has been invoiced, paid, and still owes.</div></>);
+                const rcv=conRcv.filter(r=>r.projectId===pid);
+                const invoiced=rcv.reduce((s,r)=>s+Number(r.amount||0),0);
+                const received=rcv.reduce((s,r)=>s+(r.collections||[]).reduce((a,c)=>a+Number(c.amount||0),0),0);
+                const due=invoiced-received;
+                const cv=Number(p.contractValue||0); const ct=p.contractType||""; const isPmc=ct==="pmc";
+                const progress=Number(p.progressPct||0);
+                const remaining=cv>0?Math.max(0,cv-received):0;
+                const paidPct=cv>0?Math.round(received/cv*100):0;
+                const charges=rcv.map(r=>({id:"i"+r.id,date:r.date||r.dueDate,kind:"invoice",label:r.title||"Invoice",amount:Number(r.amount||0)}));
+                const pays=[]; rcv.forEach(r=>(r.collections||[]).forEach((c,i)=>{ pays.push({id:"p"+r.id+"_"+i,date:c.date,kind:"payment",label:(r.title?r.title+" — payment":"Payment"),amount:Number(c.amount||0)}); }));
+                const tx=[...charges,...pays].sort((a,b)=>String(a.date||"").localeCompare(String(b.date||"")));
+                let run=0; const rows=tx.map(t=>{ run += t.kind==="invoice"?t.amount:-t.amount; return {...t,run}; });
+                return (<>
+                  {head}
+                  <div className="mb-3 rounded-lg border border-zinc-200 bg-white p-4">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {p.code&&<span className="mono text-[13px] font-bold">{p.code}</span>}
+                      <span className="text-[15px] font-semibold">{p.nickname||p.client||"Project"}</span>
+                      {ct&&<span className="rounded bg-indigo-50 px-1.5 py-0.5 text-[10px] font-medium text-indigo-600">{ctLabel(ct)}</span>}
+                    </div>
+                    {p.client&&<div className="mt-1 text-[11px] text-zinc-500">{p.client}{p.location?" · "+p.location:""}</div>}
+                    {!isPmc && cv>0 && <div className="mt-2"><div className="mb-0.5 flex justify-between text-[10px] text-zinc-400"><span>Work progress {progress}%</span><span>Paid {paidPct}%</span></div><div className="relative h-1.5 w-full overflow-hidden rounded-full bg-zinc-100"><div className="absolute left-0 top-0 h-full bg-emerald-400" style={{width:Math.min(100,progress)+"%"}}></div><div className="absolute left-0 top-0 h-full bg-sky-500/70" style={{width:Math.min(100,paidPct)+"%"}}></div></div>{progress>paidPct+2 && <div className="mt-1 text-[10px] text-amber-600">Collection is behind work progress by {progress-paidPct}% — consider raising the next bill.</div>}{paidPct>progress+2 && <div className="mt-1 text-[10px] text-emerald-600">Client has paid ahead of work done.</div>}</div>}
+                  </div>
+                  {isPmc ? (
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[11px] text-zinc-400">Invoiced</div><div className="mono text-[15px] font-semibold text-zinc-700">{money(invoiced)}</div></div>
+                      <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[11px] text-zinc-400">Received</div><div className="mono text-[15px] font-semibold text-sky-600">{money(received)}</div></div>
+                      <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[11px] text-zinc-400">Account status</div><div className={"text-[13px] font-semibold "+(due>0?"text-red-600":"text-emerald-600")}>{due>0?"Outstanding "+money(due):"Up to date"}</div></div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[11px] text-zinc-400">Contract value</div><div className="mono text-[15px] font-semibold">{money(cv)}</div></div>
+                      <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[11px] text-zinc-400">Received</div><div className="mono text-[15px] font-semibold text-sky-600">{money(received)}</div></div>
+                      <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[11px] text-zinc-400">Remaining</div><div className="mono text-[15px] font-semibold text-zinc-700">{money(remaining)}</div></div>
+                      <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[11px] text-zinc-400">Due now</div><div className={"mono text-[15px] font-semibold "+(due>0?"text-amber-600":"text-emerald-600")}>{money(due)}</div></div>
+                    </div>
+                  )}
+                  <div className="mt-4 overflow-hidden rounded-lg border border-zinc-200 bg-white">
+                    <div className="border-b border-zinc-100 px-3 py-2 text-[12px] font-semibold">Statement</div>
+                    {rows.length===0 ? <div className="px-3 py-8 text-center text-[12px] text-zinc-400">No invoices or payments recorded yet · add in Client billing.</div> : <div className="divide-y divide-zinc-50">{rows.map(t=>(
+                      <div key={t.id} className="flex items-center gap-2 px-3 py-2 text-[12px]">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5"><span className={"shrink-0 rounded px-1 py-0.5 text-[9px] font-medium "+(t.kind==="invoice"?"bg-zinc-100 text-zinc-500":"bg-sky-50 text-sky-600")}>{t.kind==="invoice"?"Invoice":"Paid"}</span><span className="truncate">{t.label}</span></div>
+                          <div className="mono text-[10px] text-zinc-400">{t.date||"—"}</div>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <div className={"mono text-[12px] font-medium "+(t.kind==="invoice"?"text-zinc-700":"text-sky-600")}>{t.kind==="invoice"?"+":"−"}{money(t.amount)}</div>
+                          <div className={"mono text-[10px] "+(t.run>0?"text-amber-600":"text-zinc-400")}>bal {money(t.run)}</div>
+                        </div>
+                      </div>
+                    ))}</div>}
+                  </div>
+                  <p className="mt-2 text-[10px] leading-relaxed text-zinc-400">Invoices and payments come from Client billing. Balance is what the client still owes against what has been billed.</p>
+                </>); })()}
+              {conTab==="proposal" && (()=>{
+                const CT=[["sft","Sft rate"],["pmc","PMC (monthly)"],["turnkey","Turnkey / lump-sum"]];
+                const ctLabel=t=>(CT.find(x=>x[0]===t)||["","—"])[1];
+                const STAT=[["draft","Draft"],["sent","Sent"],["accepted","Accepted"],["declined","Declined"]];
+                const statTone={draft:"bg-zinc-100 text-zinc-500",sent:"bg-amber-50 text-amber-600",accepted:"bg-emerald-50 text-emerald-700",declined:"bg-red-50 text-red-600"};
+                const statLabel=s=>(STAT.find(x=>x[0]===s)||["","Draft"])[1];
+                const propValue=pr=>{ const ct=pr.contractType; if(ct==="pmc"){ const m=Number(pr.monthlyFee||0),n=Number(pr.durationMonths||0); return n>0?m*n:m; } if(ct==="turnkey") return Number(pr.lumpSum||0); return Number(pr.area||0)*Number(pr.rate||0); };
+                const STD_TERMS=["All payments are due within 7 days of each bill being raised.","Prices are based on current market rates; any major change in material prices may be adjusted by mutual agreement.","Any work beyond the agreed scope will be treated as a variation and billed separately.","Government taxes, VAT and approval fees are not included unless stated otherwise.","Work will proceed as per the agreed schedule, subject to timely payments and site readiness.","The client will provide clear site access, water and electricity during construction.","This proposal is valid until the date mentioned above."];
+                const f=propForm;
+                if(f){ const v=propValue(f); return (<>
+                  <div className="mb-3 flex items-center justify-between"><h2 className="text-base font-semibold">{f.id?"Edit proposal":"New proposal"}</h2><button onClick={()=>setPropForm(null)} className="text-[12px] text-zinc-500">Cancel</button></div>
+                  <div className="space-y-3">
+                    <div className="rounded-lg border border-zinc-200 bg-white p-3">
+                      <Lbl>Client &amp; site</Lbl>
+                      <div className="mt-1 grid grid-cols-2 gap-2">
+                        <div><Lbl>Client name</Lbl><Input value={f.clientName} onChange={e=>setPropForm({...f,clientName:e.target.value})} /></div>
+                        <div><Lbl>Phone</Lbl><Input value={f.clientPhone} onChange={e=>setPropForm({...f,clientPhone:e.target.value})} /></div>
+                        <div><Lbl>Email</Lbl><Input value={f.clientEmail} onChange={e=>setPropForm({...f,clientEmail:e.target.value})} /></div>
+                        <div><Lbl>Reference no.</Lbl><Input value={f.ref} onChange={e=>setPropForm({...f,ref:e.target.value})} placeholder="your code" /></div>
+                        <div className="col-span-2"><Lbl>Project title</Lbl><Input value={f.projectTitle} onChange={e=>setPropForm({...f,projectTitle:e.target.value})} placeholder="e.g. 6-storey residential, Bashundhara" /></div>
+                        <div className="col-span-2"><Lbl>Site address</Lbl><Input value={f.siteAddress} onChange={e=>setPropForm({...f,siteAddress:e.target.value})} /></div>
+                      </div>
+                    </div>
+                    <div className="rounded-lg border border-zinc-200 bg-white p-3">
+                      <Lbl>Contract &amp; pricing</Lbl>
+                      <div className="mt-1 grid grid-cols-2 gap-2">
+                        <div className="col-span-2"><Lbl>Contract type</Lbl><Select value={f.contractType} onChange={v=>setPropForm({...f,contractType:v})} className="w-full" options={CT.map(c=>({value:c[0],label:c[1]}))} /></div>
+                        {f.contractType==="sft" && <><div><Lbl>Built area (sft)</Lbl><Input type="number" value={f.area} onChange={e=>setPropForm({...f,area:e.target.value})} /></div><div><Lbl>Rate / sft</Lbl><Input type="number" value={f.rate} onChange={e=>setPropForm({...f,rate:e.target.value})} /></div></>}
+                        {f.contractType==="pmc" && <><div><Lbl>Monthly fee</Lbl><Input type="number" value={f.monthlyFee} onChange={e=>setPropForm({...f,monthlyFee:e.target.value})} /></div><div><Lbl>Duration (months)</Lbl><Input type="number" value={f.durationMonths} onChange={e=>setPropForm({...f,durationMonths:e.target.value})} /></div></>}
+                        {f.contractType==="turnkey" && <div className="col-span-2"><Lbl>Lump-sum total</Lbl><Input type="number" value={f.lumpSum} onChange={e=>setPropForm({...f,lumpSum:e.target.value})} /></div>}
+                      </div>
+                      <div className="mt-2 flex items-center justify-between rounded-md bg-zinc-50 px-3 py-2"><span className="text-[11px] text-zinc-500">{f.contractType==="pmc"?"Total fee (fee × months)":f.contractType==="sft"?"Estimated value (area × rate)":"Contract value"}</span><span className="mono text-[15px] font-semibold">{money(v)}</span></div>
+                      {f.contractType==="pmc" && Number(f.monthlyFee||0)>0 && <div className="mt-1 text-[10px] text-zinc-400">{money(Number(f.monthlyFee||0))} / month{Number(f.durationMonths||0)>0?" × "+f.durationMonths+" months":""}</div>}
+                    </div>
+                    <div className="rounded-lg border border-zinc-200 bg-white p-3">
+                      <Lbl>Scope lines (optional)</Lbl>
+                      {(f.lines&&f.lines.length>0) && <div className="mt-1 divide-y divide-zinc-50 rounded-md border border-zinc-100">{f.lines.map((ln,i)=>(
+                        <div key={i} className="flex items-center gap-2 px-2 py-1.5 text-[12px]">
+                          <div className="min-w-0 flex-1"><div className="truncate">{ln.code&&<span className="mono mr-1 text-zinc-400">{ln.code}</span>}{ln.desc}</div><div className="text-[10px] text-zinc-400">{ln.qty||0}{ln.unit?" "+ln.unit:""} × {money(Number(ln.rate||0))}</div></div>
+                          <span className="mono text-[12px]">{money(Number(ln.qty||0)*Number(ln.rate||0))}</span>
+                          <button onClick={()=>setPropForm({...f,lines:f.lines.filter((_,j)=>j!==i)})} className="text-[11px] text-zinc-300 hover:text-red-500">✕</button>
+                        </div>
+                      ))}<div className="flex items-center justify-between px-2 py-1.5 text-[12px] font-semibold"><span>Scope subtotal</span><span className="mono">{money(f.lines.reduce((s,l)=>s+Number(l.qty||0)*Number(l.rate||0),0))}</span></div></div>}
+                      {f.contractType==="turnkey" && f.lines && f.lines.length>0 && <button onClick={()=>setPropForm({...f,lumpSum:f.lines.reduce((s,l)=>s+Number(l.qty||0)*Number(l.rate||0),0)})} className="mt-1 text-[10px] text-sky-600">Use scope subtotal as lump-sum total</button>}
+                      <div className="mt-2 grid grid-cols-2 gap-2">
+                        <div className="col-span-2"><Lbl>From catalog</Lbl><Select value={propLine.code} onChange={v=>{ const n=catalog.find(c=>c.code===v); setPropLine({...propLine,code:v,desc:n?n.name:propLine.desc}); }} className="w-full" options={[{value:"",label:"— pick an item (optional) —"}].concat(catalog.slice().sort((a,b)=>String(a.code).localeCompare(String(b.code))).map(c=>({value:c.code,label:c.code+" · "+c.name})))} /></div>
+                        <div className="col-span-2"><Lbl>Description</Lbl><Input value={propLine.desc} onChange={e=>setPropLine({...propLine,desc:e.target.value})} placeholder="work item / description" /></div>
+                        <div><Lbl>Qty</Lbl><Input type="number" value={propLine.qty} onChange={e=>setPropLine({...propLine,qty:e.target.value})} /></div>
+                        <div><Lbl>Unit</Lbl><Input value={propLine.unit} onChange={e=>setPropLine({...propLine,unit:e.target.value})} placeholder="sft / nos / ls" /></div>
+                        <div><Lbl>Rate</Lbl><Input type="number" value={propLine.rate} onChange={e=>setPropLine({...propLine,rate:e.target.value})} /></div>
+                        <div className="flex items-end"><button onClick={()=>{ if(!(propLine.desc||"").trim()){ alert("Add a description."); return; } setPropForm({...f,lines:[...(f.lines||[]),{desc:propLine.desc.trim(),code:propLine.code||"",qty:propLine.qty===""?"":Number(propLine.qty),unit:propLine.unit||"",rate:propLine.rate===""?"":Number(propLine.rate)}]}); setPropLine({desc:"",code:"",qty:"",unit:"",rate:""}); }} className="w-full rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Add line</button></div>
+                      </div>
+                    </div>
+                    <div className="rounded-lg border border-zinc-200 bg-white p-3">
+                      <Lbl>Scope summary</Lbl>
+                      <textarea value={f.scopeNote} onChange={e=>setPropForm({...f,scopeNote:e.target.value})} rows={4} className="mt-1 w-full rounded-md border border-zinc-200 px-2 py-1.5 text-[12px]" placeholder="Brief description of the work covered by this proposal..." />
+                      <div className="mt-2 grid grid-cols-3 gap-2">
+                        <div><Lbl>Date</Lbl><Input type="date" value={f.date} onChange={e=>setPropForm({...f,date:e.target.value})} /></div>
+                        <div><Lbl>Valid until</Lbl><Input type="date" value={f.validUntil} onChange={e=>setPropForm({...f,validUntil:e.target.value})} /></div>
+                        <div><Lbl>Status</Lbl><Select value={f.status} onChange={v=>setPropForm({...f,status:v})} className="w-full" options={STAT.map(x=>({value:x[0],label:x[1]}))} /></div>
+                      </div>
+                      <div className="mt-2"><Lbl>Internal note</Lbl><Input value={f.note} onChange={e=>setPropForm({...f,note:e.target.value})} /></div>
+                    </div>
+                    <div className="rounded-lg border border-zinc-200 bg-white p-3">
+                      <div className="flex items-center justify-between"><Lbl>Terms &amp; conditions</Lbl><button onClick={()=>setPropForm({...f,terms:(f.terms||[]).concat(STD_TERMS.filter(t=>(f.terms||[]).indexOf(t)<0))})} className="text-[10px] text-sky-600">Load standard terms</button></div>
+                      {(f.terms&&f.terms.length>0) ? <ol className="mt-1 space-y-1">{f.terms.map((t,i)=>(<li key={i} className="flex items-start gap-2 text-[12px]"><span className="mono mt-0.5 text-[10px] text-zinc-400">{i+1}.</span><span className="flex-1">{t}</span><button onClick={()=>setPropForm({...f,terms:f.terms.filter((_,j)=>j!==i)})} className="shrink-0 text-[11px] text-zinc-300 hover:text-red-500">✕</button></li>))}</ol> : <div className="mt-1 text-[10px] text-zinc-400">No terms added yet.</div>}
+                      <div className="mt-2 flex gap-2"><Input value={termLine} onChange={e=>setTermLine(e.target.value)} placeholder="Add a term or condition…" /><button onClick={()=>{ if(!termLine.trim()) return; setPropForm({...f,terms:(f.terms||[]).concat([termLine.trim()])}); setTermLine(""); }} className="shrink-0 rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Add</button></div>
+                    </div>
+                    <div className="flex items-center gap-2"><button onClick={saveConProposal} className="rounded-md bg-zinc-800 px-4 py-2 text-[12px] font-medium text-white">Save proposal</button><button onClick={()=>setPropForm(null)} className="rounded-md border border-zinc-300 px-4 py-2 text-[12px] text-zinc-600">Cancel</button>{f.id && <button onClick={()=>delProposal(f.id)} className="ml-auto rounded-md border border-red-200 px-4 py-2 text-[12px] text-red-500">Delete</button>}</div>
+                  </div>
+                </>); }
+                const list=conProposals.slice().sort((a,b)=>{ const rank={draft:0,sent:1,accepted:2,declined:3}; return (rank[a.status]||0)-(rank[b.status]||0); });
+                return (<>
+                  <div className="mb-3 flex items-center justify-between"><h2 className="text-base font-semibold">Proposals &amp; agreements</h2><button onClick={()=>setPropForm(blankProp())} className="rounded-md bg-zinc-800 px-3 py-1.5 text-[12px] font-medium text-white">New proposal</button></div>
+                  {list.length===0 ? <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No proposals yet. Create one to quote a new construction job.</div>
+                    : <div className="space-y-2">{list.map(pr=>{ const v=propValue(pr); return (
+                      <div key={pr.id} className="rounded-lg border border-zinc-200 bg-white p-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-1.5">{pr.ref&&<span className="mono text-[11px] text-zinc-400">{pr.ref}</span>}<span className="text-[13px] font-semibold">{pr.projectTitle||pr.clientName||"Untitled"}</span><span className={"rounded px-1.5 py-0.5 text-[9px] font-medium "+(statTone[pr.status]||"bg-zinc-100 text-zinc-500")}>{statLabel(pr.status)}</span></div>
+                            <div className="mt-0.5 flex flex-wrap items-center gap-1 text-[11px] text-zinc-500">{pr.clientName&&<span>{pr.clientName}</span>}<span className="rounded bg-indigo-50 px-1 py-0.5 text-[10px] text-indigo-600">{ctLabel(pr.contractType)}</span>{pr.date&&<span>· {pr.date}</span>}</div>
+                          </div>
+                          <div className="shrink-0 text-right"><div className="mono text-[14px] font-semibold">{money(v)}</div></div>
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          <button onClick={()=>setPropForm({...blankProp(),...pr})} className="rounded border border-zinc-300 px-2 py-1 text-[11px] text-zinc-600">Edit</button>
+                          <button onClick={()=>printConProposal(pr)} className="rounded border border-zinc-300 px-2 py-1 text-[11px] text-zinc-600">PDF</button>
+                          {pr.convertedProjectId ? <span className="inline-flex items-center rounded border border-emerald-200 bg-emerald-50 px-2 py-1 text-[11px] font-medium text-emerald-700">✓ Project created</span> : (<>
+                          {pr.status!=="sent" && <button onClick={()=>setPropStatus(pr,"sent")} className="rounded border border-amber-300 px-2 py-1 text-[11px] text-amber-600">Mark sent</button>}
+                          {pr.status!=="accepted" && <button onClick={()=>setPropStatus(pr,"accepted")} className="rounded border border-emerald-300 px-2 py-1 text-[11px] text-emerald-700">Mark accepted</button>}
+                          {pr.status!=="declined" && <button onClick={()=>convertProposalToProject(pr)} className="rounded bg-emerald-600 px-2 py-1 text-[11px] font-medium text-white">Convert to project →</button>}
+                          {pr.status!=="declined" && <button onClick={()=>setPropStatus(pr,"declined")} className="rounded border border-zinc-200 px-2 py-1 text-[11px] text-zinc-400">Decline</button>}
+                          </>)}
+                        </div>
+                      </div>
+                    ); })}</div>}
+                  <p className="mt-3 text-[10px] leading-relaxed text-zinc-400">Coming next for this section: detailed scope lines from the catalog, a terms &amp; conditions block, PDF / print output, and one-tap conversion of an accepted proposal into a project.</p>
                 </>); })()}
               {conTab==="costs" && (()=>{
                 const CATS=[["material","Material + transport"],["labour","Labour & vendor"],["site","Site management"],["misc","Miscellaneous"]];
