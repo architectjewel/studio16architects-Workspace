@@ -2340,7 +2340,7 @@ function printProposal(p){
             {area==="construction" && has("construction") && (<>
               {(()=>{
                 const G=[["agreement","Proposal & Agreement"],["projects","Projects"],["money","Money & Billing"],["catalog","Catalog & Vendors"]];
-                const T={agreement:[["proposal","Proposal"]],projects:[["projects","Projects"],["board","Project Board"],["site","Site schedule"],["reports","Reports"]],money:[["billing","Client billing"],["clientacct","Client account"],["costs","Costs"],["handler","Handler"],["bills","Bills & purchases"],["statements","Statements"],["requisition","Requisition"]],catalog:[["vendors","Vendor list"],["matlist","Material list"],["tasklist","Task list"],["eqplist","Equipment list"]]};
+                const T={agreement:[["proposal","Proposal"]],projects:[["projects","Projects"],["board","Project Board"],["siteteam","Site team"],["vendorboard","Vendor board"],["site","Site schedule"],["reports","Reports"]],money:[["billing","Client billing"],["clientacct","Client account"],["costs","Costs"],["handler","Handler"],["bills","Bills & purchases"],["statements","Statements"],["requisition","Requisition"]],catalog:[["vendors","Vendor list"],["matlist","Material list"],["tasklist","Task list"],["eqplist","Equipment list"]]};
                 const curG=(G.find(([g])=>T[g].some(t=>t[0]===conTab))||G[0])[0];
                 return (<div className="mb-3">
                   <div className="flex flex-wrap gap-1.5">{G.map(([g,gl])=><button key={g} onClick={()=>{ if(!T[g].some(t=>t[0]===conTab)) setConTab(T[g][0][0]); }} className={`rounded-md px-3 py-1.5 text-[12px] font-semibold ${g===curG?"bg-zinc-900 text-white":"bg-zinc-100 text-zinc-600 hover:bg-zinc-200"}`}>{gl}</button>)}</div>
@@ -2524,6 +2524,57 @@ function printProposal(p){
                     </div>
                   </div>
                 </>); })()}
+              {conTab==="siteteam" && (()=>{
+                const mName=id=>{ const m=members.find(x=>x.id===id); return m?m.name:"\u2014"; };
+                const mCode=id=>{ const m=members.find(x=>x.id===id); return m?(m.empCode||""):""; };
+                const pName=id=>{ const x=conProjects.find(z=>z.id===id); return x?(x.nickname||x.code||"Project"):"\u2014"; };
+                const stTone={assigned:"bg-amber-50 text-amber-700 border-amber-200",active:"bg-sky-50 text-sky-700 border-sky-200",done:"bg-emerald-50 text-emerald-700 border-emerald-200",cancelled:"bg-zinc-100 text-zinc-400 border-zinc-200"};
+                const mAssigns=conAssigns.filter(a=>a.assigneeType==="member"&&a.memberId);
+                const byMember={}; mAssigns.forEach(a=>{ (byMember[a.memberId]=byMember[a.memberId]||[]).push(a); });
+                const memberIds=Object.keys(byMember).sort((a,b)=>String(mName(a)).localeCompare(String(mName(b))));
+                return (<div>
+                  <div className="mb-3 flex items-center justify-between"><h2 className="text-base font-semibold">Site team board</h2><span className="text-[11px] text-zinc-400">{memberIds.length} member{memberIds.length===1?"":"s"} assigned</span></div>
+                  {memberIds.length===0 ? <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No site members assigned yet. Assign members to tasks from a Project Board.</div> : <div className="space-y-3">
+                    {memberIds.map(mid=>{ const items=byMember[mid]; const projIds=Array.from(new Set(items.map(x=>x.projectId))); return (
+                      <div key={mid} className="rounded-lg border border-zinc-200 bg-white">
+                        <div className="flex items-center justify-between border-b border-zinc-100 px-3 py-2"><span className="text-[13px] font-semibold">{mName(mid)}{mCode(mid)&&<span className="mono ml-1.5 text-[10px] text-zinc-400">{mCode(mid)}</span>}</span><span className="mono text-[11px] text-zinc-500">{projIds.length} project{projIds.length===1?"":"s"} · {items.length} task{items.length===1?"":"s"}</span></div>
+                        <div className="divide-y divide-zinc-50">{projIds.map(pid=>{ const its=items.filter(x=>x.projectId===pid); return (
+                          <div key={pid} className="px-3 py-2">
+                            <div className="mb-1 text-[11px] font-medium text-zinc-500">{pName(pid)}</div>
+                            <div className="flex flex-wrap gap-1.5">{its.map(a=>(<span key={a.id} className={"inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[11px] "+(stTone[a.status]||stTone.assigned)}><span className="mono text-[9px] opacity-60">{a.code}</span>{a.title}</span>))}</div>
+                          </div>
+                        ); })}</div>
+                      </div>
+                    ); })}
+                  </div>}
+                </div>);
+              })()}
+              {conTab==="vendorboard" && (()=>{
+                const vName=id=>{ const v=vendors.find(z=>z.id===id); return v?v.name:"\u2014"; };
+                const vCode=id=>{ const v=vendors.find(z=>z.id===id); return v?(v.code||""):""; };
+                const vCompany=id=>{ const v=vendors.find(z=>z.id===id); return v?(v.companyName||""):""; };
+                const pName=id=>{ const x=conProjects.find(z=>z.id===id); return x?(x.nickname||x.code||"Project"):"\u2014"; };
+                const stTone={assigned:"bg-amber-50 text-amber-700 border-amber-200",active:"bg-sky-50 text-sky-700 border-sky-200",done:"bg-emerald-50 text-emerald-700 border-emerald-200",cancelled:"bg-zinc-100 text-zinc-400 border-zinc-200"};
+                const vAssigns=conAssigns.filter(a=>a.assigneeType!=="member"&&a.vendorId);
+                const byVendor={}; vAssigns.forEach(a=>{ (byVendor[a.vendorId]=byVendor[a.vendorId]||[]).push(a); });
+                const vendorIds=Object.keys(byVendor).sort((a,b)=>String(vName(a)).localeCompare(String(vName(b))));
+                return (<div>
+                  <div className="mb-3 flex items-center justify-between"><h2 className="text-base font-semibold">Vendor board</h2><span className="text-[11px] text-zinc-400">{vendorIds.length} vendor{vendorIds.length===1?"":"s"} assigned</span></div>
+                  {vendorIds.length===0 ? <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No vendors assigned yet. Assign vendors to tasks from a Project Board.</div> : <div className="space-y-3">
+                    {vendorIds.map(vid=>{ const items=byVendor[vid]; const projIds=Array.from(new Set(items.map(x=>x.projectId))); const awarded=items.reduce((s,a)=>s+Number(a.amount||0),0); return (
+                      <div key={vid} className="rounded-lg border border-zinc-200 bg-white">
+                        <div className="flex items-center justify-between border-b border-zinc-100 px-3 py-2"><span className="min-w-0 flex-1 truncate text-[13px] font-semibold">{vName(vid)}{vCode(vid)&&<span className="mono ml-1.5 text-[10px] text-zinc-400">{vCode(vid)}</span>}{vCompany(vid)&&<span className="font-normal text-zinc-400"> · {vCompany(vid)}</span>}</span><span className="mono shrink-0 text-[11px] text-zinc-500">{projIds.length} project{projIds.length===1?"":"s"} · {items.length} task{items.length===1?"":"s"}{awarded>0?" · "+money(awarded):""}</span></div>
+                        <div className="divide-y divide-zinc-50">{projIds.map(pid=>{ const its=items.filter(x=>x.projectId===pid); return (
+                          <div key={pid} className="px-3 py-2">
+                            <div className="mb-1 text-[11px] font-medium text-zinc-500">{pName(pid)}</div>
+                            <div className="flex flex-wrap gap-1.5">{its.map(a=>(<span key={a.id} className={"inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[11px] "+(stTone[a.status]||stTone.assigned)}><span className="mono text-[9px] opacity-60">{a.code}</span>{a.title}{a.amount>0&&<span className="mono opacity-70">· {money(a.amount)}</span>}</span>))}</div>
+                          </div>
+                        ); })}</div>
+                      </div>
+                    ); })}
+                  </div>}
+                </div>);
+              })()}
               {conTab==="requisition" && (()=>{
                 const byCode=(a,b)=>(a.code<b.code?-1:1);
                 const nodes = cat.slice().sort(byCode);
