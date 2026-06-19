@@ -2334,7 +2334,7 @@ function printProposal(p){
             {area==="construction" && has("construction") && (<>
               {(()=>{
                 const G=[["agreement","Proposal & Agreement"],["projects","Projects"],["money","Money & Billing"],["catalog","Catalog & Vendors"]];
-                const T={agreement:[["proposal","Proposal"]],projects:[["projects","Projects"],["board","Project Board"],["site","Site schedule"],["reports","Reports"]],money:[["billing","Client billing"],["clientacct","Client account"],["costs","Costs"],["handler","Handler"],["bills","Bills & purchases"],["statements","Statements"],["requisition","Requisition"]],catalog:[["vendors","Vendor list"],["matlist","Material list"],["tasklist","Task list"]]};
+                const T={agreement:[["proposal","Proposal"]],projects:[["projects","Projects"],["board","Project Board"],["site","Site schedule"],["reports","Reports"]],money:[["billing","Client billing"],["clientacct","Client account"],["costs","Costs"],["handler","Handler"],["bills","Bills & purchases"],["statements","Statements"],["requisition","Requisition"]],catalog:[["vendors","Vendor list"],["matlist","Material list"],["tasklist","Task list"],["eqplist","Equipment list"]]};
                 const curG=(G.find(([g])=>T[g].some(t=>t[0]===conTab))||G[0])[0];
                 return (<div className="mb-3">
                   <div className="flex flex-wrap gap-1.5">{G.map(([g,gl])=><button key={g} onClick={()=>{ if(!T[g].some(t=>t[0]===conTab)) setConTab(T[g][0][0]); }} className={`rounded-md px-3 py-1.5 text-[12px] font-semibold ${g===curG?"bg-zinc-900 text-white":"bg-zinc-100 text-zinc-600 hover:bg-zinc-200"}`}>{gl}</button>)}</div>
@@ -3199,6 +3199,7 @@ function printProposal(p){
               </>); })()}
               {conTab==="matlist" && catBoard("material","Material list")}
               {conTab==="tasklist" && catBoard("task","Task list")}
+              {conTab==="eqplist" && catBoard("equipment","Equipment list")}
               {conTab==="vendors" && (()=>{
                 const byCode=(a,b)=>(a.code<b.code?-1:1);
                 const disciplines = cat.filter(c=>c.level===1).slice().sort(byCode);
