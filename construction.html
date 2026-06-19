@@ -3238,7 +3238,7 @@ function printProposal(p){
                       <button onClick={()=>setVendorEdit(ed?null:{...v})} className="flex min-w-0 flex-1 items-center gap-2 text-left">
                         <span className="text-[11px] text-zinc-400">{ed?"▾":"▸"}</span>
                         {v.code&&<span className="mono shrink-0 rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] text-zinc-500">{v.code}</span>}
-                        <span className="truncate text-[13px] font-medium">{v.name}</span>
+                        <span className="truncate text-[13px] font-medium">{v.nickname && <span className="font-normal text-zinc-400">{v.nickname} · </span>}{v.name}{v.companyName && <span className="font-normal text-zinc-400"> · {v.companyName}</span>}</span>
                         {v.blacklisted&&<span className="shrink-0 rounded bg-red-50 px-1.5 py-0.5 text-[10px] font-medium text-red-600">Blacklisted</span>}
                         {v.type&&<span className="shrink-0 rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] text-zinc-500">{v.type}</span>}
                         {v.phone&&<span className="mono hidden text-[11px] text-zinc-400 sm:inline">{v.phone}</span>}
