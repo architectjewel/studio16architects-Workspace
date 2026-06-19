@@ -2339,8 +2339,8 @@ function printProposal(p){
 
             {area==="construction" && has("construction") && (<>
               {(()=>{
-                const G=[["agreement","Proposal & Agreement"],["projects","Projects"],["money","Money & Billing"],["catalog","Catalog & Vendors"]];
-                const T={agreement:[["proposal","Proposal"]],projects:[["projects","Projects"],["board","Project Board"],["siteteam","Site team"],["vendorboard","Vendor board"],["site","Site schedule"],["reports","Reports"]],money:[["billing","Client billing"],["clientacct","Client account"],["costs","Costs"],["handler","Handler"],["bills","Bills & purchases"],["statements","Statements"],["requisition","Requisition"]],catalog:[["vendors","Vendor list"],["matlist","Material list"],["tasklist","Task list"],["eqplist","Equipment list"]]};
+                const G=[["agreement","Sales"],["projects","Projects"],["money","Finance"],["catalog","Catalog & Vendors"]];
+                const T={agreement:[["proposal","Proposal"],["projects","Projects"]],projects:[["board","Project Manager"],["taskmgr","Task Manager"],["siteteam","Team Manager"],["vendorboard","Vendor Manager"],["site","Site schedule"]],money:[["billing","Client billing"],["clientacct","Client account"],["costs","Costs"],["handler","Handler"],["bills","Bills & purchases"],["statements","Statements"],["requisition","Requisition"]],catalog:[["vendors","Vendor list"],["matlist","Material list"],["tasklist","Task list"],["eqplist","Equipment list"]]};
                 const curG=(G.find(([g])=>T[g].some(t=>t[0]===conTab))||G[0])[0];
                 return (<div className="mb-3">
                   <div className="flex flex-wrap gap-1.5">{G.map(([g,gl])=><button key={g} onClick={()=>{ if(!T[g].some(t=>t[0]===conTab)) setConTab(T[g][0][0]); }} className={`rounded-md px-3 py-1.5 text-[12px] font-semibold ${g===curG?"bg-zinc-900 text-white":"bg-zinc-100 text-zinc-600 hover:bg-zinc-200"}`}>{gl}</button>)}</div>
@@ -2459,7 +2459,7 @@ function printProposal(p){
                 const position = received-totalOut;
                 return (<>
                   <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                    <h2 className="text-base font-semibold">Project Board</h2>
+                    <h2 className="text-base font-semibold">Project Manager</h2>
                     <Select value={sel} onChange={v=>setBoardSel(v)} className="min-w-[200px]" options={plist.map(x=>({value:x.id,label:(x.code?x.code+" ":"")+(x.nickname||x.client||"Project")}))} />
                   </div>
                   <div className="mb-3 rounded-lg border border-zinc-200 bg-white p-4">
@@ -2473,26 +2473,7 @@ function printProposal(p){
                     {(p.pm||p.storeKeeper||p.siteEngineer||p.caretaker)&&<div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-zinc-400">{p.pm&&<span>PM: {mName(p.pm)}</span>}{p.storeKeeper&&<span>Store: {mName(p.storeKeeper)}</span>}{p.siteEngineer&&<span>Engr: {mName(p.siteEngineer)}</span>}{p.caretaker&&<span>Care: {mName(p.caretaker)}</span>}</div>}
                     {p.progressPct>0 && <div className="mt-2"><div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-100"><div className="h-full bg-emerald-500" style={{width:Math.min(100,p.progressPct)+"%"}} /></div><div className="mt-0.5 text-[10px] text-zinc-400">{p.progressPct}% complete</div></div>}
                   </div>
-                  <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[16px] font-semibold">{money(cv)}</div><div className="text-[11px] text-zinc-400">Contract value</div></div>
-                    <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[16px] font-semibold text-sky-700">{money(received)}</div><div className="text-[11px] text-zinc-400">Received{due>0?" · due "+money(due):""}</div></div>
-                    <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[16px] font-semibold">{money(totalOut)}</div><div className="text-[11px] text-zinc-400">Expenditure{handlerSpent>0?" · incl "+money(handlerSpent)+" cash":""}</div></div>
-                    <div className="rounded-lg border border-zinc-200 bg-white p-3"><div className={"text-[16px] font-semibold "+(position>=0?"text-emerald-700":"text-red-600")}>{money(position)}</div><div className="text-[11px] text-zinc-400">Position (received − spent)</div></div>
-                  </div>
-                  <div className="grid gap-3 lg:grid-cols-3">
-                    <div className="rounded-lg border border-zinc-200 bg-white">
-                      <div className="flex items-center justify-between border-b border-zinc-100 px-3 py-2"><span className="text-[12px] font-semibold">Receivables</span><span className="mono text-[11px] text-zinc-500">{money(received)} / {money(invoiced)}</span></div>
-                      {rcv.length===0 ? <div className="px-3 py-5 text-center text-[11px] text-zinc-400">None yet · add in Client billing</div> : <div className="divide-y divide-zinc-50">{rcv.map(r=>{ const got=(r.collections||[]).reduce((a,c)=>a+Number(c.amount||0),0); return (<div key={r.id} className="flex items-center gap-2 px-3 py-1.5 text-[12px]"><span className="min-w-0 flex-1 truncate">{r.title||"Payment"}</span><span className="mono shrink-0 text-zinc-500">{money(got)} / {money(r.amount)}</span></div>); })}</div>}
-                    </div>
-                    <div className="rounded-lg border border-zinc-200 bg-white">
-                      <div className="flex items-center justify-between border-b border-zinc-100 px-3 py-2"><span className="text-[12px] font-semibold">Expenditure</span><span className="mono text-[11px] text-zinc-500">{money(spent)}</span></div>
-                      {costs.length===0 ? <div className="px-3 py-5 text-center text-[11px] text-zinc-400">None yet · add in Costs</div> : <div className="divide-y divide-zinc-50">{costs.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))).slice(0,12).map(c=>(<div key={c.id} className="flex items-center gap-2 px-3 py-1.5 text-[12px]"><span className="min-w-0 flex-1 truncate">{c.item||c.category}{c.vendorId&&<span className="text-zinc-400"> · {vName(c.vendorId)}</span>}</span><span className="mono shrink-0 text-zinc-500">{money(c.amount)}</span></div>))}{costs.length>12&&<div className="px-3 py-1.5 text-[10px] text-zinc-400">+{costs.length-12} more in Costs</div>}</div>}
-                    </div>
-                    <div className="rounded-lg border border-zinc-200 bg-white">
-                      <div className="flex items-center justify-between border-b border-zinc-100 px-3 py-2"><span className="text-[12px] font-semibold">Vendor bills</span><span className="mono text-[11px] text-zinc-500">{money(billPaid)} / {money(billed)}{billDue>0?" · due "+money(billDue):""}</span></div>
-                      {pbills.length===0 ? <div className="px-3 py-5 text-center text-[11px] text-zinc-400">None yet · add in Bills & purchases</div> : <div className="divide-y divide-zinc-50">{pbills.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))).slice(0,12).map(b=>{ const owe=Number(b.amount||0)-Number(b.paidAmount||0); return (<div key={b.id} className="flex items-center gap-2 px-3 py-1.5 text-[12px]"><span className="min-w-0 flex-1 truncate">{b.title||"Bill"}{b.vendorId&&<span className="text-zinc-400"> · {vName(b.vendorId)}</span>}</span><span className="mono shrink-0 text-zinc-500">{money(b.paidAmount)}/{money(b.amount)}{owe>0&&<span className="text-red-500"> ·{money(owe)}</span>}</span></div>); })}{pbills.length>12&&<div className="px-3 py-1.5 text-[10px] text-zinc-400">+{pbills.length-12} more in Bills</div>}</div>}
-                    </div>
-                    {(()=>{
+                  {(()=>{
                       const byCode=(a,b)=>(a.code<b.code?-1:1);
                       const adisc=cat.filter(c=>c.level===1).slice().sort(byCode);
                       const agrp=aForm.disc?cat.filter(c=>c.level===2&&c.parent===aForm.disc).slice().sort(byCode):[];
@@ -2518,11 +2499,6 @@ function printProposal(p){
                         {passigns.length===0 ? <div className="px-3 py-5 text-center text-[11px] text-zinc-400">No work assigned yet.</div> : <div className="divide-y divide-zinc-50">{passigns.slice().sort((a,b)=>(b.sortOrder||0)-(a.sortOrder||0)).map(a=>(<div key={a.id} className="flex items-center gap-2 px-3 py-1.5 text-[12px]"><span className="min-w-0 flex-1 truncate"><span className="mono text-[10px] text-zinc-400">{a.code}</span> {a.title}{(a.assigneeType==="member"?a.memberId:a.vendorId)&&<span className="text-zinc-400"> · {a.assigneeType==="member"?mName(a.memberId):vName(a.vendorId)}</span>}</span>{a.amount>0&&<span className="mono shrink-0 text-zinc-500">{money(a.amount)}</span>}<span className={"shrink-0 rounded border px-1.5 py-0.5 text-[9px] "+(stTone[a.status]||stTone.assigned)}>{a.status}</span><button onClick={()=>delAssign(a.id)} className="shrink-0 text-[11px] text-zinc-300 hover:text-red-500">✕</button></div>))}</div>}
                       </div>);
                     })()}
-                    <div className="rounded-lg border border-zinc-200 bg-white">
-                      <div className="flex items-center justify-between border-b border-zinc-100 px-3 py-2"><span className="text-[12px] font-semibold">Site cash (handler)</span><span className="mono text-[11px] text-zinc-500">{money(handlerSpent)}</span></div>
-                      {handlerTx.length===0 ? <div className="px-3 py-5 text-center text-[11px] text-zinc-400">None yet · pay via Handler</div> : <div className="divide-y divide-zinc-50">{handlerTx.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))).slice(0,12).map(a=>(<div key={a.id} className="flex items-center gap-2 px-3 py-1.5 text-[12px]"><span className="min-w-0 flex-1 truncate">{a.vendorId?vName(a.vendorId):(a.category||"Payment")}{a.note&&<span className="text-zinc-400"> · {a.note}</span>}</span><span className="mono shrink-0 text-zinc-500">{money(a.amount)}</span></div>))}{handlerTx.length>12&&<div className="px-3 py-1.5 text-[10px] text-zinc-400">+{handlerTx.length-12} more in Handler</div>}</div>}
-                    </div>
-                  </div>
                 </>); })()}
               {conTab==="siteteam" && (()=>{
                 const mName=id=>{ const m=members.find(x=>x.id===id); return m?m.name:"\u2014"; };
@@ -2575,6 +2551,7 @@ function printProposal(p){
                   </div>}
                 </div>);
               })()}
+              {conTab==="taskmgr" && (<div className="rounded-lg border border-dashed border-zinc-300 bg-white py-12 text-center text-[12px] text-zinc-400">Task Manager — project phases &amp; tasks will be built here next.</div>)}
               {conTab==="requisition" && (()=>{
                 const byCode=(a,b)=>(a.code<b.code?-1:1);
                 const nodes = cat.slice().sort(byCode);
