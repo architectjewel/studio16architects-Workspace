@@ -66,7 +66,7 @@
     const projText = p => [p.code, (p.nickname||p.client||""), p.location||""].filter(Boolean).join(" ");
     const today = ()=> new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short"});
     const relTime = (iso)=>{ if(!iso) return ""; const d=new Date(iso); const s=Math.floor((Date.now()-d.getTime())/1000); if(s<60) return "just now"; const m=Math.floor(s/60); if(m<60) return m+"m ago"; const h=Math.floor(m/60); if(h<24) return h+"h ago"; const dd=Math.floor(h/24); if(dd<7) return dd+"d ago"; return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"}); };
-    const ALL_KEYS = [["construction","Construction"],["hr","HR"]];
+    const ALL_KEYS = [["construction","Construction"],["finance","Finance"],["design","Design"],["sales","Sales"],["hr","HR"],["marketing","Marketing"]];
     const dayStr = ()=> new Date().toLocaleDateString("en-CA");
     const clientUrl = t => window.location.origin + "/client.html?token=" + t;
     const yearOf = (code)=>{ const d=String(code||"").replace(/\D/g,""); if(d.length>=5) return 2000+parseInt(d.slice(0,2),10); if(d.length===4) return 2020+parseInt(d.slice(0,1),10); return null; };
@@ -1213,7 +1213,7 @@ function printProposal(p){
       if(!session) return (
         <div className="flex min-h-screen items-center justify-center px-4">
           <form onSubmit={signIn} className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-            <img src={"data:image/png;base64,"+LOGO_B64} alt="Studio 16 Architects" className="mb-1 h-10 w-auto" />
+            <img src={"data:image/jpeg;base64,"+LOGO_B64} alt="Studio 16 Architects" className="mb-1 h-10 w-auto" />
             <p className="mb-4 text-[12px] text-zinc-500">S16A Workspace — sign in</p>
             <Lbl>Team ID</Lbl><input value={email} onChange={e=>setEmail(e.target.value)} autoFocus placeholder="e.g. S16A101" className="mb-3 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-900" />
             <Lbl>Password</Lbl><input value={pw} onChange={e=>setPw(e.target.value)} type="password" className="mb-4 w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-900" />
@@ -3511,7 +3511,7 @@ function printProposal(p){
           <footer className="mx-auto max-w-[1100px] px-4 pb-8 pt-2 sm:px-8">
             {showSeen && <div className="mb-3 rounded-lg border border-zinc-200 bg-white p-3"><div className="mb-1.5 mono text-[10px] uppercase tracking-wider text-zinc-400">Team — last seen</div><div className="space-y-0.5">{allProfiles.slice().sort((a,b)=>(b.last_seen?new Date(b.last_seen).getTime():0)-(a.last_seen?new Date(a.last_seen).getTime():0)).map(pr=>(<div key={pr.id} className="flex items-center gap-2 text-[11px]"><span className="min-w-0 flex-1 truncate text-zinc-600">{pr.name||pr.employee_id}{pr.id===profile?.id&&<span className="text-zinc-400"> (you)</span>}</span><span className="mono shrink-0 text-zinc-400">{pr.last_seen?relTime(pr.last_seen):"never"}</span></div>))}</div></div>}
             <div className="flex flex-wrap items-center justify-between gap-2 border-t border-zinc-200 pt-4 text-[11px] text-zinc-400">
-              <span>{profile?.companies?.name||"Studio 16 Architects"}{profile?.companies?.website?" · "+profile.companies.website:""}</span>
+              <span>{STUDIO.name} · {STUDIO.web} · <span className="text-zinc-300">{STUDIO.tagline}</span></span>
               {(()=>{ const others=allProfiles.filter(p=>p.id!==profile?.id&&p.last_seen).sort((a,b)=>new Date(b.last_seen)-new Date(a.last_seen)); const last=others[0]; return <button onClick={()=>setShowSeen(s=>!s)} className="mono hover:text-zinc-700">{last?`Last opened by ${last.name||last.employee_id} · ${relTime(last.last_seen)}`:"Team activity"} {showSeen?"▾":"▸"}</button>; })()}
               <span className="mono">{new Date().toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",year:"numeric"})}</span>
             </div>
