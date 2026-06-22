@@ -68,6 +68,7 @@
     const today = ()=> new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short"});
     const relTime = (iso)=>{ if(!iso) return ""; const d=new Date(iso); const s=Math.floor((Date.now()-d.getTime())/1000); if(s<60) return "just now"; const m=Math.floor(s/60); if(m<60) return m+"m ago"; const h=Math.floor(m/60); if(h<24) return h+"h ago"; const dd=Math.floor(h/24); if(dd<7) return dd+"d ago"; return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"}); };
     const ALL_KEYS = [["design","Design"],["finance","Finance"],["construction","Construction"],["sales","Sales"],["hr","HR"],["marketing","Marketing"]];
+      const ACCESS_GROUPS = [{id:"design",label:"Design app",keys:[["design","Design"],["finance","Finance"],["sales","Sales"],["marketing","Marketing"]]},{id:"construction",label:"Construction app",keys:[["sl-construction","Construction"],["sl-finance","Finance"],["sl-sales","Sales"],["sl-marketing","Marketing"]]},{id:"shared",label:"Shared",keys:[["hr","HR"]]}];
     const dayStr = ()=> new Date().toLocaleDateString("en-CA");
     const clientUrl = t => window.location.origin + "/client.html?token=" + t;
     const yearOf = (code)=>{ const d=String(code||"").replace(/\D/g,""); if(d.length>=5) return 2000+parseInt(d.slice(0,2),10); if(d.length===4) return 2020+parseInt(d.slice(0,1),10); return null; };
@@ -1438,7 +1439,7 @@ function printProposal(p){
                       <button onClick={()=>setPEdit(ed?null:{id:pr.id,name:pr.name||"",phone:pr.phone||"",keys:pr.keys||["design"]})} className="shrink-0 px-1 text-[11px] text-zinc-400 hover:text-zinc-800">{ed?"▾":"✎"}</button>
                     </div>
                     {ed && <div className="border-t border-zinc-100 p-3"><div className="flex flex-wrap items-end gap-2"><div className="min-w-[140px] flex-1"><Lbl>Display name</Lbl><Input value={pEdit.name} onChange={e=>setPEdit({...pEdit,name:e.target.value})} /></div><div className="w-44"><Lbl>Mobile</Lbl><Input value={pEdit.phone} onChange={e=>setPEdit({...pEdit,phone:e.target.value})} placeholder="+8801…" /></div><button onClick={saveProfile} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Save</button><button onClick={()=>setPEdit(null)} className="rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] text-zinc-600">Cancel</button></div>
-                      <div className="mt-3"><Lbl>Area access (keys)</Lbl>{pr.role==="admin"?<div className="text-[11px] text-zinc-500">Admin — full access to every area.</div>:<div className="flex flex-wrap gap-1.5">{ALL_KEYS.map(([k,l])=>{ const on=(pEdit.keys||[]).includes(k); return <button key={k} onClick={()=>setPEdit({...pEdit,keys:on?(pEdit.keys||[]).filter(x=>x!==k):[...(pEdit.keys||[]),k]})} className={`rounded-md border px-2.5 py-1 text-[11px] font-medium ${on?"border-zinc-900 bg-zinc-900 text-white":"border-zinc-300 text-zinc-500 hover:border-zinc-500"}`}>{l}</button>; })}</div>}</div>
+                      <div className="mt-3"><Lbl>Area access (keys)</Lbl>{pr.role==="admin"?<div className="text-[11px] text-zinc-500">Admin — full access to every area.</div>:<div className="space-y-2.5">{ACCESS_GROUPS.map(g=>(<div key={g.id} className="rounded-lg border border-zinc-200 bg-zinc-50/60 p-2.5"><div className="mono mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">{g.label}</div><div className="flex flex-wrap gap-1.5">{g.keys.map(([k,l])=>{ const on=(pEdit.keys||[]).includes(k); return <button key={k} onClick={()=>setPEdit({...pEdit,keys:on?(pEdit.keys||[]).filter(x=>x!==k):[...(pEdit.keys||[]),k]})} className={`rounded-md border px-2.5 py-1 text-[11px] font-medium ${on?"border-zinc-900 bg-zinc-900 text-white":"border-zinc-300 text-zinc-500 hover:border-zinc-500"}`}>{l}</button>; })}</div></div>))}</div>}</div>
                       <div className="mono mt-2 text-[10px] text-zinc-400">Team ID ({pr.employee_id||"—"}) &amp; password are managed in Supabase; name, mobile &amp; area access here.</div></div>}
                   </div>
                 ); })}</div>
@@ -1447,9 +1448,9 @@ function printProposal(p){
               </div>
 
               <div className="rounded-lg border border-zinc-200 bg-white p-3">
-                <h3 className="mb-2 text-[13px] font-semibold">Studio details <span className="mono text-[10px] font-normal text-zinc-400">— used on the printed letterhead &amp; footer</span></h3>
+                <h3 className="mb-2 text-[13px] font-semibold">Company details <span className="mono text-[10px] font-normal text-zinc-400">— used on the printed letterhead &amp; footer</span></h3>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  <div><Lbl>Studio name</Lbl><Input value={profile?.companies?.name||""} onChange={e=>patchCompany({name:e.target.value})} /></div>
+                  <div><Lbl>Company name</Lbl><Input value={profile?.companies?.name||""} onChange={e=>patchCompany({name:e.target.value})} /></div>
                   <div><Lbl>Website</Lbl><Input value={profile?.companies?.website||""} onChange={e=>patchCompany({website:e.target.value})} /></div>
                   <div><Lbl>Email</Lbl><Input value={profile?.companies?.email||""} onChange={e=>patchCompany({email:e.target.value})} /></div>
                   <div><Lbl>Address</Lbl><Input value={profile?.companies?.address||""} onChange={e=>patchCompany({address:e.target.value})} /></div>
