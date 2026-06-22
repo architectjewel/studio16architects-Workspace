@@ -1243,7 +1243,7 @@ function printProposal(p){
                   <button onClick={signOut} className="rounded-md border border-zinc-300 px-3 py-1.5 hover:bg-zinc-50">Sign out</button>
                 </div>
               </div>
-              {area==="design" && (<><div className="mb-3 flex flex-wrap items-center justify-between gap-2"><h2 className="text-base font-semibold">Design overview</h2><a href="https://workspace.studio16architectsbd.com" target="_blank" rel="noopener" className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">Open Design workspace →</a></div></>)}{false && (<>
+              {area==="design" && (<></>)}{false && (<>
                 <div className="flex flex-wrap items-stretch gap-x-6 gap-y-2 pt-3">
                   <Stat n={kpis.live} l="Live" /><Stat n={kpis.ongoing} l="Ongoing" /><Stat n={kpis.hold} l="On hold" /><Stat n={kpis.unassigned} l="Unassigned" tone="red" /><Stat n={kpis.pending} l="Pending follow-ups" />
                 </div>
@@ -1261,6 +1261,8 @@ function printProposal(p){
           </header>
 
           <main className="mx-auto max-w-[1100px] px-4 py-5 sm:px-8">
+            {area==="design" && (<><div className="mb-3 flex flex-wrap items-center justify-between gap-2"><h2 className="text-base font-semibold">Design overview</h2><a href="https://workspace.studio16architectsbd.com" target="_blank" rel="noopener" className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">Open Design workspace →</a></div></>)}
+
             {loading && <div className="mono mb-4 text-sm text-zinc-400">Loading…</div>}
             {err && <div className="mb-4 rounded-md bg-red-50 px-3 py-2 text-[12px] text-red-600">{err}</div>}
             {realAdmin && viewAs==="member" && <div className="mb-4 flex items-center justify-between rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-[12px] text-amber-800"><span>Previewing the app as a regular member sees it.</span><button onClick={()=>setViewAs("admin")} className="rounded-md bg-amber-600 px-2.5 py-1 text-[11px] font-medium text-white">Back to admin</button></div>}
