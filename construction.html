@@ -1243,28 +1243,7 @@ function printProposal(p){
                   <button onClick={signOut} className="rounded-md border border-zinc-300 px-3 py-1.5 hover:bg-zinc-50">Sign out</button>
                 </div>
               </div>
-              {area==="design" && (<><div className="space-y-4">
-  <div className="flex items-center justify-between gap-2">
-    <h2 className="text-base font-semibold">Design overview</h2>
-    <a href="https://workspace.studio16architectsbd.com" target="_blank" rel="noopener" className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">Open Design App →</a>
-  </div>
-  <div className="rounded-xl border border-zinc-200 bg-white p-5">
-    <div className="flex items-center gap-3">
-      <div className="grid h-10 w-10 place-items-center rounded-lg bg-zinc-900 text-[12px] font-bold text-white">S16</div>
-      <div>
-        <div className="text-[13px] font-semibold text-zinc-800">Studio 16 Architects</div>
-        <div className="mono text-[11px] text-zinc-400">Architecture · Simplicity · Diversity</div>
-      </div>
-    </div>
-    <p className="mt-3 text-[12px] leading-relaxed text-zinc-500">Design, drawings, client proposals and approvals are managed in the Studio 16 Architects design workspace — the mother company's app. Tap Open Design App to switch over.</p>
-  </div>
-  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-    <div className="rounded-xl border border-zinc-200 bg-white p-4"><div className="mono text-[10px] uppercase tracking-wider text-zinc-400">Workspace</div><div className="mt-1 text-[13px] font-semibold text-zinc-800">Design projects</div></div>
-    <div className="rounded-xl border border-zinc-200 bg-white p-4"><div className="mono text-[10px] uppercase tracking-wider text-zinc-400">Documents</div><div className="mt-1 text-[13px] font-semibold text-zinc-800">Drawings and approvals</div></div>
-    <div className="rounded-xl border border-zinc-200 bg-white p-4"><div className="mono text-[10px] uppercase tracking-wider text-zinc-400">Clients</div><div className="mt-1 text-[13px] font-semibold text-zinc-800">Proposals and leads</div></div>
-  </div>
-  <p className="text-[11px] text-zinc-400">This links to the separate Studio 16 Architects design app — opens in a new tab.</p>
-</div></>)}{false && (<>
+              {area==="design" && (<><div className="mb-3 flex flex-wrap items-center justify-between gap-2"><h2 className="text-base font-semibold">Design overview</h2><a href="https://workspace.studio16architectsbd.com" target="_blank" rel="noopener" className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">Open Design workspace →</a></div></>)}{false && (<>
                 <div className="flex flex-wrap items-stretch gap-x-6 gap-y-2 pt-3">
                   <Stat n={kpis.live} l="Live" /><Stat n={kpis.ongoing} l="Ongoing" /><Stat n={kpis.hold} l="On hold" /><Stat n={kpis.unassigned} l="Unassigned" tone="red" /><Stat n={kpis.pending} l="Pending follow-ups" />
                 </div>
