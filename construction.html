@@ -1572,14 +1572,16 @@ function printProposal(p){
               </div>
 
               <div className="rounded-lg border border-zinc-200 bg-white p-3">
-                <h3 className="mb-2 text-[13px] font-semibold">Studio details <span className="mono text-[10px] font-normal text-zinc-400">— used on the printed letterhead &amp; footer</span></h3>
+                <h3 className="mb-2 text-[13px] font-semibold">Company details <span className="mono text-[10px] font-normal text-zinc-400">— shown on the printed letterhead & footer</span></h3>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  <div><Lbl>Studio name</Lbl><Input value={profile?.companies?.name||""} onChange={e=>patchCompany({name:e.target.value})} /></div>
-                  <div><Lbl>Website</Lbl><Input value={profile?.companies?.website||""} onChange={e=>patchCompany({website:e.target.value})} /></div>
-                  <div><Lbl>Email</Lbl><Input value={profile?.companies?.email||""} onChange={e=>patchCompany({email:e.target.value})} /></div>
-                  <div><Lbl>Address</Lbl><Input value={profile?.companies?.address||""} onChange={e=>patchCompany({address:e.target.value})} /></div>
+                  <div><Lbl>Company name</Lbl><div className="rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1.5 text-[12px] text-zinc-700">{STUDIO.name}</div></div>
+                  <div><Lbl>Tagline</Lbl><div className="rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1.5 text-[12px] text-zinc-700">{STUDIO.tagline}</div></div>
+                  <div><Lbl>Website</Lbl><div className="rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1.5 text-[12px] text-zinc-700">{STUDIO.web}</div></div>
+                  <div><Lbl>Email</Lbl><div className="rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1.5 text-[12px] text-zinc-700">{STUDIO.email}</div></div>
+                  <div><Lbl>Phone</Lbl><div className="rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1.5 text-[12px] text-zinc-700">{STUDIO.phone}</div></div>
+                  <div><Lbl>Address</Lbl><div className="rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1.5 text-[12px] text-zinc-700">{STUDIO.address}</div></div>
                 </div>
-                <div className="mono mt-2 text-[10px] text-zinc-400">Changes save as you type.</div>
+                <div className="mono mt-2 text-[10px] text-zinc-400">Fixed for Sync Land Limited — tell me here if any detail changes.</div>
               </div>
             </>)}
             {area==="design" && tab==="resource" && (<>
@@ -3505,7 +3507,7 @@ function printProposal(p){
                 </>)}</>);
               })()}
               
-{area==="marketing" && (()=>{ const lbl=(ALL_KEYS.find(([k])=>k===area)||[])[1]||area; return (
+{area==="marketing" && has("sl-marketing") && (()=>{ const lbl=(ALL_KEYS.find(([k])=>k===area)||[])[1]||area; return (
               <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-10 text-center">
                 <div className="text-base font-semibold text-zinc-700">{lbl} — coming soon</div>
                 <p className="mx-auto mt-2 max-w-md text-[12px] leading-relaxed text-zinc-400">This area exists and is access-controlled — only people you give the <b>{lbl}</b> key can open it, and its data will be invisible to everyone else. We'll build its tools in an upcoming step.</p>
