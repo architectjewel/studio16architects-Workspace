@@ -199,7 +199,9 @@
       const isAdmin = realAdmin && viewAs==="admin";
       const memberMode = realAdmin && viewAs==="member";
       const has = k => { const pk=Array.isArray(profile?.keys)?profile.keys:["design"]; const vk=Array.isArray(viewKeys)?viewKeys:["design"]; return k==="sales" ? isAdmin : (memberMode ? vk.includes(k) : (realAdmin || pk.includes(k))); };
-      const areas = ALL_KEYS.filter(([k])=>has(AREA_KEY[k]||k));
+      const areas = ALL_KEYS.filter(([k])=> k==="design" || has(AREA_KEY[k]||k));
+
+      useEffect(()=>{ if(!profile) return; if(realAdmin && viewAs!=="member") return; const ok = ALL_KEYS.filter(([k])=> k==="design" || has(AREA_KEY[k]||k)).map(([k])=>k); if(!ok.includes(area)) setArea((ALL_KEYS.find(([k])=>k!=="design" && has(AREA_KEY[k]||k))||["design"])[0]); },[profile,viewAs,viewKeys,area,realAdmin]);
 
       useEffect(()=>{ if(!db) return; db.auth.getSession().then(({data})=>setSession(data.session)); const {data:sub}=db.auth.onAuthStateChange((_e,s)=>setSession(s)); return ()=>sub.subscription.unsubscribe(); },[]);
       useEffect(()=>{ if(session) load(true); },[session]);
@@ -380,7 +382,7 @@
       async function saveEditP(){ const e=editP; const f={code:e.code.trim(),nickname:e.nickname,client:e.client,location:e.location,size:e.size,address:e.address,priority:e.priority,status:e.status,lead_member_id:e.lead==="__none"?null:e.lead}; if(fail((await db.from("projects").update(f).eq("id",e.id)).error)) return; if(f.lead_member_id) await db.from("tasks").update({assignee_member_id:f.lead_member_id}).eq("project_id",e.id).is("assignee_member_id",null); setEditP(null); await refresh(); }
       async function deleteProject(id){ await db.from("tasks").delete().eq("project_id",id); if(fail((await db.from("projects").delete().eq("id",id)).error)) return; setDelP(null); if(expanded===id) setExpanded(null); await refresh(); }
       async function setProfileRole(id,role){ if(id===profile.id) return; if(fail((await db.from("profiles").update({role}).eq("id",id)).error)) return; await refresh(); }
-      async function saveProfile(){ const e=pEdit; if(fail((await db.from("profiles").update({name:e.name.trim(),phone:e.phone.trim()||null,keys:e.keys||["design"]}).eq("id",e.id)).error)) return; if(e.id===profile.id) setProfile(p=>({...p,name:e.name.trim()})); setPEdit(null); await refresh(); }
+      async function saveProfile(){ const e=pEdit; if(fail((await db.from("profiles").update({name:e.name.trim(),phone:e.phone.trim()||null,keys:e.keys||["design"],member_type:e.member_type||"both"}).eq("id",e.id)).error)) return; if(e.id===profile.id) setProfile(p=>({...p,name:e.name.trim()})); setPEdit(null); await refresh(); }
       async function patchCompany(f){ if(fail((await db.from("companies").update(f).eq("id",cid())).error)) return; setProfile(p=>({...p,companies:{...p.companies,...f}})); }
       async function checkIn(){ if(myCheckin) return; const {data,error}=await db.from("attendance").insert({profile_id:session.user.id,company_id:cid(),day:dayStr()}).select().single(); if(fail(error)) return; setMyCheckin(data); }
       async function addLead(){ if(!nl.name.trim()&&!nl.phone.trim()) return; if(fail((await db.from("leads").insert({company_id:cid(),name:nl.name.trim(),phone:nl.phone.trim(),email:nl.email.trim(),who:nl.who.trim(),project_type:nl.projectType.trim(),location:nl.location.trim(),present_address:nl.presentAddress.trim(),plot_size:nl.plotSize.trim(),road_width:nl.roadWidth.trim(),services:nl.services.trim(),message:nl.message.trim(),source:"manual",status:"new"})).error)) return; setNl({name:"",phone:"",email:"",who:"",projectType:"",location:"",presentAddress:"",plotSize:"",roadWidth:"",services:"",message:""}); setShowAddLead(false); await refresh(); }
@@ -1240,7 +1242,7 @@ function printProposal(p){
                 <div className="flex items-center gap-2 text-[12px]">
                   <button onClick={checkIn} disabled={!!myCheckin} className={`rounded-md px-2.5 py-1.5 text-[11px] font-medium ${myCheckin?"border border-emerald-300 bg-emerald-50 text-emerald-700":"bg-zinc-900 text-white hover:bg-zinc-700"}`}>{myCheckin?`✓ In · ${new Date(myCheckin.ts).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}`:"Check in"}</button>
                   <span className="hidden text-zinc-500 sm:inline">{profile?.name} · {profile?.role}</span>
-                  {realAdmin && (viewAs==="admin" ? <button onClick={()=>{setViewAs("member");setViewKeys(["design"]);setArea("design");setTab("team");setShowAddP(false);setShowRegAdd(false);setEditP(null);setDelP(null);}} className="rounded-md border border-zinc-300 px-2.5 py-1.5 text-[11px] text-zinc-500 hover:bg-zinc-50">View as member</button> : <button onClick={()=>setViewAs("admin")} className="rounded-md border border-amber-300 bg-amber-50 px-2.5 py-1.5 text-[11px] font-medium text-amber-700 hover:bg-amber-100">Exit member view</button>)}
+                  {realAdmin && (viewAs==="admin" ? <button onClick={()=>{setViewAs("member");setViewKeys(["design"]);setArea("design");setShowAddP(false);setShowRegAdd(false);setEditP(null);setDelP(null);}} className="rounded-md border border-zinc-300 px-2.5 py-1.5 text-[11px] text-zinc-500 hover:bg-zinc-50">View as member</button> : <button onClick={()=>setViewAs("admin")} className="rounded-md border border-amber-300 bg-amber-50 px-2.5 py-1.5 text-[11px] font-medium text-amber-700 hover:bg-amber-100">Exit member view</button>)}
                   {memberMode && <div className="flex flex-wrap items-center gap-1"><span className="mr-1 text-[10px] text-zinc-400">preview as member with:</span>{ALL_KEYS.filter(([k])=>k!=="sales").map(([k,lbl])=>(<button key={k} onClick={()=>setViewKeys(vk=>vk.includes(k)?vk.filter(x=>x!==k):[...vk,k])} className={"rounded-md border px-2 py-1 text-[10px] "+(viewKeys.includes(k)?"border-amber-300 bg-amber-50 text-amber-700":"border-zinc-200 text-zinc-400 hover:bg-zinc-50")}>{lbl}</button>))}</div>}
                   <button onClick={signOut} className="rounded-md border border-zinc-300 px-3 py-1.5 hover:bg-zinc-50">Sign out</button>
                 </div>
@@ -1269,7 +1271,7 @@ function printProposal(p){
             {err && <div className="mb-4 rounded-md bg-red-50 px-3 py-2 text-[12px] text-red-600">{err}</div>}
             {realAdmin && viewAs==="member" && <div className="mb-4 flex items-center justify-between rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-[12px] text-amber-800"><span>Previewing the app as a regular member sees it.</span><button onClick={()=>setViewAs("admin")} className="rounded-md bg-amber-600 px-2.5 py-1 text-[11px] font-medium text-white">Back to admin</button></div>}
 
-            {area==="design" && tab==="overview" && (()=>{
+            {false && tab==="overview" && (()=>{
                 const memName=id=>{const m=members.find(x=>x.id===id); return m?m.name:null;};
                 const ps=p=>p.status||"live";
                 const liveProjects=projects.filter(p=>ps(p)==="live");
@@ -1313,7 +1315,7 @@ function printProposal(p){
                 </div>);
               })()}
               
-{area==="design" && tab==="team" && (<>
+{false && tab==="team" && (<>
             {showAddP && isAdmin && (
               <div className="mb-4 rounded-lg border border-zinc-300 bg-white p-3">
                 <div className="mb-2"><Lbl>Paste full project name</Lbl><Input value={np.raw} onChange={e=>setNp({...np,raw:e.target.value,...parseName(e.target.value)})} placeholder="5102_LT GEN SHAFIQUR RAHMAN_JOLSHIRI_5 Katha_PLOT ID 17" /></div>
@@ -1443,7 +1445,7 @@ function printProposal(p){
             ); })()}
             </>)}
 
-            {area==="design" && tab==="board" && (<>
+            {false && tab==="board" && (<>
               <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-base font-semibold">Live Projects <span className="mono text-[11px] text-zinc-400">{projects.filter(p=>p.status==="live").length} live</span></h2>
                 <div className="flex flex-wrap items-center gap-2"><label className="mono flex cursor-pointer items-center gap-1 text-[11px] text-zinc-500"><input type="checkbox" checked={printUpcoming} onChange={e=>setPrintUpcoming(e.target.checked)} /> include upcoming in print</label><button onClick={()=>setShowBoardShare(s=>!s)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600 hover:bg-zinc-50">Copy list</button><button onClick={printBoard} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] font-medium text-zinc-700 hover:bg-zinc-50">⧉ Print</button></div>
@@ -1470,7 +1472,7 @@ function printProposal(p){
               {!projects.some(p=>p.status==="live") && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No live projects yet — add one from the Registry.</div>}
             </>)}
 
-            {area==="design" && tab==="registry" && isAdmin && (<>
+            {false && tab==="registry" && isAdmin && (<>
               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-base font-semibold">Project Registry <span className="mono text-[11px] text-zinc-400">{projects.length} total</span></h2>
                 <button onClick={()=>{setShowRegAdd(s=>!s); setNp(s=>({...s,lead:"__none",status:"live"}));}} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">+ Add project</button>
@@ -1563,7 +1565,7 @@ function printProposal(p){
                       <button onClick={()=>setPEdit(ed?null:{id:pr.id,name:pr.name||"",phone:pr.phone||"",keys:pr.keys||["design"]})} className="shrink-0 px-1 text-[11px] text-zinc-400 hover:text-zinc-800">{ed?"▾":"✎"}</button>
                     </div>
                     {ed && <div className="border-t border-zinc-100 p-3"><div className="flex flex-wrap items-end gap-2"><div className="min-w-[140px] flex-1"><Lbl>Display name</Lbl><Input value={pEdit.name} onChange={e=>setPEdit({...pEdit,name:e.target.value})} /></div><div className="w-44"><Lbl>Mobile</Lbl><Input value={pEdit.phone} onChange={e=>setPEdit({...pEdit,phone:e.target.value})} placeholder="+8801…" /></div><button onClick={saveProfile} className="rounded-md bg-zinc-700 px-3 py-1.5 text-[12px] font-medium text-white">Save</button><button onClick={()=>setPEdit(null)} className="rounded-md border border-zinc-300 px-2 py-1.5 text-[12px] text-zinc-600">Cancel</button></div>
-                      <div className="mt-3"><Lbl>Area access (keys)</Lbl>{pr.role==="admin"?<div className="text-[11px] text-zinc-500">Admin — full access to every area.</div>:<div className="space-y-2.5">{ACCESS_GROUPS.map(g=>(<div key={g.id} className="rounded-lg border border-zinc-200 bg-zinc-50/60 p-2.5"><div className="mono mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">{g.label}</div><div className="flex flex-wrap gap-1.5">{g.keys.map(([k,l])=>{ const on=(pEdit.keys||[]).includes(k); return <button key={k} onClick={()=>setPEdit({...pEdit,keys:on?(pEdit.keys||[]).filter(x=>x!==k):[...(pEdit.keys||[]),k]})} className={`rounded-md border px-2.5 py-1 text-[11px] font-medium ${on?"border-zinc-900 bg-zinc-900 text-white":"border-zinc-300 text-zinc-500 hover:border-zinc-500"}`}>{l}</button>; })}</div></div>))}</div>}</div>
+                      <div className="mt-3"><Lbl>Area access (keys)</Lbl>{pr.role==="admin"?<div className="text-[11px] text-zinc-500">Admin — full access to every area.</div>:<div className="space-y-2.5"><div className="pb-1"><div className="mono mb-1 text-[10px] uppercase tracking-wider text-zinc-400">Member type</div><div className="flex gap-1.5">{[["design","Design"],["construction","Construction"],["both","Both"]].map(([v,l])=>{ const on=(pEdit.member_type||"both")===v; return <button key={v} onClick={()=>setPEdit({...pEdit,member_type:v})} className={`rounded-md border px-2.5 py-1 text-[11px] font-medium ${on?"border-zinc-900 bg-zinc-900 text-white":"border-zinc-300 text-zinc-500 hover:border-zinc-500"}`}>{l}</button>; })}</div></div>{ACCESS_GROUPS.filter(g=> g.id==="shared" || (pEdit.member_type||"both")==="both" || g.id===(pEdit.member_type||"both")).map(g=>(<div key={g.id} className="rounded-lg border border-zinc-200 bg-zinc-50/60 p-2.5"><div className="mono mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">{g.label}</div><div className="flex flex-wrap gap-1.5">{g.keys.map(([k,l])=>{ const on=(pEdit.keys||[]).includes(k); return <button key={k} onClick={()=>setPEdit({...pEdit,keys:on?(pEdit.keys||[]).filter(x=>x!==k):[...(pEdit.keys||[]),k]})} className={`rounded-md border px-2.5 py-1 text-[11px] font-medium ${on?"border-zinc-900 bg-zinc-900 text-white":"border-zinc-300 text-zinc-500 hover:border-zinc-500"}`}>{l}</button>; })}</div></div>))}</div>}</div>
                       <div className="mono mt-2 text-[10px] text-zinc-400">Team ID ({pr.employee_id||"—"}) &amp; password are managed in Supabase; name, mobile &amp; area access here.</div></div>}
                   </div>
                 ); })}</div>
@@ -1584,7 +1586,7 @@ function printProposal(p){
                 <div className="mono mt-2 text-[10px] text-zinc-400">Fixed for Sync Land Limited — tell me here if any detail changes.</div>
               </div>
             </>)}
-            {area==="design" && tab==="resource" && (<>
+            {false && tab==="resource" && (<>
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <h2 className="text-base font-semibold">Resources</h2>
                 <div className="ml-auto flex flex-wrap gap-1">
