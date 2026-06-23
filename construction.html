@@ -1265,7 +1265,21 @@ function printProposal(p){
           </header>
 
           <main className="mx-auto max-w-[1100px] px-4 py-5 sm:px-8">
-            {area==="design" && (<><div className="mb-3 flex flex-wrap items-center justify-between gap-2"><h2 className="text-base font-semibold">Design overview</h2><a href="https://workspace.studio16architectsbd.com" target="_blank" rel="noopener" className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">Open Design workspace →</a></div></>)}
+            {area==="design" && (<><div className="mb-3 flex flex-wrap items-center justify-between gap-2"><h2 className="text-base font-semibold">Design overview</h2><a href="https://workspace.studio16architectsbd.com" target="_blank" rel="noopener" className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">Open Design workspace →</a></div>
+                <div className="mb-4 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3"><div className="flex flex-wrap items-stretch gap-x-6 gap-y-2">
+                  <Stat n={projects.length} l="Design projects" />
+                  <Stat n={projects.filter(p=>p.status==="live").length} l="Live projects" />
+                  <Stat n={leads.length} l="Leads" />
+                  <Stat n={proposals.length} l="Proposals" />
+                </div></div>
+                {projects.length>0 ? (<div className="space-y-1.5">{projects.slice(0,6).map(pp=>(
+                  <div key={pp.id} className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2.5">
+                    {pp.code&&<span className="mono text-[12px] font-bold">{pp.code}</span>}
+                    <span className="min-w-0 flex-1 truncate text-[13px] font-medium">{pp.nickname||pp.client||pp.location||"Project"}</span>
+                    <span className="mono text-[11px] text-zinc-500">{pp.status||""}</span>
+                  </div>
+                ))}</div>) : <div className="rounded-lg border border-dashed border-zinc-300 bg-white px-4 py-6 text-center text-[12px] text-zinc-400">No design projects yet.</div>}
+                <p className="mt-3 text-[11px] text-zinc-400">Read-only snapshot. Manage design work in the Design workspace.</p></>)}
 
             {loading && <div className="mono mb-4 text-sm text-zinc-400">Loading…</div>}
             {err && <div className="mb-4 rounded-md bg-red-50 px-3 py-2 text-[12px] text-red-600">{err}</div>}
