@@ -284,7 +284,36 @@
       async function addCat(){ if(!catAdd) return; const name=catForm.name.trim(); if(!name) return; const code=(catForm.code.trim()||nextCatCode(catAdd.parentCode,catAdd.level)); if(cat.some(c=>c.code===code)){ setErr("Code "+code+" already exists."); return; } if(fail((await db.from("construction_catalog").insert({company_id:cid(),kind:(catAdd.kind||"material"),code,name,parent_code:catAdd.parentCode,level:catAdd.level})).error)) return; setCatAdd(null); setCatForm({name:"",code:""}); await refresh(); }
       async function saveCat(node){ const name=catEditForm.name.trim(); if(!name) return; const code=catEditForm.code.trim()||node.code; if(code!==node.code && cat.some(c=>c.code===code)){ setErr("Code "+code+" already exists."); return; } if(fail((await db.from("construction_catalog").update({name,code}).eq("id",node.id)).error)) return; setCatEdit(null); await refresh(); }
       async function delCat(node){ const kids=catDesc(node.code); if(!window.confirm("Delete "+node.name+(kids.length?(" and "+kids.length+" item(s) under it"):"")+"?")) return; const ids=[node.id,...kids.map(k=>k.id)]; if(fail((await db.from("construction_catalog").delete().in("id",ids)).error)) return; await refresh(); }
-      const catBoard = (kind,title) => {
+      const saveCatMeta = async (id,patch) => { if(fail((await db.from("construction_catalog").update(patch).eq("id",id)).error)) return; setCat(cs=>cs.map(c=>c.id===id?{...c,...patch}:c)); };
+      const sizeBoard = () => {
+                const items = cat.filter(c=>c.kind==="material" && c.level===3).slice().sort((a,b)=>(a.code<b.code?-1:1));
+                const ql = catQ.trim().toLowerCase();
+                const shown = items.filter(n=> !ql || (n.name.toLowerCase().includes(ql) || (n.code||"").includes(ql)));
+                const byGrp={}; shown.forEach(c=>{ const g=c.parent||"—"; (byGrp[g]=byGrp[g]||[]).push(c); });
+                const gname=code=>{ const g=cat.find(x=>x.code===code); return g?g.name:code; };
+                const grps=Object.keys(byGrp).sort();
+                return (<>
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                    <h2 className="text-base font-semibold">Size &amp; brand chart <span className="mono text-[11px] text-zinc-400">{items.length}</span></h2>
+                    <input value={catQ} onChange={e=>setCatQ(e.target.value)} placeholder="Search code or name" className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] outline-none focus:border-zinc-500" />
+                  </div>
+                  <p className="mb-3 text-[11px] text-zinc-400">Standard sizes &amp; brands per material. Edits save automatically and feed the Material Specification.</p>
+                  {!shown.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No materials match.</div>}
+                  {grps.map(g=>(<div key={g} className="mb-4">
+                    <div className="mb-1 flex items-center gap-2 rounded bg-zinc-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-zinc-500"><span className="mono text-zinc-400">{g}</span>{gname(g)}</div>
+                    <div className="space-y-1">
+                      {byGrp[g].map(c=>(<div key={c.id} className="grid grid-cols-12 items-center gap-2 border-b border-zinc-100 py-1">
+                        <div className="col-span-2 mono text-[11px] text-zinc-400 sm:col-span-1">{c.code}</div>
+                        <div className="col-span-10 text-[12px] font-medium text-zinc-700 sm:col-span-3">{c.name}</div>
+                        <input defaultValue={c.sizes} onBlur={e=>{ if(e.target.value!==c.sizes) saveCatMeta(c.id,{sizes:e.target.value}); }} placeholder="sizes — e.g. 600×600, 800×800" className="col-span-6 rounded border border-zinc-200 px-2 py-1 text-[12px] outline-none focus:border-zinc-400 sm:col-span-4" />
+                        <input defaultValue={c.brands} onBlur={e=>{ if(e.target.value!==c.brands) saveCatMeta(c.id,{brands:e.target.value}); }} placeholder="brands — e.g. RAK / Akij" className="col-span-6 rounded border border-zinc-200 px-2 py-1 text-[12px] outline-none focus:border-zinc-400 sm:col-span-4" />
+                      </div>))}
+                    </div>
+                  </div>))}
+                </>);
+              };
+              
+const catBoard = (kind,title) => {
                 const disc = cat.filter(c=>c.level===1 && c.kind===kind).slice().sort((a,b)=>(a.code<b.code?-1:1));
                 const ql = catQ.trim().toLowerCase();
                 const match = n => !ql || (n.name.toLowerCase().includes(ql) || (n.code||"").includes(ql));
@@ -2377,8 +2406,8 @@ function printProposal(p){
 
             {((area==="construction" && has("sl-construction"))||(area==="finance" && has("sl-finance"))||(area==="sales" && has("sl-sales"))) && (<>
               {(()=>{
-                const G = area==="finance" ? [["money","Finance"]] : area==="sales" ? [["agreement","Sales"]] : [["projects","Projects"],["catalog","Catalog & Vendors"]];
-                const T={agreement:[["leads","Leads"],["proposal","Proposal"],["projects","Projects"]],projects:[["board","Project Manager"],["taskmgr","Task Manager"],["siteteam","Team Manager"],["vendorboard","Vendor Manager"],["site","Site schedule"]],money:[["billing","Client billing"],["clientacct","Client account"],["costs","Costs"],["handler","Handler"],["bills","Bills & purchases"],["statements","Statements"],["requisition","Requisition"]],catalog:[["vendors","Vendor list"],["matlist","Material list"],["tasklist","Task list"],["eqplist","Equipment list"],["phaselist","Phase list"]]};
+                const G = area==="finance" ? [["money","Finance"]] : area==="sales" ? [["agreement","Sales"]] : [["projects","Projects"],["catalog","Standard Charts"]];
+                const T={agreement:[["leads","Leads"],["proposal","Proposal"],["projects","Projects"]],projects:[["board","Project Manager"],["taskmgr","Task Manager"],["siteteam","Team Manager"],["vendorboard","Vendor Manager"],["site","Site schedule"]],money:[["billing","Client billing"],["clientacct","Client account"],["costs","Costs"],["handler","Handler"],["bills","Bills & purchases"],["statements","Statements"],["requisition","Requisition"]],catalog:[["matlist","Material"],["sizelist","Size"],["tasklist","Task"],["eqplist","Equipment"],["phaselist","Phase"],["vendors","Vendors"]]};
                 const curG=(G.find(([g])=>T[g].some(t=>t[0]===conTab))||G[0])[0];
                 return (<div className="mb-3">
                   {G.length>1 && <div className="flex flex-wrap gap-1.5">{G.map(([g,gl])=><button key={g} onClick={()=>{ if(!T[g].some(t=>t[0]===conTab)) setConTab(T[g][0][0]); }} className={`rounded-md px-3 py-1.5 text-[12px] font-semibold ${g===curG?"bg-zinc-900 text-white":"bg-zinc-100 text-zinc-600 hover:bg-zinc-200"}`}>{gl}</button>)}</div>}
@@ -3379,10 +3408,11 @@ function printProposal(p){
                 ); })}
                 {!bills.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No bills yet. Add a vendor bill or purchase to track construction spend per project.</div>}
               </>); })()}
-              {conTab==="matlist" && catBoard("material","Material list")}
-              {conTab==="tasklist" && catBoard("task","Task list")}
-              {conTab==="eqplist" && catBoard("equipment","Equipment list")}
-              {conTab==="phaselist" && catBoard("phase","Standard Phase list")}
+              {conTab==="matlist" && catBoard("material","Material Chart")}
+              {conTab==="sizelist" && sizeBoard()}
+              {conTab==="tasklist" && catBoard("task","Task Chart")}
+              {conTab==="eqplist" && catBoard("equipment","Equipment Chart")}
+              {conTab==="phaselist" && catBoard("phase","Phase Chart")}
               {conTab==="vendors" && (()=>{
                 const byCode=(a,b)=>(a.code<b.code?-1:1);
                 const disciplines = cat.filter(c=>c.level===1).slice().sort(byCode);
