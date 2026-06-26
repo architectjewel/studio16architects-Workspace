@@ -1377,7 +1377,144 @@ function printExpenditure(){
         try{ w.document.title="Receipt "+(pmt.receiptRef||""); }catch(e){}
       }
       
+function printAgreement(p){
+        const num=v=>Number(v||0);
+        const esc=v=>String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        const bold=v=>esc(v).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+        const PI=p.projectInfo||[];
+        const gv=re=>{const r=PI.find(x=>re.test(String(x.label||"")));return r?(r.value||""):"";};
+        const ct=p.cType||"developer";
+        const ord=n=>{n=Number(n)||0;var s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);};
+        const MO=["January","February","March","April","May","June","July","August","September","October","November","December"];
+        const ONES=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
+        const TENS=["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+        const two=n=>{n=Number(n)||0;if(n<20)return ONES[n];const t=Math.floor(n/10),o=n%10;return TENS[t]+(o?"-"+ONES[o]:"");};
+        const yearWords=y=>{y=Number(y)||0;const th=Math.floor(y/1000),rest=y%1000,hun=Math.floor(rest/100),rem=rest%100;let s="";if(th)s+=ONES[th]+" Thousand";if(hun)s+=" "+ONES[hun]+" Hundred";if(rem)s+=" "+two(rem);return s.trim();};
+        const inW=n=>{n=Math.round(num(n));if(n===0)return "Zero";const seg=[[10000000,"Crore"],[100000,"Lac"],[1000,"Thousand"],[100,"Hundred"]];let out="";for(const[d,nm]of seg){if(n>=d){const q=Math.floor(n/d);out+=(out?" ":"")+two(q)+" "+nm;n-=q*d;}}if(n>0)out+=(out?" ":"")+two(n);return out.trim();};
+        const tkfmt=n=>"Tk "+Number(num(n)).toLocaleString("en-IN")+"/-";
+        const ad=p.agreementDate||p.date||"";
+        let dateLine="This Deed of Agreement is made and executed on this the ____ day of ________, ____ of the Christian Era";
+        if(ad){const d=new Date(ad);if(!isNaN(d)){dateLine="This Deed of Agreement is made and executed on this the <b>"+ord(d.getDate())+"</b> day of <b>"+MO[d.getMonth()]+"</b>, <b>"+yearWords(d.getFullYear())+"</b> of the Christian Era";}}
+
+        // ---- Section 02: First Party (Client / Land Owner) ----
+        const ownerName=gv(/land owner name/i)||p.clientName||"";
+        const ownerContact=gv(/owner contact person|land owners contact/i)||"";
+        const cli="<p><b>"+(esc(p.clientName)||esc(ownerName)||"____________________")+"</b>"
+          +(p.clientAddress?", "+esc(p.clientAddress):"")
+          +(p.clientPhone?", Mobile: "+esc(p.clientPhone):"")
+          +(p.clientEmail?", Email: "+esc(p.clientEmail):"")
+          +" &mdash; hereinafter referred to as the <b>&ldquo;Land Owner&rdquo;</b> / <b>First Party</b> (which expression shall, unless repugnant to the context, include their heirs, successors, legal representatives and assigns).</p>";
+
+        // ---- Section 03: Second Party (Sync Land Limited) ----
+        const dev="<p><b>Sync Land Limited (SLL)</b>, a private limited company incorporated under the laws of Bangladesh, having its registered office at "
+          +esc(STUDIO.address)+", represented by its Managing Director <b>Ar. Jewel Barua</b> (Mobile: "+esc(STUDIO.phone)+", Email: "+esc(STUDIO.email)
+          +") &mdash; hereinafter referred to as the <b>&ldquo;Developer&rdquo;</b> / <b>Second Party</b> (which expression shall, unless repugnant to the context, include its successors-in-interest, legal representatives and assigns).</p>";
+
+        // ---- Section 04: Intent ----
+        const projAddr=gv(/project address|address/i);
+        const dur=p.projDurationMain?(esc(p.projDurationMain)+(p.projDurationRest?" "+esc(p.projDurationRest):"")):esc(gv(/project duration|construction duration/i));
+        const intent="<p>WHEREAS the First Party is the lawful owner in peaceful possession of the scheduled land described in the Plot/Land Schedule herein"
+          +(projAddr?" situated at <b>"+esc(projAddr)+"</b>":"")
+          +"; AND WHEREAS the Second Party is engaged in the business of land development and construction and has agreed to develop the said land into a residential/commercial building on the terms, conditions, ownership ratio and specifications mutually agreed and recorded in this Deed and its Appendix; NOW THEREFORE both parties, of their own free will and sound mind, do hereby agree as follows:</p>";
+
+        // ---- Section 05: Land Development Detail (full projectInfo) ----
+        const isDevHead=l=>/^(development information|land owner information|land information)$/i.test(String(l||"").trim());
+        let detailRows="";PI.forEach(r=>{const lbl=String(r.label||"").trim();if(!lbl)return;if(isDevHead(lbl)){detailRows+='<tr class="gh"><td colspan="2">'+esc(lbl)+'</td></tr>';return;}detailRows+='<tr><td class="k">'+esc(lbl)+'</td><td>'+esc(r.value||"")+'</td></tr>';});
+        const detailTbl=detailRows?'<table class="dt"><tbody>'+detailRows+'</tbody></table>':'<p class="muted">No development details recorded.</p>';
+
+        // ---- Section 06: Payment Details ----
+        const totV=num(p.total);
+        const signMoney=gv(/signing money/i);
+        let payDet="";
+        if(totV>0){payDet+="<p>The total consideration / contract value under this Deed is <b>"+tkfmt(totV)+"</b> (Taka "+esc(inW(totV))+" only), payable by the parties in accordance with the Payment Schedule set out in Section 07 below.</p>";}
+        if(ct==="developer"){const lr=gv(/land owner ratio/i),dr=gv(/developer ratio/i);if(lr||dr)payDet+="<p>The developed building and car-parking spaces shall be shared between the parties at a ratio of Land Owner <b>"+esc(lr||"50%")+"</b> to Developer <b>"+esc(dr||"50%")+"</b>, as detailed in the Land Development Detail above.</p>";if(signMoney)payDet+="<p>Signing money (if any): <b>"+esc(signMoney)+"</b>, subject to deduction of applicable income tax under the Income Tax Act, 2023.</p>";}
+        if(p.paymentNote){payDet+='<div class="note"><b>Note:</b><ol>'+String(p.paymentNote).split("\n").filter(Boolean).map(x=>'<li>'+esc(x.replace(/\{(\w+)\}/g,""))+'</li>').join("")+'</ol></div>';}
+        if(!payDet)payDet='<p class="muted">Payment details to be recorded.</p>';
+
+        // ---- Section 07: Payment Schedule (p.payments) ----
+        let payRows="",ph=0,pno=0,tot=0;(p.payments||[]).forEach(pay=>{if(pay.head){ph++;payRows+='<tr class="gh"><td class="c">'+ph+'</td><td colspan="4">'+esc(pay.desc||"")+'</td></tr>';return;}pno++;tot+=num(String(pay.amount||"").replace(/[^0-9.]/g,""));payRows+='<tr><td class="c">'+pno+'</td><td>'+esc(pay.desc||"")+'</td><td>'+esc(pay.area||"")+'</td><td class="r">'+esc(pay.amount||"")+'</td><td>'+ord(pno)+' Instalment</td></tr>';});
+        const payTbl=payRows?'<table class="dt"><thead><tr><td class="c">Sl</td><td>Description</td><td>Area</td><td class="r">Amount</td><td>Instalment</td></tr></thead><tbody>'+payRows+(tot?'<tr class="tot"><td colspan="3">Total</td><td class="r">'+Number(tot).toLocaleString("en-IN")+'/-</td><td></td></tr>':"")+'</tbody></table>':'<p class="muted">Payment schedule to be recorded.</p>';
+
+        // ---- Section 08: Plot / Land Schedule ----
+        const landKeys=[["Project Address",/project address|^address/i],["Plot / Land Area",/plot|land area|land size/i],["Boundaries / Surroundings",/surrounding|boundar/i],["Access Road Width",/access road|road width/i],["Govt. Approval Authority",/approval authority|authority/i]];
+        let landRows="";landKeys.forEach(([nm,re])=>{const v=gv(re);if(v)landRows+='<tr><td class="k">'+esc(nm)+'</td><td>'+esc(v)+'</td></tr>';});
+        const landTbl=landRows?'<table class="dt"><tbody>'+landRows+'</tbody></table>':'<p class="muted">Land schedule to be recorded.</p>';
+
+        // ---- Section 09: Terms & Conditions (p.terms) ----
+        const incT=(p.terms||[]).filter(t=>t.on!==false);
+        let termsHTML="";incT.forEach((t,si)=>{termsHTML+='<div class="tsec"><div class="tt">'+(si+1)+". "+esc(String(t.title||"").replace(/\{(\w+)\}/g,""))+'</div>';(t.body||"").split("\n").filter(Boolean).forEach((c,ci)=>{termsHTML+='<div class="tc"><span class="tn">'+(si+1)+"."+(ci+1)+'</span><span>'+bold(String(c).replace(/^\s*\d+\.\s*/,"").replace(/\{(\w+)\}/g,""))+'</span></div>';});termsHTML+='</div>';});
+        if(!termsHTML)termsHTML='<p class="muted">No terms recorded. Load terms in the Terms tab and re-convert.</p>';
+
+        // ---- Section 10: Signatures (two columns) ----
+        const sig='<table class="sig"><tr>'
+          +'<td><div class="sigline">&nbsp;</div><div class="signame"><b>'+(esc(p.clientName)||"____________________")+'</b></div><div class="sigrole">First Party / Land Owner</div></td>'
+          +'<td><div class="sigline">&nbsp;</div><div class="signame"><b>Ar. Jewel Barua</b></div><div class="sigrole">Managing Director, Sync Land Limited<br/>Second Party / Developer</div></td>'
+          +'</tr></table>';
+
+        // ---- Section 11: Witnesses (min 3) ----
+        let wit="";for(let i=1;i<=3;i++){wit+='<div class="wit"><div class="witno">Witness '+ord(i)+'</div>'
+          +'<div class="witrow">Name: <span class="fill">&nbsp;</span></div>'
+          +'<div class="witrow">Address: <span class="fill">&nbsp;</span></div>'
+          +'<div class="witrow">NID No.: <span class="fillh">&nbsp;</span> &nbsp; Signature: <span class="fillh">&nbsp;</span></div></div>';}
+
+        // ---- Section 12: Appendix Material Schedule (p.specData) ----
+        let matBody="";(p.specData||[]).forEach(g=>{let cnt=0;if(g.h)matBody+='<tr class="gh"><td colspan="7">'+esc(g.g)+". "+esc(g.h)+'</td></tr>';const rows=(g.i||[]).map(it=>{cnt++;return '<tr><td class="c">'+esc(g.g)+'.'+cnt+'</td><td class="c">'+esc(it.c||"")+'</td><td>'+esc(it.n||"")+'</td><td>'+esc(it.s||"")+'</td><td>'+esc(it.b||"")+'</td><td>'+esc(it.o||"")+'</td><td class="r">'+esc(it.pr||"")+'</td></tr>';}).join("");matBody+=rows;});
+        const matTbl=matBody?'<table class="dt spec"><thead><tr><td class="c">No</td><td class="c">Code</td><td>Item</td><td>Specification</td><td>Brand</td><td>Origin</td><td class="r">Price range</td></tr></thead><tbody>'+matBody+'</tbody></table>':'<p class="muted">No material schedule recorded.</p>';
+        const appendix=(p.specMode==="material"&&p.specInclude!==false&&(p.specData||[]).length)?'<div class="appx"><h2 class="sh">12. APPENDIX &mdash; MATERIAL SCHEDULE</h2>'+matTbl+'</div>':'<div class="appx"><h2 class="sh">12. APPENDIX &mdash; MATERIAL SCHEDULE</h2><p class="muted">No material schedule attached.</p></div>';
+
+        const css='*{box-sizing:border-box}'
+          +'@page{size:210mm 340mm;margin:115mm 20mm 20mm 15mm;}'
+          +'@page{@bottom-center{content:"" counter(page) " of " counter(pages);font-size:8pt;color:#444;font-family:Georgia,\'Times New Roman\',serif;}}'
+          +'html,body{margin:0;padding:0}'
+          +'body{font-family:Georgia,\'Times New Roman\',Times,serif;font-size:10pt;line-height:1.55;color:#111;text-align:justify}'
+          +'.title{text-align:center;font-size:16pt;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin:0 0 4pt}'
+          +'.subtitle{text-align:center;font-size:9pt;color:#444;margin:0 0 14pt;font-style:italic}'
+          +'h2.sh{text-align:center;font-size:11pt;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin:16pt 0 6pt;page-break-after:avoid}'
+          +'p{margin:0 0 8pt}.muted{color:#777;font-style:italic}'
+          +'table.dt{width:100%;border-collapse:collapse;font-size:9pt;margin:4pt 0 8pt}'
+          +'table.dt td{border:1px solid #999;padding:3pt 5pt;vertical-align:top;text-align:left}'
+          +'table.dt thead td{background:#222;color:#fff;font-weight:700;font-size:8.5pt;text-align:left}'
+          +'table.dt td.k{width:38%;font-weight:600;background:#f4f4f4}'
+          +'table.dt td.c{text-align:center;width:34px}table.dt td.r{text-align:right}'
+          +'table.dt tr.gh td{background:#e9e9e9;font-weight:700}'
+          +'table.dt tr.tot td{font-weight:700;background:#f4f4f4}'
+          +'table.spec td{font-size:8.5pt}'
+          +'.tsec{margin:6pt 0;page-break-inside:auto}.tt{font-weight:700;font-size:9.5pt;margin:6pt 0 2pt;text-transform:uppercase}'
+          +'.tc{display:flex;gap:6pt;margin:2pt 0}.tc .tn{min-width:30px;font-weight:600;color:#333}'
+          +'.note{margin:4pt 0}.note ol{margin:2pt 0 2pt 16pt;padding:0}.note li{margin:1pt 0}'
+          +'table.sig{width:100%;border-collapse:collapse;margin-top:24pt}table.sig td{width:50%;vertical-align:bottom;padding:0 10pt;text-align:center}'
+          +'.sigline{border-top:1px solid #111;margin-top:40pt;padding-top:3pt}'
+          +'.signame{font-size:10pt}.sigrole{font-size:8.5pt;color:#444}'
+          +'.wit{margin:10pt 0;page-break-inside:avoid}.witno{font-weight:700;font-size:9.5pt;margin-bottom:3pt}'
+          +'.witrow{font-size:9.5pt;margin:3pt 0}.fill{display:inline-block;border-bottom:1px solid #555;min-width:60%}.fillh{display:inline-block;border-bottom:1px solid #555;min-width:28%}'
+          +'.appx{page-break-before:always}'
+          +'.secbreak{page-break-before:always}';
+
+        const head='<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Deed of Agreement &mdash; '+esc(p.clientName||p.refNo||"Sync Land")+'</title><style>'+css+'</style></head>';
+        const body=[
+          '<div class="title">Deed of Agreement</div>',
+          '<div class="subtitle">(To be executed on Legal Stamp paper)</div>',
+          '<h2 class="sh">01. Date</h2>','<p>'+dateLine+'.</p>',
+          '<h2 class="sh">02. Between</h2>',cli,
+          '<h2 class="sh">03. And</h2>',dev,
+          '<h2 class="sh">04. Intent of Deed</h2>',intent,
+          '<h2 class="sh">05. Proposed Land Development Detail</h2>',detailTbl,
+          '<h2 class="sh">06. Payment Details</h2>',payDet,
+          '<h2 class="sh">07. Payment Schedule</h2>',payTbl,
+          '<h2 class="sh">08. Plot / Land Schedule</h2>',landTbl,
+          '<h2 class="sh">09. Terms and Conditions of this Agreement</h2>',termsHTML,
+          '<h2 class="sh">10. Signature of Both Parties</h2>',sig,
+          '<h2 class="sh">11. Witnesses</h2>',wit,
+          appendix
+        ].join("");
+        const auto='<scr'+'ipt>setTimeout(function(){try{window.focus();window.print();}catch(e){}},500)</scr'+'ipt>';
+        const w=window.open("","_blank");
+        if(!w){alert("Please allow pop-ups to open the printable deed, then tap again.");return;}
+        w.document.open();w.document.write(head+'<body>'+body+auto+'</body></html>');w.document.close();
+        try{w.document.title="Deed of Agreement "+(p.clientName||"");}catch(e){}
+      }
 function printProposal(p){
+        if(p&&p.docType==="agreement"){ return printAgreement(p); }
         const num=v=>Number(v||0); const lt=r=>(num(r.qty)||(String(r.qty||"").trim()?1:0))*num(r.rate);
         const esc=v=>String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
         const bold=v=>esc(v).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
