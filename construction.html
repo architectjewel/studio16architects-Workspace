@@ -1377,7 +1377,8 @@ function printExpenditure(){
         try{ w.document.title="Receipt "+(pmt.receiptRef||""); }catch(e){}
       }
       
-function deedCompose(p){
+const BN={"Deed of Agreement":"চুক্তিনামা দলিল","01. Date":"০১। তারিখ","02. Between":"০২। প্রথম পক্ষ (জমির মালিক)","03. And":"০৩। দ্বিতীয় পক্ষ (ডেভেলপার)","04. Intent of Deed":"০৪। দলিলের উদ্দেশ্য","05. Proposed Land Development Detail":"০৫। প্রস্তাবিত ভূমি উন্নয়নের বিবরণ","06. Payment Details":"০৬। পরিশোধের বিবরণ","07. Plot / Land Schedule":"০৭। প্লট / জমির তফসিল","08. Terms and Conditions of this Agreement":"০৮। এই চুক্তির শর্তাবলী","09. Declaration &amp; Execution":"০৯। ঘোষণা ও সম্পাদন"};function trD(lang,s){return (lang==="bn"&&BN[s])?BN[s]:s;}
+        function deedCompose(p){
         const dz=p.deed||{};
         const PI=p.projectInfo||[];
         const gv=re=>{const r=PI.find(x=>re.test(String(x.label||"")));return r?(r.value||""):"";};
@@ -1395,7 +1396,7 @@ function deedCompose(p){
         const para=v=>'<p>'+bold(v).replace(/\n+/g,'</p><p>')+'</p>';
         const PI=p.projectInfo||[];
         const dz=p.deed||{};
-        const DC=deedCompose(p);
+        const L=(dz.lang==="bn")?"bn":"en";const DC=deedCompose(p);
         const gv=re=>{const r=PI.find(x=>re.test(String(x.label||"")));return r?(r.value||""):"";};
         const ct=p.cType||"developer";
         const ord=n=>{n=Number(n)||0;var s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);};
@@ -1417,7 +1418,7 @@ function deedCompose(p){
         const it=(dz.intentText&&String(dz.intentText).trim())?dz.intentText:DC.intent;
         const intent=para(it);
         const ld=(dz.landDetail&&String(dz.landDetail).trim())?dz.landDetail:DC.landDetail;const landBlk=para(ld);
-        const _sec06html=pd=>{if(!pd||!String(pd).trim())return '<p class="muted">Payment details to be recorded.</p>';const lines=String(pd).split("\n");let out="",kvOpen=false,notesMode=false;const closeKV=()=>{if(kvOpen){out+='</tbody></table>';kvOpen=false;}};lines.forEach(raw=>{const line=raw.trim();if(!line)return;if(/^notes\s*:/i.test(line)){closeKV();notesMode=true;out+='<div class="pnh">Notes:</div>';return;}if(notesMode){out+='<div class="pn">'+bold(line)+'</div>';return;}const m=line.match(/^([^:]{1,45}):\s*(.*)$/);if(m){if(!kvOpen){out+='<table class="dt tight pkv"><tbody>';kvOpen=true;}out+='<tr><td class="k">'+esc(m[1].trim())+'</td><td>'+esc(m[2].trim())+'</td></tr>';return;}closeKV();out+='<p>'+bold(line)+'</p>';});closeKV();return out;};const pd=(dz.payDetail&&String(dz.payDetail).trim())?dz.payDetail:DC.payDetail;const sec06=(ct==="developer")?[]:['<h2 class="sh">06. Payment Details</h2>',_sec06html(pd)];
+        const _sec06html=pd=>{if(!pd||!String(pd).trim())return '<p class="muted">Payment details to be recorded.</p>';const lines=String(pd).split("\n");let out="",kvOpen=false,notesMode=false;const closeKV=()=>{if(kvOpen){out+='</tbody></table>';kvOpen=false;}};lines.forEach(raw=>{const line=raw.trim();if(!line)return;if(/^notes\s*:/i.test(line)){closeKV();notesMode=true;out+='<div class="pnh">Notes:</div>';return;}if(notesMode){out+='<div class="pn">'+bold(line)+'</div>';return;}const m=line.match(/^([^:]{1,45}):\s*(.*)$/);if(m){if(!kvOpen){out+='<table class="dt tight pkv"><tbody>';kvOpen=true;}out+='<tr><td class="k">'+esc(m[1].trim())+'</td><td>'+esc(m[2].trim())+'</td></tr>';return;}closeKV();out+='<p>'+bold(line)+'</p>';});closeKV();return out;};const pd=(dz.payDetail&&String(dz.payDetail).trim())?dz.payDetail:DC.payDetail;const sec06=(ct==="developer")?[]:['<h2 class="sh">'+trD(L,"06. Payment Details")+'</h2>',_sec06html(pd)];
 
         const isDevHead=l=>/^(development information|land owner information|land information)$/i.test(String(l||"").trim());
         let detailRows="";PI.forEach(r=>{const lbl=String(r.label||"").trim();if(!lbl)return;if(isDevHead(lbl)){detailRows+='<tr class="gh"><td colspan="2">'+esc(lbl)+'</td></tr>';return;}detailRows+='<tr><td class="k">'+esc(lbl)+'</td><td>'+esc(r.value||"")+'</td></tr>';});
@@ -1458,7 +1459,7 @@ function deedCompose(p){
         const matTbl=matBody?'<table class="dt spec tight"><thead><tr><td class="c">No</td><td>Item</td><td>Specification</td><td>Brand</td><td>Origin</td><td class="r">Price range</td></tr></thead><tbody>'+matBody+'</tbody></table>':'<p class="muted">No material schedule recorded.</p>';
         const matInner=(p.specMode==="material"&&p.specInclude!==false&&(p.specData||[]).length)?matTbl:'<p class="muted">No material schedule attached.</p>';const apx=[];let _ax=0;if(ct!=="developer"){_ax++;apx.push('<div class="appx"><h2 class="sh">Appendix 0'+_ax+' &mdash; Payment Schedule</h2>'+payTbl+'</div>');}_ax++;apx.push('<div class="appx"><h2 class="sh">Appendix 0'+_ax+' &mdash; Material Schedule</h2>'+matInner+'</div>');
 
-        const css='*{box-sizing:border-box}'
+        const css='@import url(https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;700&display=swap);*{box-sizing:border-box}'
           +'@page{size:210mm 340mm;margin:115mm 20mm 20mm 15mm;}'
           +'@page{@bottom-center{content:"" counter(page) " of " counter(pages);font-size:8pt;color:#444;font-family:Georgia,\'Times New Roman\',serif;}}'
           +'html,body{margin:0;padding:0}'
@@ -1482,26 +1483,26 @@ function deedCompose(p){
           +'.signame{font-size:10pt}.sigrole{font-size:8.5pt;color:#444}'
           +'.wit{margin:10pt 0;page-break-inside:avoid}.witno{font-weight:700;font-size:9.5pt;margin-bottom:3pt}'
           +'.witrow{font-size:9.5pt;margin:3pt 0}.fill{display:inline-block;border-bottom:1px solid #555;min-width:60%}.fillh{display:inline-block;border-bottom:1px solid #555;min-width:28%}'
-          +'.appx{page-break-before:always}'+'.sigtbl{width:100%;border-collapse:collapse;font-size:9pt;margin-top:18pt;page-break-inside:avoid}.sigtbl td{border:1px solid #999;padding:4pt 5pt;vertical-align:top}.sigtbl thead td{background:#f4f4f4;font-weight:700;font-size:8.5pt;text-align:center}.sigtbl td.c{text-align:center;width:24px;font-weight:600}.sigtbl .wd{font-size:8.5pt;line-height:1.55}.sigtbl .wsig{width:90px}.sigtbl .pcell{width:34%}.sigtbl .psign{height:36pt}.sigtbl .plabel{font-size:8.5pt;border-top:1px solid #111;padding-top:2pt;line-height:1.4}.pkv td.k{width:32%}.pnh{font-weight:700;margin-top:6pt;font-size:9.5pt}.pn{margin:2pt 0;font-size:9.5pt}';
+          +'.appx{page-break-before:always}'+'.sigtbl{width:100%;border-collapse:collapse;font-size:9pt;margin-top:18pt;page-break-inside:avoid}.sigtbl td{border:1px solid #999;padding:4pt 5pt;vertical-align:top}.sigtbl thead td{background:#f4f4f4;font-weight:700;font-size:8.5pt;text-align:center}.sigtbl td.c{text-align:center;width:24px;font-weight:600}.sigtbl .wd{font-size:8.5pt;line-height:1.55}.sigtbl .wsig{width:90px}.sigtbl .pcell{width:34%}.sigtbl .psign{height:36pt}.sigtbl .plabel{font-size:8.5pt;border-top:1px solid #111;padding-top:2pt;line-height:1.4}.pkv td.k{width:32%}.pnh{font-weight:700;margin-top:6pt;font-size:9.5pt}.pn{margin:2pt 0;font-size:9.5pt}.lang-bn,.lang-bn *{font-family:"Noto Serif Bengali","Nikosh","SolaimanLipi",serif}';
 
         const head='<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Deed of Agreement &mdash; '+esc(p.clientName||p.refNo||"Sync Land")+'</title><style>'+css+'</style></head>';
         const body=[
-          '<div class="title">Deed of Agreement</div>',
-          '<h2 class="sh">01. Date</h2>','<p>'+dateLine+'.</p>',
-          '<h2 class="sh">02. Between</h2>',cli,
-          '<h2 class="sh">03. And</h2>',dev,
-          '<h2 class="sh">04. Intent of Deed</h2>',intent,
-          '<h2 class="sh">05. Proposed Land Development Detail</h2>',landBlk,
+          '<div class="title">'+trD(L,"Deed of Agreement")+'</div>',
+          '<h2 class="sh">'+trD(L,"01. Date")+'</h2>','<p>'+dateLine+'.</p>',
+          '<h2 class="sh">'+trD(L,"02. Between")+'</h2>',cli,
+          '<h2 class="sh">'+trD(L,"03. And")+'</h2>',dev,
+          '<h2 class="sh">'+trD(L,"04. Intent of Deed")+'</h2>',intent,
+          '<h2 class="sh">'+trD(L,"05. Proposed Land Development Detail")+'</h2>',landBlk,
           ...sec06,
-          '<h2 class="sh">07. Plot / Land Schedule</h2>',landTbl,
-          '<h2 class="sh">08. Terms and Conditions of this Agreement</h2>',termsHTML,
-          '<h2 class="sh">09. Declaration &amp; Execution</h2>',declBlk,sigTable,
+          '<h2 class="sh">'+trD(L,"07. Plot / Land Schedule")+'</h2>',landTbl,
+          '<h2 class="sh">'+trD(L,"08. Terms and Conditions of this Agreement")+'</h2>',termsHTML,
+          '<h2 class="sh">'+trD(L,"09. Declaration &amp; Execution")+'</h2>',declBlk,sigTable,
           ...apx
         ].join("");
-        const auto='<scr'+'ipt>setTimeout(function(){try{window.focus();window.print();}catch(e){}},500)</scr'+'ipt>';
+        const auto='<scr'+'ipt>function _pr(){try{window.focus();window.print();}catch(e){}}if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){setTimeout(_pr,300);});}else{setTimeout(_pr,500);}</scr'+'ipt>';
         const w=window.open("","_blank");
         if(!w){alert("Please allow pop-ups to open the printable deed, then tap again.");return;}
-        w.document.open();w.document.write(head+'<body>'+body+auto+'</body></html>');w.document.close();
+        w.document.open();w.document.write(head+'<body class="'+(L==="bn"?"lang-bn":"")+'">'+body+auto+'</body></html>');w.document.close();
         try{w.document.title="Deed of Agreement "+(p.clientName||"");}catch(e){}
       }
 function printProposal(p){
@@ -3400,7 +3401,7 @@ function printProposal(p){
   return (<div>
     <div className="mb-3 flex flex-wrap items-center gap-2">
       <button onClick={()=>setPropEdit(null)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600 hover:bg-zinc-50">Back</button>
-      <h2 className="text-base font-semibold">Edit Agreement <span className="mono text-[11px] text-zinc-400">{e.refNo}</span></h2>
+      <h2 className="text-base font-semibold">Edit Agreement <span className="mono text-[11px] text-zinc-400">{e.refNo}</span></h2><div className="inline-flex overflow-hidden rounded-md border border-zinc-300"><button onClick={()=>setD("lang","en")} className={"px-2 py-1 text-[11px] "+((dz.lang||"en")==="en"?"bg-zinc-800 text-white":"text-zinc-600 hover:bg-zinc-50")}>EN</button><button onClick={()=>setD("lang","bn")} className={"px-2 py-1 text-[11px] "+(dz.lang==="bn"?"bg-zinc-800 text-white":"text-zinc-600 hover:bg-zinc-50")}>বাংলা</button></div>
       <span className="ml-auto" />
       <select value={e.status} onChange={ev=>setF("status",ev.target.value)} className="rounded-md border border-zinc-300 px-2 py-1.5 text-[12px]">{PROP_STATUS.map(s=><option key={s[0]} value={s[0]}>{s[1]}</option>)}</select>
       <button onClick={saveProposal} className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">Save</button>
