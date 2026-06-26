@@ -1377,13 +1377,34 @@ function printExpenditure(){
         try{ w.document.title="Receipt "+(pmt.receiptRef||""); }catch(e){}
       }
       
-function printAgreement(p){
+function deedCompose(p){
+        const dz=p.deed||{};
+        const PI=p.projectInfo||[];
+        const gv=re=>{const r=PI.find(x=>re.test(String(x.label||"")));return r?(r.value||""):"";};
+        const owners=(dz.owners&&dz.owners.length)?dz.owners:[{name:p.clientName||"",permAddress:p.clientAddress||"",mobile:p.clientPhone||"",email:p.clientEmail||""}];
+        const od=o=>{const det=[];if(o.father)det.push("Father: "+o.father);if(o.mother)det.push("Mother: "+o.mother);if(o.spouse)det.push("Spouse: "+o.spouse);if(o.dob)det.push("Date of Birth: "+o.dob);if(o.nid)det.push("NID No: "+o.nid);let s=(o.name||"____________________");if(o.company)s+=", "+o.company;if(o.regOffice)s+=" (Registered office: "+o.regOffice+")";if(det.length)s+=" ("+det.join("; ")+")";if(o.permAddress)s+=", permanently residing at "+o.permAddress;if(o.mobile)s+=", Mobile: "+o.mobile;if(o.email)s+=", Email: "+o.email;return s;};
+        const ownerPara=owners.map(od).join("  AND  ")+" \u2014 hereinafter referred to as the \u201cLand Owner\u201d / First Party (which expression shall, unless repugnant to the context, include their heirs, successors, legal representatives and assigns).";
+        const dv=dz.dev||{};
+        const dCompany=dv.company||"Sync Land Limited (SLL)";
+        const dOffice=dv.regOffice||STUDIO.address;
+        const dMD=dv.mdName||dz.devMD||"Ar. Jewel Barua";
+        const ddet=[];if(dv.father)ddet.push("Father: "+dv.father);if(dv.mother)ddet.push("Mother: "+dv.mother);if(dv.spouse)ddet.push("Spouse: "+dv.spouse);if(dv.dob)ddet.push("Date of Birth: "+dv.dob);if(dv.nid)ddet.push("NID No: "+dv.nid);
+        const dMob=dv.mobile||STUDIO.phone,dEm=dv.email||STUDIO.email;
+        const devPara=dCompany+", a company duly incorporated under the laws of Bangladesh having its registered office at "+dOffice+", represented by its Managing Director "+dMD+(ddet.length?" ("+ddet.join("; ")+")":"")+(dMob?", Mobile: "+dMob:"")+(dEm?", Email: "+dEm:"")+" \u2014 hereinafter referred to as the \u201cDeveloper\u201d / Second Party (which expression shall, unless repugnant to the context, include its successors-in-interest, legal representatives and assigns).";
+        const loc=gv(/project address|address/i)||"{projectLocation}";
+        const bt=gv(/occupancy type|building type/i)||gv(/building height/i)||"{buildingType}";
+        const ratio=(p.cType==="developer")?(" the ownership ratio of Land Owner "+(gv(/land owner ratio/i)||"{landRatio}")+" to Developer "+(gv(/developer ratio/i)||"{developerRatio}")+","):"";
+        const intent="WHEREAS the First Party is the lawful owner in peaceful possession of the scheduled land described in the Plot/Land Schedule herein situated at "+loc+"; AND WHEREAS the Second Party is engaged in the business of land development and construction and has agreed to develop the said land into a "+bt+" building on the terms, conditions,"+ratio+" and specifications mutually agreed and recorded in this Deed and its Appendix; NOW THEREFORE both parties, of their own free will and sound mind, do hereby agree as follows:";
+        return {ownerPara:ownerPara,devPara:devPara,intent:intent,ownerNames:owners.map(o=>o.name).filter(Boolean).join(", ")||(p.clientName||""),devMD:dMD};
+      }
+      function printAgreement(p){
         const num=v=>Number(v||0);
         const esc=v=>String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
         const bold=v=>esc(v).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
-        const para=v=>'<p>'+esc(v).replace(/\n+/g,'</p><p>')+'</p>';
+        const para=v=>'<p>'+bold(v).replace(/\n+/g,'</p><p>')+'</p>';
         const PI=p.projectInfo||[];
         const dz=p.deed||{};
+        const DC=deedCompose(p);
         const gv=re=>{const r=PI.find(x=>re.test(String(x.label||"")));return r?(r.value||""):"";};
         const ct=p.cType||"developer";
         const ord=n=>{n=Number(n)||0;var s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);};
@@ -1398,36 +1419,17 @@ function printAgreement(p){
         let dateLine="This Deed of Agreement is made and executed on this the ____ day of ________, ____ of the Christian Era";
         if(ad){const d=new Date(ad);if(!isNaN(d)){dateLine="This Deed of Agreement is made and executed on this the <b>"+ord(d.getDate())+"</b> day of <b>"+MO[d.getMonth()]+"</b>, <b>"+yearWords(d.getFullYear())+"</b> of the Christian Era";}}
 
-        // Section 02: First Party (Client / Land Owner)
-        const ownerName=gv(/land owner name/i)||p.clientName||"";
-        const cli="<p><b>"+(esc(p.clientName)||esc(ownerName)||"____________________")+"</b>"
-          +(dz.ownerFather?", son/spouse of "+esc(dz.ownerFather):"")
-          +(dz.ownerProfession?", "+esc(dz.ownerProfession):"")
-          +(p.clientAddress?", of "+esc(p.clientAddress):"")
-          +(dz.ownerNID?", holding National ID No. "+esc(dz.ownerNID):"")
-          +(p.clientPhone?", Mobile: "+esc(p.clientPhone):"")
-          +(p.clientEmail?", Email: "+esc(p.clientEmail):"")
-          +" &mdash; hereinafter referred to as the <b>&ldquo;Land Owner&rdquo;</b> / <b>First Party</b> (which expression shall, unless repugnant to the context, include their heirs, successors, legal representatives and assigns).</p>";
+        const op=(dz.ownerPara&&String(dz.ownerPara).trim())?dz.ownerPara:DC.ownerPara;
+        const cli=para(op);
+        const dp=(dz.devPara&&String(dz.devPara).trim())?dz.devPara:DC.devPara;
+        const dev=para(dp);
+        const it=(dz.intentText&&String(dz.intentText).trim())?dz.intentText:DC.intent;
+        const intent=para(it);
 
-        // Section 03: Second Party (Sync Land Limited)
-        const devMD=dz.devMD||"Ar. Jewel Barua";
-        const dev="<p><b>Sync Land Limited (SLL)</b>, a private limited company incorporated under the laws of Bangladesh, having its registered office at "
-          +esc(STUDIO.address)+", represented by its Managing Director <b>"+esc(devMD)+"</b> (Mobile: "+esc(STUDIO.phone)+", Email: "+esc(STUDIO.email)
-          +") &mdash; hereinafter referred to as the <b>&ldquo;Developer&rdquo;</b> / <b>Second Party</b> (which expression shall, unless repugnant to the context, include its successors-in-interest, legal representatives and assigns).</p>";
-
-        // Section 04: Intent
-        const projAddr=gv(/project address|address/i);
-        const intentDef="<p>WHEREAS the First Party is the lawful owner in peaceful possession of the scheduled land described in the Plot/Land Schedule herein"
-          +(projAddr?" situated at <b>"+esc(projAddr)+"</b>":"")
-          +"; AND WHEREAS the Second Party is engaged in the business of land development and construction and has agreed to develop the said land into a residential/commercial building on the terms, conditions, ownership ratio and specifications mutually agreed and recorded in this Deed and its Appendix; NOW THEREFORE both parties, of their own free will and sound mind, do hereby agree as follows:</p>";
-        const intent=dz.intentText?para(dz.intentText):intentDef;
-
-        // Section 05: Land Development Detail (full projectInfo)
         const isDevHead=l=>/^(development information|land owner information|land information)$/i.test(String(l||"").trim());
         let detailRows="";PI.forEach(r=>{const lbl=String(r.label||"").trim();if(!lbl)return;if(isDevHead(lbl)){detailRows+='<tr class="gh"><td colspan="2">'+esc(lbl)+'</td></tr>';return;}detailRows+='<tr><td class="k">'+esc(lbl)+'</td><td>'+esc(r.value||"")+'</td></tr>';});
         const detailTbl=detailRows?'<table class="dt"><tbody>'+detailRows+'</tbody></table>':'<p class="muted">No development details recorded.</p>';
 
-        // Section 06: Payment Details
         const totV=num(p.total);
         const signMoney=gv(/signing money/i);
         let payDet="";
@@ -1437,35 +1439,29 @@ function printAgreement(p){
         if(p.paymentNote){payDet+='<div class="note"><b>Note:</b><ol>'+String(p.paymentNote).split("\n").filter(Boolean).map(x=>'<li>'+esc(x.replace(/\{(\w+)\}/g,""))+'</li>').join("")+'</ol></div>';}
         if(!payDet)payDet='<p class="muted">Payment details to be recorded.</p>';
 
-        // Section 07: Payment Schedule
         let payRows="",ph=0,pno=0,tot=0;(p.payments||[]).forEach(pay=>{if(pay.head){ph++;payRows+='<tr class="gh"><td class="c">'+ph+'</td><td colspan="4">'+esc(pay.desc||"")+'</td></tr>';return;}pno++;tot+=num(String(pay.amount||"").replace(/[^0-9.]/g,""));payRows+='<tr><td class="c">'+pno+'</td><td>'+esc(pay.desc||"")+'</td><td>'+esc(pay.area||"")+'</td><td class="r">'+esc(pay.amount||"")+'</td><td>'+ord(pno)+' Instalment</td></tr>';});
         const payTbl=payRows?'<table class="dt"><thead><tr><td class="c">Sl</td><td>Description</td><td>Area</td><td class="r">Amount</td><td>Instalment</td></tr></thead><tbody>'+payRows+(tot?'<tr class="tot"><td colspan="3">Total</td><td class="r">'+Number(tot).toLocaleString("en-IN")+'/-</td><td></td></tr>':"")+'</tbody></table>':'<p class="muted">Payment schedule to be recorded.</p>';
 
-        // Section 08: Plot / Land Schedule
         const landKeys=[["Project Address",/project address|^address/i],["Plot / Land Area",/plot|land area|land size/i],["Boundaries / Surroundings",/surrounding|boundar/i],["Access Road Width",/access road|road width/i],["Govt. Approval Authority",/approval authority|authority/i]];
         let landRows="";landKeys.forEach(k=>{const v=gv(k[1]);if(v)landRows+='<tr><td class="k">'+esc(k[0])+'</td><td>'+esc(v)+'</td></tr>';});
         const landTbl=landRows?'<table class="dt"><tbody>'+landRows+'</tbody></table>':'<p class="muted">Land schedule to be recorded.</p>';
 
-        // Section 09: Terms & Conditions
         const incT=(p.terms||[]).filter(t=>t.on!==false);
         let termsHTML="";incT.forEach((t,si)=>{termsHTML+='<div class="tsec"><div class="tt">'+(si+1)+". "+esc(String(t.title||"").replace(/\{(\w+)\}/g,""))+'</div>';(t.body||"").split("\n").filter(Boolean).forEach((c,ci)=>{termsHTML+='<div class="tc"><span class="tn">'+(si+1)+"."+(ci+1)+'</span><span>'+bold(String(c).replace(/^\s*\d+\.\s*/,"").replace(/\{(\w+)\}/g,""))+'</span></div>';});termsHTML+='</div>';});
         if(!termsHTML)termsHTML='<p class="muted">No terms recorded. Load terms in the Terms tab and re-convert.</p>';
 
-        // Section 10: Signatures
         const sig='<table class="sig"><tr>'
-          +'<td><div class="sigline">&nbsp;</div><div class="signame"><b>'+(esc(p.clientName)||"____________________")+'</b></div><div class="sigrole">First Party / Land Owner</div></td>'
-          +'<td><div class="sigline">&nbsp;</div><div class="signame"><b>'+esc(devMD)+'</b></div><div class="sigrole">Managing Director, Sync Land Limited<br/>Second Party / Developer</div></td>'
+          +'<td><div class="sigline">&nbsp;</div><div class="signame"><b>'+(esc(DC.ownerNames)||"____________________")+'</b></div><div class="sigrole">First Party / Land Owner</div></td>'
+          +'<td><div class="sigline">&nbsp;</div><div class="signame"><b>'+esc(DC.devMD)+'</b></div><div class="sigrole">Managing Director, Sync Land Limited<br/>Second Party / Developer</div></td>'
           +'</tr></table>';
 
-        // Section 11: Witnesses
         const ws=(dz.witnesses&&dz.witnesses.length?dz.witnesses:[{},{},{}]);
         let wit="";ws.forEach((w,i)=>{wit+='<div class="wit"><div class="witno">Witness '+ord(i+1)+'</div>'
           +'<div class="witrow">Name: <span class="fill">'+(w.name?esc(w.name):"&nbsp;")+'</span></div>'
           +'<div class="witrow">Address: <span class="fill">'+(w.address?esc(w.address):"&nbsp;")+'</span></div>'
           +'<div class="witrow">NID No.: <span class="fillh">'+(w.nid?esc(w.nid):"&nbsp;")+'</span> &nbsp; Signature: <span class="fillh">&nbsp;</span></div></div>';});
 
-        // Section 12: Appendix Material Schedule
-        let matBody="";(p.specData||[]).forEach(g=>{let cnt=0;if(g.h)matBody+='<tr class="gh"><td colspan="7">'+esc(g.g)+". "+esc(g.h)+'</td></tr>';const rows=(g.i||[]).map(it=>{cnt++;return '<tr><td class="c">'+esc(g.g)+'.'+cnt+'</td><td class="c">'+esc(it.c||"")+'</td><td>'+esc(it.n||"")+'</td><td>'+esc(it.s||"")+'</td><td>'+esc(it.b||"")+'</td><td>'+esc(it.o||"")+'</td><td class="r">'+esc(it.pr||"")+'</td></tr>';}).join("");matBody+=rows;});
+        let matBody="";(p.specData||[]).forEach(g=>{let cnt=0;if(g.h)matBody+='<tr class="gh"><td colspan="7">'+esc(g.g)+". "+esc(g.h)+'</td></tr>';const rows=(g.i||[]).map(it2=>{cnt++;return '<tr><td class="c">'+esc(g.g)+'.'+cnt+'</td><td class="c">'+esc(it2.c||"")+'</td><td>'+esc(it2.n||"")+'</td><td>'+esc(it2.s||"")+'</td><td>'+esc(it2.b||"")+'</td><td>'+esc(it2.o||"")+'</td><td class="r">'+esc(it2.pr||"")+'</td></tr>';}).join("");matBody+=rows;});
         const matTbl=matBody?'<table class="dt spec"><thead><tr><td class="c">No</td><td class="c">Code</td><td>Item</td><td>Specification</td><td>Brand</td><td>Origin</td><td class="r">Price range</td></tr></thead><tbody>'+matBody+'</tbody></table>':'<p class="muted">No material schedule recorded.</p>';
         const appendix=(p.specMode==="material"&&p.specInclude!==false&&(p.specData||[]).length)?'<div class="appx"><h2 class="sh">12. APPENDIX &mdash; MATERIAL SCHEDULE</h2>'+matTbl+'</div>':'<div class="appx"><h2 class="sh">12. APPENDIX &mdash; MATERIAL SCHEDULE</h2><p class="muted">No material schedule attached.</p></div>';
 
@@ -1474,8 +1470,7 @@ function printAgreement(p){
           +'@page{@bottom-center{content:"" counter(page) " of " counter(pages);font-size:8pt;color:#444;font-family:Georgia,\'Times New Roman\',serif;}}'
           +'html,body{margin:0;padding:0}'
           +'body{font-family:Georgia,\'Times New Roman\',Times,serif;font-size:10pt;line-height:1.55;color:#111;text-align:justify}'
-          +'.title{text-align:center;font-size:16pt;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin:0 0 4pt}'
-          +'.subtitle{text-align:center;font-size:9pt;color:#444;margin:0 0 14pt;font-style:italic}'
+          +'.title{text-align:center;font-size:16pt;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin:0 0 14pt}'
           +'h2.sh{text-align:center;font-size:11pt;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin:16pt 0 6pt;page-break-after:avoid}'
           +'p{margin:0 0 8pt}.muted{color:#777;font-style:italic}'
           +'table.dt{width:100%;border-collapse:collapse;font-size:9pt;margin:4pt 0 8pt}'
@@ -1499,7 +1494,6 @@ function printAgreement(p){
         const head='<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Deed of Agreement &mdash; '+esc(p.clientName||p.refNo||"Sync Land")+'</title><style>'+css+'</style></head>';
         const body=[
           '<div class="title">Deed of Agreement</div>',
-          '<div class="subtitle">(To be executed on Legal Stamp paper)</div>',
           '<h2 class="sh">01. Date</h2>','<p>'+dateLine+'.</p>',
           '<h2 class="sh">02. Between</h2>',cli,
           '<h2 class="sh">03. And</h2>',dev,
@@ -3382,6 +3376,13 @@ function printProposal(p){
   const dz=e.deed||{};
   const setD=(k,v)=>setF("deed",{...dz,[k]:v});
   const cell="w-full rounded border border-zinc-300 px-2 py-1 text-[13px] outline-none focus:border-zinc-900";
+  const F=(label,val,on,extra)=>(<div className={extra||""}><div className="text-[11px] text-zinc-500">{label}</div><input value={val||""} onChange={on} className={cell} /></div>);
+  const OWN=(dz.owners&&dz.owners.length)?dz.owners:[{name:e.clientName||"",permAddress:e.clientAddress||"",mobile:e.clientPhone||"",email:e.clientEmail||""}];
+  const setOwn=(i,patch)=>{const arr=OWN.map((r,j)=>j===i?{...r,...patch}:r);const np={...e,deed:{...dz,owners:arr}};if(i===0&&patch.name!==undefined)np.clientName=patch.name;setPropEdit(np);};
+  const addOwn=()=>setD("owners",[...OWN,{name:"",company:"",regOffice:"",dob:"",nid:"",father:"",mother:"",spouse:"",permAddress:"",mobile:"",email:""}]);
+  const delOwn=i=>setD("owners",OWN.filter((_,j)=>j!==i));
+  const DV=dz.dev||{};
+  const setDV=(k,v)=>setD("dev",{...DV,[k]:v});
   const PI=e.projectInfo||[];
   const setPI=(i,patch)=>setF("projectInfo",PI.map((r,j)=>j===i?{...r,...patch}:r));
   const addPI=()=>setF("projectInfo",[...PI,{label:"",value:""}]);
@@ -3404,6 +3405,7 @@ function printProposal(p){
   if(ad){const d=new Date(ad);if(!isNaN(d)){const ORD=n=>{var s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);};const MO=["January","February","March","April","May","June","July","August","September","October","November","December"];dprev="\u2026on this the "+ORD(d.getDate())+" day of "+MO[d.getMonth()]+", "+d.getFullYear()+" of the Christian Era.";}}
   const SH=t=><div className="mt-6 mb-2 border-t border-zinc-200 pt-3 text-center text-[14px] font-bold uppercase tracking-wide text-zinc-800">{t}</div>;
   const land=lbl=>{const r=PI.find(x=>new RegExp(lbl,"i").test(String(x.label||"")));return r?(r.value||""):"";};
+  const ownNames=OWN.map(o=>o.name).filter(Boolean).join(", ")||e.clientName||"____________";
   return (<div>
     <div className="mb-3 flex flex-wrap items-center gap-2">
       <button onClick={()=>setPropEdit(null)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] text-zinc-600 hover:bg-zinc-50">Back</button>
@@ -3416,29 +3418,52 @@ function printProposal(p){
     </div>
     <div className="mx-auto max-w-3xl rounded-lg border border-zinc-200 bg-white px-6 py-5" style={{fontFamily:"Georgia, 'Times New Roman', serif"}}>
       <div className="text-center text-[20px] font-bold uppercase tracking-wide">Deed of Agreement</div>
-      <div className="text-center text-[11px] italic text-zinc-500">(prints on Legal stamp paper &mdash; this editor mirrors the printed deed)</div>
 
       {SH("01. Date")}
       <input type="date" value={e.agreementDate||""} onChange={ev=>setF("agreementDate",ev.target.value)} className={cell+" max-w-[220px]"} />
       <div className="mt-1 text-[12px] italic text-zinc-500">{dprev||"Pick the agreement date \u2014 it prints in words."}</div>
 
       {SH("02. Between \u2014 First Party (Land Owner)")}
-      <div className="grid grid-cols-2 gap-2">
-        <div><div className="text-[11px] text-zinc-500">Name</div><input value={e.clientName||""} onChange={ev=>setF("clientName",ev.target.value)} className={cell} /></div>
-        <div><div className="text-[11px] text-zinc-500">Father / Spouse name</div><input value={dz.ownerFather||""} onChange={ev=>setD("ownerFather",ev.target.value)} className={cell} /></div>
-        <div><div className="text-[11px] text-zinc-500">Profession</div><input value={dz.ownerProfession||""} onChange={ev=>setD("ownerProfession",ev.target.value)} className={cell} /></div>
-        <div><div className="text-[11px] text-zinc-500">National ID No.</div><input value={dz.ownerNID||""} onChange={ev=>setD("ownerNID",ev.target.value)} className={cell} /></div>
-        <div className="col-span-2"><div className="text-[11px] text-zinc-500">Address</div><input value={e.clientAddress||""} onChange={ev=>setF("clientAddress",ev.target.value)} className={cell} /></div>
-        <div><div className="text-[11px] text-zinc-500">Mobile</div><input value={e.clientPhone||""} onChange={ev=>setF("clientPhone",ev.target.value)} className={cell} /></div>
-        <div><div className="text-[11px] text-zinc-500">Email</div><input value={e.clientEmail||""} onChange={ev=>setF("clientEmail",ev.target.value)} className={cell} /></div>
-      </div>
+      {OWN.map((o,i)=>(<div key={i} className="mb-2 rounded border border-zinc-200 p-2">
+        <div className="mb-1 flex items-center justify-between"><div className="text-[11px] font-semibold text-zinc-500">Land Owner {i+1}</div>{OWN.length>1&&<button onClick={()=>delOwn(i)} className="text-[11px] text-red-500">remove</button>}</div>
+        <div className="grid grid-cols-2 gap-2">
+          {F("Company Name (if any)",o.company,ev=>setOwn(i,{company:ev.target.value}))}
+          {F("Registered office (if any)",o.regOffice,ev=>setOwn(i,{regOffice:ev.target.value}))}
+          {F("Land Owner Name",o.name,ev=>setOwn(i,{name:ev.target.value}))}
+          {F("Date of Birth",o.dob,ev=>setOwn(i,{dob:ev.target.value}))}
+          {F("NID No",o.nid,ev=>setOwn(i,{nid:ev.target.value}))}
+          {F("Father Name",o.father,ev=>setOwn(i,{father:ev.target.value}))}
+          {F("Mother Name",o.mother,ev=>setOwn(i,{mother:ev.target.value}))}
+          {F("Spouse Name",o.spouse,ev=>setOwn(i,{spouse:ev.target.value}))}
+          {F("Permanent Address",o.permAddress,ev=>setOwn(i,{permAddress:ev.target.value}),"col-span-2")}
+          {F("Mobile Number",o.mobile,ev=>setOwn(i,{mobile:ev.target.value}))}
+          {F("Email",o.email,ev=>setOwn(i,{email:ev.target.value}))}
+        </div>
+      </div>))}
+      <button onClick={addOwn} className="text-[12px] text-emerald-700">+ add land owner</button>
+      <div className="mt-3 flex items-center justify-between"><div className="text-[11px] font-semibold text-zinc-500">First Party paragraph (this prints in the deed)</div><button onClick={()=>setD("ownerPara",deedCompose(e).ownerPara)} className="rounded border border-sky-300 px-2 py-0.5 text-[11px] text-sky-700 hover:bg-sky-50">Fill from fields</button></div>
+      <textarea value={dz.ownerPara!==undefined?dz.ownerPara:deedCompose(e).ownerPara} onChange={ev=>setD("ownerPara",ev.target.value)} rows={4} className={cell+" mt-1"} />
 
       {SH("03. And \u2014 Second Party (Developer)")}
-      <div className="rounded border border-zinc-100 bg-zinc-50 p-2 text-[12px] text-zinc-600">Sync Land Limited (SLL) &mdash; registered office at Flat A7, House 08, Road 12, Block J, Baridhara, Dhaka-1212. Represented by its Managing Director:</div>
-      <div className="mt-2 max-w-[260px]"><div className="text-[11px] text-zinc-500">Managing Director</div><input value={dz.devMD||"Ar. Jewel Barua"} onChange={ev=>setD("devMD",ev.target.value)} className={cell} /></div>
+      <div className="grid grid-cols-2 gap-2">
+        {F("Company Name",DV.company!==undefined?DV.company:"Sync Land Limited (SLL)",ev=>setDV("company",ev.target.value))}
+        {F("Registered office address",DV.regOffice!==undefined?DV.regOffice:"Flat A7, House 08, Road 12, Block J, Baridhara, Dhaka-1212",ev=>setDV("regOffice",ev.target.value))}
+        {F("MD / Owner Name",DV.mdName!==undefined?DV.mdName:(dz.devMD||"Ar. Jewel Barua"),ev=>setDV("mdName",ev.target.value))}
+        {F("Mobile",DV.mobile!==undefined?DV.mobile:"+880 1973-522907",ev=>setDV("mobile",ev.target.value))}
+        {F("Email",DV.email!==undefined?DV.email:"info.synclandbd@gmail.com",ev=>setDV("email",ev.target.value))}
+        {F("Date of Birth",DV.dob,ev=>setDV("dob",ev.target.value))}
+        {F("NID No",DV.nid,ev=>setDV("nid",ev.target.value))}
+        {F("Father Name",DV.father,ev=>setDV("father",ev.target.value))}
+        {F("Mother Name",DV.mother,ev=>setDV("mother",ev.target.value))}
+        {F("Spouse Name",DV.spouse,ev=>setDV("spouse",ev.target.value))}
+        {F("Permanent Address",DV.permAddress,ev=>setDV("permAddress",ev.target.value),"col-span-2")}
+      </div>
+      <div className="mt-3 flex items-center justify-between"><div className="text-[11px] font-semibold text-zinc-500">Second Party paragraph (this prints in the deed)</div><button onClick={()=>setD("devPara",deedCompose(e).devPara)} className="rounded border border-sky-300 px-2 py-0.5 text-[11px] text-sky-700 hover:bg-sky-50">Fill from fields</button></div>
+      <textarea value={dz.devPara!==undefined?dz.devPara:deedCompose(e).devPara} onChange={ev=>setD("devPara",ev.target.value)} rows={4} className={cell+" mt-1"} />
 
       {SH("04. Intent of Deed")}
-      <textarea value={dz.intentText||""} onChange={ev=>setD("intentText",ev.target.value)} rows={4} placeholder="Leave blank to use the standard WHEREAS... intent paragraph." className={cell} />
+      <div className="flex items-center justify-between"><div className="text-[11px] text-zinc-500">Edit freely; tokens fill from the proposal when you click the button.</div><button onClick={()=>setD("intentText",deedCompose(e).intent)} className="rounded border border-sky-300 px-2 py-0.5 text-[11px] text-sky-700 hover:bg-sky-50">Fill tokens now</button></div>
+      <textarea value={dz.intentText!==undefined?dz.intentText:deedCompose(e).intent} onChange={ev=>setD("intentText",ev.target.value)} rows={6} className={cell+" mt-1"} />
 
       {SH("05. Proposed Land Development Detail")}
       <div className="space-y-1">{PI.map((r,i)=>(<div key={i} className="flex gap-1"><input value={r.label||""} onChange={ev=>setPI(i,{label:ev.target.value})} placeholder="Label" className={cell+" w-1/3"} /><input value={r.value||""} onChange={ev=>setPI(i,{value:ev.target.value})} placeholder="Value" className={cell} /><button onClick={()=>delPI(i)} className="shrink-0 rounded border border-zinc-200 px-2 text-[12px] text-zinc-400 hover:text-red-500">x</button></div>))}</div>
@@ -3462,8 +3487,8 @@ function printProposal(p){
 
       {SH("10. Signature of Both Parties")}
       <div className="grid grid-cols-2 gap-4 text-center text-[12px] text-zinc-600">
-        <div className="pt-8"><div className="mx-4 border-t border-zinc-400 pt-1 font-semibold text-zinc-800">{e.clientName||"____________"}</div><div>First Party / Land Owner</div></div>
-        <div className="pt-8"><div className="mx-4 border-t border-zinc-400 pt-1 font-semibold text-zinc-800">{dz.devMD||"Ar. Jewel Barua"}</div><div>Managing Director, Sync Land Limited</div></div>
+        <div className="pt-8"><div className="mx-4 border-t border-zinc-400 pt-1 font-semibold text-zinc-800">{ownNames}</div><div>First Party / Land Owner</div></div>
+        <div className="pt-8"><div className="mx-4 border-t border-zinc-400 pt-1 font-semibold text-zinc-800">{DV.mdName||dz.devMD||"Ar. Jewel Barua"}</div><div>Managing Director, Sync Land Limited</div></div>
       </div>
 
       {SH("11. Witnesses")}
