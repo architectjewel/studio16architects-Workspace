@@ -1778,6 +1778,7 @@ function printProposal(p){
                     <Card l="Money out" v={money(moneyOut)} tone="zinc" sub="expenses + capital invested" />
                     <Card l="Net cash flow" v={money(net)} tone={net>=0?"emerald":"red"} sub="money in − money out" />
                   </div>
+                  <div className="mt-5 mb-1 text-[11px] font-semibold uppercase tracking-wide text-zinc-400">Cash flow by source · {plabel}</div><div className="grid grid-cols-1 gap-3 sm:grid-cols-3"><Card l="Capital invested" v={money(invCap)} tone="zinc" sub="capital put into investments" /><Card l="Investment return" v={money(invRet)} tone="emerald" sub="returns received" /><Card l="Client receipts" v={money(recClient)} tone="emerald" sub="payments from clients" /></div>
                   <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-2">
                     <div className="rounded-lg border border-zinc-200 bg-white p-4">
                       <div className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-zinc-500">Where money came from</div>
