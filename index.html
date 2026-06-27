@@ -1767,6 +1767,7 @@ function printProposal(p){
                 const yetBill=receivables.reduce((s,x)=>!x.billed?s+Number(x.amount||0):s,0);
                 const catMap={}; expenses.filter(x=>inP(x.date)).forEach(x=>{const k=x.category||"Other"; catMap[k]=(catMap[k]||0)+Number(x.amount||0);});
                 const cats=Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+                const _ovExp=expenses.filter(x=>inP(x.date)); const _ogT=g=>_ovExp.filter(x=>x.kind==="overhead"&&(x.og||"office")===g).reduce((s,x)=>s+Number(x.amount||0),0); const _hrT=_ovExp.filter(x=>x.kind==="salary").reduce((s,x)=>s+Number(x.amount||0),0); const _officeT=_ogT("office"); const _mgmtT=_ogT("management");
                 const Card=({l,v,tone,sub})=>(<div className="rounded-lg border border-zinc-200 bg-white p-4"><div className="text-[11px] uppercase tracking-wide text-zinc-400">{l}</div><div className={`mono mt-1 text-xl font-semibold ${tone==="emerald"?"text-emerald-600":tone==="red"?"text-red-600":"text-zinc-900"}`}>{v}</div>{sub&&<div className="mt-1 text-[11px] text-zinc-400">{sub}</div>}</div>);
                 const Row=({l,v,bold})=>(<div className={`flex items-center justify-between py-1.5 ${bold?"mt-1 border-t border-zinc-200 pt-2 font-semibold":""}`}><span className="text-[13px] text-zinc-600">{l}</span><span className={`mono text-[13px] ${bold?"text-zinc-900":"text-zinc-700"}`}>{v}</span></div>);
                 const Mini=({l,v,tone})=>(<div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[10px] uppercase tracking-wide text-zinc-400">{l}</div><div className={`mono mt-0.5 text-[15px] font-semibold ${tone==="emerald"?"text-emerald-600":tone==="red"?"text-red-600":tone==="amber"?"text-amber-600":"text-zinc-900"}`}>{v}</div></div>);
@@ -1791,6 +1792,7 @@ function printProposal(p){
                       <Row l="Total out" v={money(moneyOut)} bold />
                     </div>
                   </div>
+                  <div className="mt-5 mb-1 text-[11px] font-semibold uppercase tracking-wide text-zinc-400">Overhead by group · {plabel}</div><div className="grid grid-cols-1 gap-3 sm:grid-cols-3"><Card l="Office overhead" v={money(_officeT)} tone="zinc" sub="office bills & expenses" /><Card l="HR (salary)" v={money(_hrT)} tone="zinc" sub="team salaries" /><Card l="Management overhead" v={money(_mgmtT)} tone="zinc" sub="management bills & expenses" /></div>
                   <div className="mt-5 mb-1 text-[11px] font-semibold uppercase tracking-wide text-zinc-400">Standing position · all-time</div><div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                     <Mini l="To collect" v={money(outstanding)} tone="amber" />
                     <Mini l="Yet to bill" v={money(yetBill)} />
