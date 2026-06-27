@@ -1510,11 +1510,20 @@ function printProposal(p){
                     <tr className="border-t border-zinc-200 font-semibold"><td className="py-2 text-[13px] text-zinc-700">Total</td><td className="py-2 text-right text-[13px] text-zinc-600">{props.length}</td><td className="mono py-2 text-right text-[13px] text-zinc-900">{money(valOf(props))}</td></tr>
                     </tbody></table>
                   </div>
-                  <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    <Mini l="Leads" v={lds.length} sub="" />
-                    <Mini l="New" v={lds.filter(l=>l.status==="new").length} tone="red" />
+                  <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
+                    <Mini l="Lead" v={lds.length} />
+                    <Mini l="New" v={lds.filter(l=>l.status==="new").length} tone="amber" />
                     <Mini l="Won" v={lds.filter(l=>l.status==="won").length} tone="emerald" />
-                    <Mini l="Lost" v={lds.filter(l=>l.status==="lost").length} />
+                    <Mini l="Lost" v={lds.filter(l=>l.status==="lost").length} tone="red" />
+                    <Mini l="Not pursued" v={lds.filter(l=>l.status==="nopursue").length} />
+                  </div>
+                  <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-6">
+                    <Mini l="Proposal" v={props.length} />
+                    <Mini l="Draft" v={draft.length} />
+                    <Mini l="Sent" v={sent.length} tone="amber" />
+                    <Mini l="Accept" v={accepted.length} tone="emerald" />
+                    <Mini l="Decline" v={declined.length} tone="red" />
+                    <Mini l="Expired" v={expired.length} />
                   </div>
                   <div className="mt-3 text-[11px] text-zinc-400">Proposals and leads counted by their date within {plabel==="All time"?"all time":plabel}. Value uses each proposal's grand total (services + VAT + tax).</div>
                 </div>);
@@ -1793,7 +1802,7 @@ function printProposal(p){
                     </div>
                   </div>
                   <div className="mt-5 mb-1 text-[11px] font-semibold uppercase tracking-wide text-zinc-400">Overhead by group · {plabel}</div><div className="grid grid-cols-1 gap-3 sm:grid-cols-3"><Card l="Office overhead" v={money(_officeT)} tone="zinc" sub="office bills & expenses" /><Card l="HR (salary)" v={money(_hrT)} tone="zinc" sub="team salaries" /><Card l="Management overhead" v={money(_mgmtT)} tone="zinc" sub="management bills & expenses" /></div>
-                  <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2"><Card l="Client receipts" v={money(recClient)} tone="emerald" sub="payments from clients" /><Card l="Project overhead" v={money(_projT)} tone="zinc" sub="project costs" /></div><div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2"><Card l="Capital invested" v={money(invCap)} tone="zinc" sub="capital put into investments" /><Card l="Investment return" v={money(invRet)} tone="emerald" sub="returns received" /></div>
+                  <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2"><Card l="Client receipts" v={money(recClient)} tone="emerald" sub="payments from clients" /><Card l="Project overhead" v={money(_projT)} tone="zinc" sub="project costs" /></div><div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2"><Card l="Investment return" v={money(invRet)} tone="emerald" sub="returns received" /><Card l="Capital invested" v={money(invCap)} tone="zinc" sub="capital put into investments" /></div>
                   <div className="mt-5 mb-1 text-[11px] font-semibold uppercase tracking-wide text-zinc-400">Standing position · all-time</div><div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                     <Mini l="To collect" v={money(outstanding)} tone="amber" />
                     <Mini l="Yet to bill" v={money(yetBill)} />
