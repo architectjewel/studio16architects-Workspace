@@ -203,6 +203,8 @@
 
       useEffect(()=>{ if(!profile) return; if(realAdmin && viewAs!=="member") return; const ok = ALL_KEYS.filter(([k])=> k==="construction" || has(k)).map(([k])=>k); if(!ok.includes(area)) setArea((ALL_KEYS.find(([k])=>k!=="construction" && has(k))||["construction"])[0]); },[profile,viewAs,viewKeys,area,realAdmin]);
 
+      useEffect(()=>{ if(!isAdmin && finTab==="overview") setFinTab("receivables"); },[isAdmin,finTab]);
+
       useEffect(()=>{ if(!db) return; db.auth.getSession().then(({data})=>setSession(data.session)); const {data:sub}=db.auth.onAuthStateChange((_e,s)=>setSession(s)); return ()=>sub.subscription.unsubscribe(); },[]);
       useEffect(()=>{ if(session) load(true); },[session]);
       useEffect(()=>{ if(!db||!proposals.length) return; const today=new Date().toISOString().slice(0,10); const exp=p=>{ if(!p.date) return false; const d=new Date(p.date); d.setDate(d.getDate()+(Number(p.validDays)||30)); return d.toISOString().slice(0,10)<today; }; const due=proposals.filter(p=>p.status==="sent"&&exp(p)); if(!due.length) return; (async()=>{ for(const p of due){ await db.from("proposals").update({status:"expired"}).eq("id",p.id); } refresh(); })(); },[proposals]);
@@ -1135,7 +1137,7 @@ function printProposal(p){
               </>)}
               {area==="finance" && has("finance") && (<>
                 <div className="flex flex-wrap items-stretch gap-x-6 gap-y-2 pt-3">{(()=>{ const billed=receivables.reduce((s,x)=>s+x.amount,0); const received=receivables.reduce((s,x)=>s+x.paidAmount,0); const overdue=receivables.filter(x=>x.dueDate&&x.dueDate<dayStr()&&x.paidAmount<x.amount).reduce((s,x)=>s+(x.amount-x.paidAmount),0); return (<><Stat n={money(billed)} l="Billed" /><Stat n={money(received)} l="Received" /><Stat n={money(billed-received)} l="Outstanding" /><Stat n={money(overdue)} l="Overdue" tone="red" /></>); })()}</div>
-                <div className="flex flex-wrap items-center gap-1 pt-3">{[["overview","Overview"],["receivables","Receivables"],["expenditure","Expenditure"],...(isAdmin?[["profit","Profit"]]:[]),...((isAdmin||has("finance"))?[["investments","Investments"]]:[])].map(([k,l])=><button key={k} onClick={()=>setFinTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${finTab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
+                <div className="flex flex-wrap items-center gap-1 pt-3">{[...(isAdmin?[["overview","Overview"]]:[]),["receivables","Receivables"],["expenditure","Expenditure"],...(isAdmin?[["profit","Profit"]]:[]),...((isAdmin||has("finance"))?[["investments","Investments"]]:[])].map(([k,l])=><button key={k} onClick={()=>setFinTab(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${finTab===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
               </>)}
             </div>
           </header>
@@ -1760,7 +1762,7 @@ function printProposal(p){
 
             {area==="finance" && has("finance") && (<>
               
-              {finTab==="overview" && (()=>{
+              {finTab==="overview" && isAdmin && (()=>{
                 const thisM=dayStr().slice(0,7), thisY=dayStr().slice(0,4);
                 const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
                 const inP=d=>{ if(finPeriod==="all")return true; const ds=String(d||""); if(!ds)return false; return finPeriod==="month"?ds.slice(0,7)===thisM:ds.slice(0,4)===thisY; };
