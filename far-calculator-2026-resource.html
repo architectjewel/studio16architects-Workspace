@@ -168,7 +168,7 @@ select:focus,input:focus{border-color:var(--ink)}
 .hl.accent .mono{color:var(--brass-2)!important}
 
 section.sec{padding:24px 28px;border-bottom:1px solid var(--line-2);counter-reset:rownum}
-.report{counter-reset:secnum} section.sec h2{font-size:11px;display:flex;align-items:center;gap:10px;margin-bottom:16px;text-transform:uppercase;letter-spacing:.16em;font-weight:600;counter-increment:secnum}
+.rep-body{counter-reset:secnum} section.sec h2{font-size:11px;display:flex;align-items:center;gap:10px;margin-bottom:16px;text-transform:uppercase;letter-spacing:.16em;font-weight:600;counter-increment:secnum}
 section.sec h2:before{content:counter(secnum) ".";color:var(--brass);font-weight:700;flex:none;font-variant-numeric:tabular-nums}
 
 table.kv{width:100%;border-collapse:collapse;font-size:13.5px}
@@ -181,14 +181,6 @@ table.kv td:last-child{text-align:right;font-weight:500;white-space:nowrap;font-
   padding:2px 7px;margin-left:8px;cursor:help;vertical-align:middle;white-space:nowrap;text-transform:uppercase;letter-spacing:.06em}
 .badge:hover{border-color:var(--ink);color:var(--ink)}
 .capped{color:var(--cap)!important}
-/* highlighted key result rows — Approved FAR · Total floor area */
-table.kv tr.kv-hi td{background:color-mix(in srgb,var(--brass) 13%,var(--card));font-weight:700;
-  border-top:1.5px solid color-mix(in srgb,var(--brass) 55%,transparent);
-  border-bottom:1.5px solid color-mix(in srgb,var(--brass) 55%,transparent);
-  padding-top:11px;padding-bottom:11px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-table.kv tr.kv-hi td:first-child{color:var(--ink);box-shadow:inset 4px 0 0 var(--brass);padding-left:12px}
-table.kv tr.kv-hi td:first-child:before{color:var(--brass);opacity:1}
-table.kv tr.kv-hi td:last-child{color:var(--brass);font-size:1.12em;letter-spacing:.01em}
 
 .floors{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
 @media(max-width:560px){.floors{grid-template-columns:1fr}}
@@ -263,7 +255,7 @@ details.audit summary:hover{color:var(--ink)}
   .wrap{max-width:none;padding:0 0 12px}
   .grid{display:block;margin:0;border:0}
   .panel{box-shadow:none}
-  .report{background:#fff;zoom:0.82}
+  .report{background:#fff;zoom:0.85}
   .print-only{display:block!important}
   a{color:#000;border:0}
   /* small, presentable header */
@@ -346,7 +338,7 @@ details.audit summary:hover{color:var(--ink)}
 .luc .luc-v.luc-red{color:#c00000}
 .luc .luc-v.luc-blue{background:transparent;color:#0070c0}
 @media print{
-  section.sec.sec-luc{break-inside:avoid;page-break-inside:avoid;overflow:visible;border-top:0;padding-top:0;break-before:page;page-break-before:always}
+  section.sec.sec-luc{column-span:all;-webkit-column-span:all;break-inside:auto;page-break-inside:auto;break-after:column;padding-top:0}
   section.sec.sec-luc h2{break-after:avoid;page-break-after:avoid}
   section.sec.sec-luc h2{break-after:avoid;page-break-after:avoid}
   .luc{font-size:8.6px;box-shadow:none;border-radius:0}
@@ -372,6 +364,12 @@ body.lang-bn{--display:'Hind Siliguri','Noto Sans Bengali','Nikosh','Kalpurush',
 
 </head>
 <body>
+
+<nav class="zonetoggle">
+  <a class="active" href="https://www.studio16architectsbd.com/rajuk-far-calculator-2025" target="_top">For RAJUK area (2025)</a>
+  <a href="https://www.studio16architectsbd.com/rajuk-far-calculator-2008" target="_top">For outside RAJUK area (2008)</a>
+</nav>
+
 <header class="top">
   <div class="top-in">
     <div class="brand">
@@ -2233,7 +2231,7 @@ const R = {
   "ref": "DAP 2025 §3.6.10 + Table 3.31 (SRO 468/2025)",
   "minBlockKatha": {
    "central_S": 10,
-   "central_P": 30,
+   "central_P": 20,
    "outside_city": 20,
    "other_urban": 66
   },
@@ -2668,7 +2666,6 @@ const REPORT_MAP=[
   ["Roof slab · ","ছাদ স্ল্যাব · "],["Basement ","বেজমেন্ট "],
   ["FAR floor area","ফার মেঝে ক্ষেত্রফল"],["Verandah + green bonus","বারান্দা + সবুজ বোনাস"],
   ["Parking · FAR-excluded","পার্কিং · ফার-বহির্ভূত"],
-  ["FAR-excluded area (parking, basement &amp; rooftop)","ফার-বহির্ভূত এলাকা (পার্কিং, বেজমেন্ট ও ছাদ)"],
   ["Allowable FAR ","অনুমোদিত ফার "],["Total build ","মোট নির্মাণ "],
   ["Floor plate ","ফ্লোর প্লেট "],["Land ","জমি "],["ROAD · ","রাস্তা · "],
   /* audit summary */
@@ -2906,8 +2903,8 @@ function buildAudit(r){
 function badge(t){return `<span class="badge" title="Source: ${t}">${t}</span>`;}
 const SHARE_URL="";
 const SHARE_TXT="RAJUK FAR Calculator 2025 — free DAP 2025 / Bidhimala 2025 FAR & coverage calculator by Studio 16 Architects";
-const STANDALONE_URL="";  /* optional: set to a hosted URL to enable mobile print */
-const SHARE_LINKS={wa:"",fb:"",x:"",li:""};
+const STANDALONE_URL="";  /* set to your hosted (non-Wix) URL e.g. https://xxx.netlify.app to enable mobile print */
+const SHARE_LINKS=(function(){var u=encodeURIComponent(SHARE_URL),t=encodeURIComponent(SHARE_TXT);return{wa:"https://wa.me/?text="+t+"%20"+u,fb:"https://www.facebook.com/sharer/sharer.php?u="+u,x:"https://twitter.com/intent/tweet?text="+t+"&url="+u,li:"https://www.linkedin.com/sharing/share-offsite/?url="+u};})();
 function toggleShareMenu(force){var m=document.getElementById("shareMenu");if(!m)return;m.style.display=(force===true)?"flex":(m.style.display==="flex"?"none":"flex");}
 function doShare(){try{if(navigator.share){navigator.share({title:"RAJUK FAR Calculator 2025",text:SHARE_TXT,url:SHARE_URL}).catch(function(){toggleShareMenu(true);});return;}}catch(e){}toggleShareMenu();}
 function copyShareLink(ev){try{navigator.clipboard.writeText(SHARE_URL);}catch(e){}var b=ev&&(ev.currentTarget||ev.target);if(b){var t=b.textContent;b.textContent="Copied!";setTimeout(function(){b.textContent=t;},1400);}}
@@ -2925,42 +2922,6 @@ function copyReportText(btn){var box=document.getElementById("reportShareBox");v
 function shareReport(r,ref,tfa){var txt=reportSummaryText(r,ref,tfa);try{if(navigator.share){navigator.share({title:"RAJUK FAR result — Studio 16 Architects",text:txt}).catch(function(){revealReportShare(txt);});return;}}catch(e){}revealReportShare(txt);}
 function printHint(){var box=document.getElementById("reportShareBox");if(!box)return;box.innerHTML='<div class="hint" style="line-height:1.55">'+(STANDALONE_URL?('To save a PDF on mobile, open the full (non-embedded) calculator: <a class="shm" href="'+STANDALONE_URL+'" target="_blank" rel="noopener">Open full calculator ↗</a>'):'On mobile the embedded calculator cannot open the print dialog. Open the calculator on its own page (hosted outside Wix) to save a PDF.')+'</div>';box.style.display="block";}
 window.doPrint=doPrint;window.doShare=doShare;window.copyShareLink=copyShareLink;window.shareReport=shareReport;window.copyReportText=copyReportText;
-// Programmatic entry point — lets the proposal app auto-fill inputs and calculate.
-// params: {occ:"A3", area:"Aftabnagar" (or a full address), roadFt:30, katha:5, blockId?, loc?}
-window.S16_FAR_AUTORUN=function(p){
-  p=p||{};
-  var out={ok:false,matched:null,error:"",occ:""};
-  try{
-    if(p.occ && ALL_OCC.some(function(o){return o.id===p.occ;})) $("#occ").value=p.occ;
-    var matched=null;
-    if(p.area){
-      var atext=String(p.area);
-      var direct=blockOptions(atext);
-      if(direct&&direct.length){ matched=direct[0]; }
-      else {
-        var noise=/^(block|sector|road|plot|holding|house|flat|floor|project|the|near|opposite|beside|main|avenue|lane|no|number|dhaka|bangladesh|at|in|of|and)$/i;
-        var cand=[];
-        atext.split(/[,;/]| at | in /i).forEach(function(seg){ seg=(seg||"").trim(); if(seg) cand.push(seg); });
-        atext.split(/[^A-Za-z]+/).forEach(function(w){ if(w&&w.length>=4 && !noise.test(w)) cand.push(w); });
-        cand.sort(function(a,b){ return b.length-a.length; }).forEach(function(t){ if(matched) return; var o=blockOptions(t); if(o&&o.length) matched=o[0]; });
-      }
-    }
-    if(!matched && p.blockId){ var bb=blockById(p.blockId); if(bb) matched=bb; }
-    if(matched) selectBlock(matched.id);
-    if(p.katha!=null && String(p.katha)!==""){ var pv=document.querySelector("#plots .plot .pv"), pu=document.querySelector("#plots .plot .pu"); if(pv) pv.value=String(p.katha); if(pu) pu.value="katha"; if(typeof totLand==="function") totLand(); }
-    if(p.roadFt!=null && String(p.roadFt)!==""){ var rv=$("#roadVal"); if(rv) rv.value=String(p.roadFt); state.roadUnit="ft"; $$("#roadUnit button").forEach(function(x){ x.classList.toggle("on", x.dataset.u==="ft"); }); if(typeof roadHint==="function") roadHint(); }
-    if(p.loc){ var le=$("#loc"); if(le) le.value=p.loc; }
-    if(typeof occChange==="function") occChange();
-    calculate();
-    var err=$("#errbox"); var failed=!!(err && err.style.display!=="none" && (err.textContent||"").trim());
-    var hasReport=!!document.querySelector("#report .hl, #report table, #report tr");
-    out.ok=!failed && hasReport;
-    out.error=failed?(err.textContent||"").trim():"";
-    out.matched=matched?{id:matched.id,name:matched.name,areas:matched.areas||""}:null;
-    out.occ=$("#occ").value;
-  }catch(e){ out.ok=false; out.error=String(e&&e.message||e); }
-  return out;
-};
 /* ----------------------------------------------------------------
    OFFICIAL RAJUK LAND USE CLEARANCE (LUC) TABLE — "A3" format.
    Reproduces the government worksheet (LUC_A3_New_2025.xls) row-for-row:
@@ -3140,6 +3101,10 @@ function renderReport(r){
   </div>
 
   <div class="rep-body">
+  <section class="sec sec-luc"><h2>RAJUK Land Use Clearance — A3 (official format)</h2>
+    ${lucTable(r)}
+    <div class="refnote" style="padding-left:0">প্রস্তাবিত জমি সংশ্লিষ্ট সূচকসমূহ — generated in the RAJUK DAP&nbsp;2025 Land Use Clearance worksheet format (ref. <span style="font-variant-numeric:normal">LUC_A3_New_2025</span>). Figures are computed from your inputs; clause references (অনুচ্ছেদ ৩.৬.৪.১ · পরিশিষ্ট ৩.৬) follow DAP&nbsp;2025. Indicative only — verify with RAJUK before submission.</div>
+  </section>
   <section class="sec sec-planning"><h2>Planning Information</h2>
     <table class="kv">
       <tr><td>Land area / size</td><td>${fmt(r.katha)} katha · ${fmt0(r.sqft)} ft²</td></tr>
@@ -3168,7 +3133,7 @@ function renderReport(r){
       <tr class="res-only"><td>Maximum FAR · MAX</td><td>${fmt(r.maxFAR)}</td></tr>${r.isNR?('<tr><td style="color:var(--brass)">Non-restricted (NR)</td><td>'+(r.nrMode?('build area by parking @ 200 m²/space'+(r.parking>0?(': '+r.parking+' × 200 m² = '+fmt0(r.nrFloorSqft)+' ft²'):' (enter a parking count)')):('reference FAR '+fmt(r.roadFAR)+' used; tick the NR option to size by parking instead'))+badge('DAP 2025 App.3.5 *NR')+'</td></tr>'):''}`;
   r.incentives.forEach(i=>{h+=`<tr><td style="padding-left:14px;color:var(--brass)">+ ${i.label}</td><td>+${fmt(i.val)}${badge(i.ref)}</td></tr>`;});
   h+=`<tr class="res-only"><td>Total incentive FAR</td><td>+${fmt(r.totalInc)}${badge(R.incentives.ref)}</td></tr>
-      <tr class="res-only kv-hi"><td>Approved FAR</td><td class="${r.approvedFAR>=r.maxFAR&&r.totalInc>0?'capped':''}">${fmt(r.approvedFAR)}${r.approvedFAR>=r.maxFAR&&r.totalInc>0?' (capped)':''}</td></tr>
+      <tr class="res-only"><td>Approved FAR</td><td class="${r.approvedFAR>=r.maxFAR&&r.totalInc>0?'capped':''}">${fmt(r.approvedFAR)}${r.approvedFAR>=r.maxFAR&&r.totalInc>0?' (capped)':''}</td></tr>
       <tr class="res-only"><td>Special-case ceiling (TOD/LR)</td><td>${fmt(r.superMax)}</td></tr>
     </table></section>
 
@@ -3227,7 +3192,7 @@ function renderReport(r){
     <table class="kv" style="margin-top:13px">
       ${r.totalBuildArea!=null?`
       <tr><td colspan="2" style="text-align:right;padding-bottom:4px;font-weight:600;color:var(--ink);border-bottom:1px solid var(--line)">Floor area calculation</td></tr>
-      ${(r.roadWidened&&r.roadBenefit>0)?`<tr class="kv-hi"><td>Total floor area (FAR included)</td><td>${fmt0(r.floorAreaApproved)} ft² · ${fmt0(tfaSqm)} m²${badge('Bidhimala §2(81)')}</td></tr>`:`<tr class="kv-hi"><td><b>Total floor area (FAR included)</b></td><td><b>${fmt0(r.floorAreaApproved)} ft² · ${fmt0(tfaSqm)} m²</b>${badge('Bidhimala §2(81)')}</td></tr>`}
+      ${(r.roadWidened&&r.roadBenefit>0)?`<tr><td>Total floor area (FAR included)</td><td>${fmt0(r.floorAreaApproved)} ft² · ${fmt0(tfaSqm)} m²${badge('Bidhimala §2(81)')}</td></tr>`:`<tr><td><b>Total floor area (FAR included)</b></td><td><b>${fmt0(r.floorAreaApproved)} ft² · ${fmt0(tfaSqm)} m²</b>${badge('Bidhimala §2(81)')}</td></tr>`}
       ${r.roadWidened&&r.roadBenefit>0?`<tr><td>Land surrendered for 20 ft road (DAP 2025 cl.4)</td><td>${fmt(r.roadGiveawayWidth,1)} ft × ${fmt0(r.roadFrontage)} ft = ${fmt0(r.roadGiveawayArea)} ft²</td></tr>
       <tr><td>Road-widening build benefit (3× surrendered)</td><td>+ ${fmt0(r.roadBenefit)} ft²</td></tr>
       <tr><td><b>Total Floor area incl. road benefit</b></td><td><b>${fmt0(r.floorAreaApproved + r.roadBenefit)} ft²</b></td></tr>`:''}
@@ -3278,11 +3243,6 @@ function renderReport(r){
   </section>
   </div>
 
-  <section class="sec sec-luc"><h2>RAJUK Land Use Clearance — A3 (official format)</h2>
-    ${lucTable(r)}
-    <div class="refnote" style="padding-left:0">প্রস্তাবিত জমি সংশ্লিষ্ট সূচকসমূহ — generated in the RAJUK DAP&nbsp;2025 Land Use Clearance worksheet format (ref. <span style="font-variant-numeric:normal">LUC_A3_New_2025</span>). Figures are computed from your inputs; clause references (অনুচ্ছেদ ৩.৬.৪.১ · পরিশিষ্ট ৩.৬) follow DAP&nbsp;2025. Indicative only — verify with RAJUK before submission.</div>
-  </section>
-
   <details class="audit"><summary>▸ Audit trail — formulas &amp; sources (${audit.length} steps)</summary>
     <div class="auditlist">${audit.map((a,i)=>`<div><span class="step-a">${String(i+1).padStart(2,'0')}.</span> ${a}</div>`).join('')}</div>
   </details>
@@ -3294,7 +3254,6 @@ function renderReport(r){
   $("#report").innerHTML=h;
   $("#report").classList.toggle('nonres', !r.isRes);
   const cb=$("#shareReportBtn"); if(cb)cb.addEventListener('click',()=>shareReport(r,ref,tfa));
-  $("#report").scrollIntoView({behavior:'smooth',block:'start'});
 }
 function setbackSVG(r){
   const sb=r.setbacks;
@@ -3375,7 +3334,7 @@ function sectionSVG(r){
   const footRows=[["Total FAR-included area", r.floorAreaApproved]];
   if(r.roadWidened&&r.roadBenefit>0){ footRows.push(["Total Floor area incl. road benefit", r.floorAreaApproved + r.roadBenefit]); }
   footRows.push(["Total FAR + "+((r.roadWidened&&r.roadBenefit>0)?"road bonus + ":"")+"bonus (build) area", r.totalBuildArea + (r.roadBenefit||0)]);
-  footRows.push(["FAR-excluded area (parking, basement &amp; rooftop)", r.farExcludedArea + r.roofArea]);
+  footRows.push(["FAR-excluded area (parking &amp; basement)", r.farExcludedArea]);
   footRows.forEach(rw=>{ body+=`<text x="10" y="${fy}" font-size="9" style="fill:var(--ink)">${rw[0]}</text><text x="${W-10}" y="${fy}" text-anchor="end" font-size="9.5" font-weight="600" style="fill:var(--ink)">${fmt0(rw[1])} ft²</text>`; fy+=16; });
   fy+=1;
   body+=`<text x="10" y="${fy}" font-size="9.5" font-weight="700" style="fill:var(--ink)">Total construction area</text><text x="${W-10}" y="${fy}" text-anchor="end" font-size="11" font-weight="700" style="fill:var(--ink)">${fmt0(r.totalConstruction)} ft²</text>`;
