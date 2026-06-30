@@ -1787,7 +1787,7 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
                   <span className="hidden text-zinc-500 sm:inline">{profile?.name} · {profile?.role}</span>
                   {realAdmin && (viewAs==="admin" ? <button onClick={()=>{setViewAs("member");setViewKeys(["design"]);setArea("design");setShowAddP(false);setShowRegAdd(false);setEditP(null);setDelP(null);}} className="rounded-md border border-zinc-300 px-2.5 py-1.5 text-[11px] text-zinc-500 hover:bg-zinc-50">View as member</button> : <button onClick={()=>setViewAs("admin")} className="rounded-md border border-amber-300 bg-amber-50 px-2.5 py-1.5 text-[11px] font-medium text-amber-700 hover:bg-amber-100">Exit member view</button>)}
                   {memberMode && <div className="flex flex-wrap items-center gap-1"><span className="mr-1 text-[10px] text-zinc-400">preview as member with:</span>{ALL_KEYS.map(([k,lbl])=>{ const kk=AREA_KEY[k]||k; return (<button key={k} onClick={()=>setViewKeys(vk=>vk.includes(kk)?vk.filter(x=>x!==kk):[...vk,kk])} className={"rounded-md border px-2 py-1 text-[10px] "+(viewKeys.includes(kk)?"border-amber-300 bg-amber-50 text-amber-700":"border-zinc-200 text-zinc-400 hover:bg-zinc-50")}>{lbl}</button>); })}</div>}
-                  <button onClick={signOut} className="rounded-md border border-zinc-300 px-3 py-1.5 hover:bg-zinc-50">Sign out</button>
+                  <span className="self-center rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400" title="App build version">build 0630·1</span><button onClick={signOut} className="rounded-md border border-zinc-300 px-3 py-1.5 hover:bg-zinc-50">Sign out</button>
                 </div>
               </div>
               {area==="design" && (<></>)}{false && (<>
