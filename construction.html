@@ -598,7 +598,7 @@ const taskChartBoard = () => {
                     <input value={catQ} onChange={e=>setCatQ(e.target.value)} placeholder="Search code or name" className="rounded-md border border-zinc-300 px-3 py-1.5 text-[12px] outline-none focus:border-zinc-500" />
                   </div>
                   <p className="mb-3 text-[11px] text-zinc-400">Coded catalog: discipline (11000) {"\u2192"} group (11100) {"\u2192"} item (11110). New entries get the next code automatically; you can override a code if you need a specific one. Vendors attach under each item later.</p>
-                  {disc.length===0 ? <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No material catalog yet {"\u2014"} run the catalog seed SQL first.</div> : <div className="space-y-2">
+                  {disc.length===0 ? <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">Nothing here yet {"\u2014"} add an entry to get started.</div> : <div className="space-y-2">
                     {disc.map(d=>{ const open=catExpand[d.code]; const groups=catKids(d.code); return (
                       <div key={d.id} className="rounded-lg border border-zinc-200 bg-white">
                         <div className="flex flex-wrap items-center gap-2 px-3 py-2">
@@ -1870,7 +1870,7 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
             <div className="mx-auto max-w-[1100px] px-4 py-3 sm:px-8">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-3">
                 <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-2"><img src={LOGO_URL} alt="Sync Land Limited" className="h-6 w-auto sm:h-7" /><span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-400" title="App build version">build 0630·40</span></div>
+                  <div className="flex items-center gap-2"><img src={LOGO_URL} alt="Sync Land Limited" className="h-6 w-auto sm:h-7" /><span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-400" title="App build version">build 0630·42</span></div>
                   <div className="flex flex-wrap gap-1">{[...areas, ...(isAdmin?[["admin","Admin"]]:[])].map(([k,l])=><button key={k} onClick={()=>{ setArea(k); if(k==="finance")setConTab("coverview"); else if(k==="sales")setConTab("leads"); else if(k==="construction")setConTab("board"); }} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${area===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
                 </div>
                 <div className="flex items-center gap-2 text-[12px]">
@@ -3022,7 +3022,7 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
             {((area==="construction" && has("sl-construction"))||(area==="finance" && has("sl-finance"))||(area==="sales" && has("sl-sales"))) && (<>
               {(()=>{
                 const G = area==="finance" ? [["money","Finance"]] : area==="sales" ? [["agreement","Sales"]] : [["projects","Project Manager"],["catalog","Listing"],["conreg","Con Project Registry"]];
-                const T={agreement:[["leads","Leads"],["proposal","Proposal"],["agreements","Agreements"],["speccat","Spec Catalogue"],["terms","Terms"]],projects:[["board","Project board"],["teamboard","Team board"],["vendorboard","Vendor board"]],conreg:[["conregistry","Con Project Registry"]],money:[["coverview","Overview"],["cprofit","Profit"],["creceivables","Receivables"],["cexpenditure","Expenditure"],["bills","Bills & purchases"],["vendors","Vendors"],["payables","Payables"],["statements","Statements"],["requisition","Requisition"]],catalog:[["vendorlist","Vendor"],["tasklist","Task"],["matlist","Material"],["sizelist","Size"]]};
+                const T={agreement:[["leads","Leads"],["proposal","Proposal"],["agreements","Agreements"],["speccat","Spec Catalogue"],["terms","Terms"]],projects:[["board","Project board"],["teamboard","Team board"],["vendorboard","Vendor board"]],conreg:[["conregistry","Con Project Registry"]],money:[["coverview","Overview"],["cprofit","Profit"],["creceivables","Receivables"],["cexpenditure","Expenditure"],["bills","Bills & purchases"],["payables","Payables"],["statements","Statements"],["requisition","Requisition"]],catalog:[["vendors","Vendor"],["tasklist","Task"],["matlist","Material"],["equiplist","Equipment"],["sizelist","Size"]]};
                 const curG=(G.find(([g])=>T[g].some(t=>t[0]===conTab))||G[0])[0];
                 return (<div className="mb-3">
                   {G.length>1 && <div className="flex flex-wrap gap-1.5">{G.map(([g,gl])=><button key={g} onClick={()=>{ if(!T[g].some(t=>t[0]===conTab)) setConTab(T[g][0][0]); }} className={`rounded-md px-3 py-1.5 text-[12px] font-semibold ${g===curG?"bg-zinc-900 text-white":"bg-zinc-100 text-zinc-600 hover:bg-zinc-200"}`}>{gl}</button>)}</div>}
@@ -4483,9 +4483,9 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
                 {!bills.length && <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-10 text-center text-[12px] text-zinc-400">No bills yet. Add a vendor bill or purchase to track construction spend per project.</div>}
               </>); })()}
               {conTab==="matlist" && catBoard("material","Material Chart")}
+              {conTab==="equiplist" && catBoard("equipment","Equipment list")}
               {conTab==="sizelist" && sizeBoard()}
               {conTab==="tasklist" && taskChartBoard()}
-              {conTab==="vendorlist" && (()=>{ const vs=vendors.slice(); const byType={}; const order=[]; vs.forEach(v=>{ const t=v.type||"Other"; if(!byType[t]){byType[t]=[];order.push(t);} byType[t].push(v); }); order.sort((a,b)=>a.localeCompare(b)); order.forEach(t=>byType[t].sort((a,b)=>String((a.code||"")+(a.name||"")).localeCompare(String((b.code||"")+(b.name||""))))); return (<div><div className="mb-3 flex items-center justify-between"><h2 className="text-base font-semibold">Vendor list</h2><span className="text-[11px] text-zinc-400">{vendors.length} vendor{vendors.length===1?"":"s"} · from Finance</span></div>{vendors.length===0 ? <div className="rounded-lg border border-dashed border-zinc-300 bg-white py-8 text-center text-[12px] text-zinc-400">No vendors yet. Add them under Finance → Vendors.</div> : <div className="space-y-3">{order.map(t=>(<div key={t}><div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-zinc-400">{t}</div><div className="divide-y divide-zinc-100 overflow-hidden rounded-lg border border-zinc-200 bg-white">{byType[t].map(v=>(<div key={v.id} className="flex items-center gap-2 px-3 py-2">{v.code&&<span className="mono shrink-0 rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] text-zinc-500">{v.code}</span>}<span className="min-w-0 flex-1 truncate text-[13px] font-medium text-zinc-800">{v.name}{v.blacklisted&&<span className="ml-1.5 rounded bg-red-50 px-1 py-0.5 text-[9px] font-semibold text-red-500">BLACKLISTED</span>}</span>{v.phone&&<span className="mono shrink-0 text-[11px] text-zinc-500">{v.phone}</span>}</div>))}</div></div>))}</div>}</div>); })()}
               
               {conTab==="payables" && payablesBoard()}
               {conTab==="vendors" && (()=>{
@@ -4503,7 +4503,7 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
                 function FilingFields(o,setO){
                   const d=o.disciplineCode||"", g=o.groupCode||"", items=o.itemCodes||[];
                   const rc=(nd,ng,ni)=>{ const a=anchorOf(nd,ng,ni); return {code:a?nextVendorCode(a,o.id):""}; };
-                  const typeDisc=disciplines.filter(c=>{ if(o.type==="Material supplier") return c.kind==="material"; if(o.type==="Labour contractor") return c.kind==="task"&&String(c.code).charAt(0)==="2"; if(o.type==="Subcontractor") return c.kind==="task"&&String(c.code).charAt(0)==="3"; if(o.type==="Equipment") return c.kind==="equipment"; return false; });
+                  const typeDisc=disciplines.filter(c=>{ if(o.type==="Material supplier") return c.kind==="material"; if(o.type==="Labour contractor") return c.kind==="task"; if(o.type==="Subcontractor") return c.kind==="task"; if(o.type==="Equipment") return c.kind==="equipment"; return false; });
                   const filed=(o.type==="Material supplier"||o.type==="Labour contractor"||o.type==="Subcontractor"||o.type==="Equipment");
                   return (<React.Fragment>
                     <div><Lbl>Vendor type</Lbl><Select value={o.type} onChange={val=>setO({...o,type:val,disciplineCode:"",groupCode:"",itemCodes:[],code:""})} options={VENDOR_TYPES.map(t=>({value:t,label:t}))} className="w-full" /></div>
