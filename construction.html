@@ -1989,7 +1989,7 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
             <div className="mx-auto max-w-[1100px] px-4 py-3 sm:px-8">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-3">
                 <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-2"><img src={LOGO_URL} alt="Sync Land Limited" className="h-6 w-auto sm:h-7" /><span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-400" title="App build version">build 0630·99</span></div>
+                  <div className="flex items-center gap-2"><img src={LOGO_URL} alt="Sync Land Limited" className="h-6 w-auto sm:h-7" /><span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-400" title="App build version">build 0630·100</span></div>
                   <div className="flex flex-wrap gap-1">{[...areas, ...(isAdmin?[["admin","Admin"]]:[])].map(([k,l])=><button key={k} onClick={()=>{ setArea(k); if(k==="finance")setConTab("coverview"); else if(k==="sales")setConTab("leads"); else if(k==="construction")setConTab("board"); }} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${area===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
                 </div>
                 <div className="flex items-center gap-2 text-[12px]">
@@ -4123,7 +4123,7 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
                 const recClient=conPay2.filter(x=>inP(x.date)).reduce((s,x)=>s+Number(x.amount||0),0);
                 const invRet=([]).filter(x=>x.direction==="in"&&inP(x.date)).reduce((s,x)=>s+Number(x.amount||0),0);
                 const invCap=([]).filter(x=>x.direction==="out"&&inP(x.date)).reduce((s,x)=>s+Number(x.amount||0),0);
-                const expTotal=conExp.filter(x=>inP(x.date)).reduce((s,x)=>s+Number(x.amount||0),0);
+                const expTotal=conExp.filter(x=>inP(x.date)).reduce((s,x)=>s+Number(x.amount||0),0)+conCosts.filter(x=>inP(x.date)).reduce((s,x)=>s+Number(x.amount||0),0);
                 const moneyIn=recClient+invRet;
                 const moneyOut=expTotal+invCap;
                 const net=moneyIn-moneyOut;
@@ -4179,7 +4179,7 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
                   const fee=pRec.reduce((s,r)=>s+Number(r.amount||0),0);
                   const received=pRec.reduce((s,r)=>s+Number(r.paidAmount||0),0);
                   const pExp=conExp.filter(e=>e.projectId===p.id);
-                  const costs=pExp.reduce((s,e)=>s+Number(e.amount||0),0);
+                  const costs=pExp.reduce((s,e)=>s+Number(e.amount||0),0)+conCosts.filter(x=>x.projectId===p.id).reduce((s,x)=>s+Number(x.amount||0),0);
                   const billableCosts=pExp.filter(e=>e.billable&&!e.billed).reduce((s,e)=>s+Number(e.amount||0),0);
                   const absorbed=costs-billableCosts;
                   const outstanding=fee-received;
