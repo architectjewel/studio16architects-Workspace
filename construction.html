@@ -1990,7 +1990,7 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
             <div className="mx-auto max-w-[1100px] px-4 py-3 sm:px-8">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-3">
                 <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-2"><img src={LOGO_URL} alt="Sync Land Limited" className="h-6 w-auto sm:h-7" /><span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-400" title="App build version">build 0630·120</span></div>
+                  <div className="flex items-center gap-2"><img src={LOGO_URL} alt="Sync Land Limited" className="h-6 w-auto sm:h-7" /><span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-400" title="App build version">v26.120</span></div>
                   <div className="flex flex-wrap gap-1">{[...areas, ...(isAdmin?[["admin","Admin"]]:[])].map(([k,l])=><button key={k} onClick={()=>{ setArea(k); if(k==="finance")setConTab("coverview"); else if(k==="sales")setConTab("leads"); else if(k==="construction")setConTab("board"); }} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${area===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
                 </div>
                 <div className="flex items-center gap-2 text-[12px]">
