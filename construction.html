@@ -4617,10 +4617,10 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
                   </>}
                 </>); })()}
               
-              {conTab==="bills" && (()=>{ try{ 
+              {conTab==="bills" && (()=>{
                 const B=billForm;
                 const kinds=[["material","Material purchase"],["labour","Labour contractor"],["subcon","Sub-contractor"]];
-                const projName=pid=>{const p=conProjects.find(x=>x.id===pid);return p?((p.code?p.code+" ":"")+(p.nickname||p.client||p.location||"Project")):"";};
+                const projName=pid=>{const p=conProjects.find(x=>x.id===pid);return p?((p.code?p.code+" ":"")+(p.nickname||p.client||p.location||"Project")):"";}; const vName=id=>{ const v=vendors.find(x=>x.id===id); return v?([v.code,v.nickname,v.name,v.companyName].filter(Boolean).join(" \u00b7 ")||"\u2014"):"\u2014"; };
                 const setBL=(idx,patch)=>setBillForm(f=>({...f,lines:(f.lines||[]).map((x,i)=>i===idx?{...x,...patch}:x)}));
                 const delBL=idx=>setBillForm(f=>({...f,lines:(f.lines||[]).filter((x,i)=>i!==idx)}));
                 const addBL=()=>setBillForm(f=>({...f,lines:[...(f.lines||[]),f.kind==="material"?{type:"material",item:"",spec:"",size:"",brand:"",qty:"",unit:"",price:""}:{type:f.kind,desc:"",amount:""}]}));
@@ -4694,7 +4694,7 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
                       </div>
                     ); })}
                   </div>
-                </>);  }catch(_e){ return <div className="p-4 text-[13px] text-red-600">Bill tab error: {String((_e&&_e.stack)||(_e&&_e.message)||_e)}</div>; } })()}
+                </>); })()}
               {conTab==="matlist" && catBoard("material","Material Chart")}
               {conTab==="equiplist" && catBoard("equipment","Equipment list")}
               {conTab==="sizelist" && sizeBoard()}
