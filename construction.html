@@ -1995,7 +1995,7 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
             <div className="mx-auto max-w-[1100px] px-4 py-3 sm:px-8">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-3">
                 <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-2"><img src={LOGO_URL} alt="Sync Land Limited" className="h-6 w-auto sm:h-7" /><span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-400" title="App build version">cv26.150</span></div>
+                  <div className="flex items-center gap-2"><img src={LOGO_URL} alt="Sync Land Limited" className="h-6 w-auto sm:h-7" /><span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-400" title="App build version">cv26.151</span></div>
                   <div className="flex flex-wrap gap-1">{[...areas, ...(isAdmin?[["admin","Admin"]]:[])].map(([k,l])=><button key={k} onClick={()=>{ setArea(k); if(k==="finance")setConTab("coverview"); else if(k==="sales")setConTab("leads"); else if(k==="construction")setConTab("board"); }} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${area===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
                 </div>
                 <div className="flex items-center gap-2 text-[12px]">
@@ -3292,7 +3292,7 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
                   </div>)}
                 </div>);
               })()}
-              {conTab==="requisition" && (()=>{ try{ 
+              {conTab==="requisition" && (()=>{ 
                 const projName = pid => { const p=conProjects.find(x=>x.id===pid); return p?((p.code?p.code+" ":"")+(p.nickname||p.client||p.location||"Project")):""; };
                 const F=reqForm;
                 const same=(a,b)=>a.level===b.level&&(a.groupCode||"")===(b.groupCode||"")&&(a.taskCode||"")===(b.taskCode||"");
@@ -3412,25 +3412,22 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
                                 <span className={"shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium uppercase "+tone}>{r.status}</span>
                               </div>
                               {open && <div className="border-t border-zinc-100 p-3 text-[12px]">
-                          {b.requisitionId && (()=>{ const _wr=reqs.find(x=>String(x.id)===String(b.requisitionId)); return _wr?<div className="mb-2"><button onClick={()=>{setConTab("requisition");setReqProjFilter(_wr.projectId||"");setReqOpen([_wr.id]);}} className="rounded bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700 hover:bg-emerald-100">Wired to {_wr.ref} →</button></div>:null; })()}
-                          {(b.scope&&(b.scope.phase||b.scope.sub))?<div className="mb-1 text-[11px] font-bold text-zinc-700">{b.scope.phase} · {b.scope.phaseName}{b.scope.sub?(" › "+b.scope.sub+" · "+(b.scope.floor||b.scope.subName||"")):""}</div>:null}
-                          {(b.coverage||[]).length>0 && (()=>{ const bg={},bo=[]; (b.coverage||[]).forEach(cv=>{ const gk=cv.groupCode||"—"; if(!bg[gk]){bg[gk]={code:cv.groupCode,name:cv.groupName,tasks:[]};bo.push(gk);} bg[gk].tasks.push(cv); }); return <div className="mb-2">{bo.map(gk=>{ const g=bg[gk]; return <div key={gk} className="mb-0.5"><span className="rounded bg-indigo-100 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-800">{(g.code?g.code+" · ":"")+(g.name||"Group")}</span> {g.tasks.filter(t=>t.taskCode||t.taskName).map((t,i,ta)=><span key={i} className="ml-1 text-[11px] text-zinc-600">{(t.taskCode?t.taskCode+" ":"")+(t.taskName||"")}{i<ta.length-1?", ":""}</span>)}</div>; })}</div>; })()}
-                          <div className="mb-1 text-[12px] font-bold text-zinc-700">{b.kind==="material"?"Materials":"Labour / Sub-contractor / Equipment"}</div>
-                          {(b.lines||[]).map((l,i)=><div key={i} className="flex items-center gap-2 border-b border-zinc-50 py-1">{l.type==="material"?<><span className="min-w-0 flex-1 truncate">{l.itemCode?(l.itemCode+" · "):""}{l.item}{l.spec?(" · "+l.spec):""}{l.size?(" · "+l.size):""}{l.brand?(" · "+l.brand):""}</span><span className="shrink-0 text-zinc-500">{l.qty}{l.unit?(" "+l.unit):""} × {money(Number(l.price||0))}</span></>:<><span className="shrink-0 rounded bg-zinc-100 px-1 text-[9px] uppercase text-zinc-500">{l.type==="labour"?"labour":l.type==="subcon"?"sub-con":"equip"}</span><span className="min-w-0 flex-1 truncate">{l.desc}</span></>}<span className="mono shrink-0 font-semibold">{money(bLineTot(l))}</span></div>)}
-                          <div className="mt-2 flex justify-end rounded-lg bg-zinc-100 px-3 py-2 text-[13px]"><span className="text-zinc-600">Grand total: </span><span className="mono ml-2 font-bold">{money(b.amount)}</span></div>
-                          <div className="mb-2 mt-1 flex justify-between text-[11px]"><span className="text-zinc-500">Paid {money(b.paidAmount)}{Number(b.discount||0)>0?(" + "+money(b.discount)+" disc"):""} of {money(b.amount)}</span><span className="text-zinc-400">{Math.max(0,Number(b.amount||0)-Number(b.paidAmount||0)-Number(b.discount||0))>0.01?(money(Math.max(0,Number(b.amount||0)-Number(b.paidAmount||0)-Number(b.discount||0)))+" due"):"fully settled"}</span></div>
-                          <div className="flex flex-wrap items-center gap-1">
-                            {isAdmin && ["draft","sent","received"].map(st=><button key={st} onClick={()=>setBillStatus(b,st)} className={"rounded border px-2 py-0.5 text-[10px] capitalize "+((b.status||"draft")===st?"border-zinc-800 bg-zinc-800 text-white":"border-zinc-200 text-zinc-500 hover:bg-zinc-50")}>{st}</button>)}
-                            <button onClick={()=>setBillForm({...b,...(b.scope||{}),vendor:vName(b.vendorId)})} className="ml-auto text-[11px] text-zinc-400 hover:text-zinc-700">edit</button>
-                            {isAdmin && <button onClick={()=>delBill(b.id)} className="text-[11px] text-zinc-400 hover:text-red-500">delete</button>}
-                          </div>
-                        </div>}
+                                {(r.coverage||[]).length>0 && <div className="mb-2">{(r.scope&&(r.scope.phase||r.scope.sub))?<div className="mb-1 text-[11px] font-bold text-zinc-700">{r.scope.phase} · {r.scope.phaseName}{r.scope.sub?(" › "+r.scope.sub+" · "+(r.scope.floor||r.scope.subName||"")):""}</div>:null}{(()=>{ const bg={},bo=[]; (r.coverage||[]).forEach(cv=>{ const gk=cv.groupCode||"—"; if(!bg[gk]){bg[gk]={code:cv.groupCode,name:cv.groupName,tasks:[]};bo.push(gk);} bg[gk].tasks.push(cv); }); return bo.map(gk=>{ const g=bg[gk]; return <div key={gk} className="mb-0.5"><span className="rounded bg-indigo-100 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-800">{(g.code?g.code+" · ":"")+(g.name||"Group")}</span> {g.tasks.filter(t=>t.taskCode||t.taskName).map((t,i,ta)=>{ const _dc=_taskCount[r.projectId+"|"+t.taskCode]||1; return <span key={i} className={"ml-1 rounded px-1 text-[11px] "+(_dc>1?"bg-amber-100 font-semibold text-amber-800":"text-zinc-600")}>{(t.taskCode?t.taskCode+" ":"")+(t.taskName||"")}{_dc>1?(" ×"+_dc):""}{i<ta.length-1?", ":""}</span>; })}</div>; }); })()}</div>}
+                                {mats.length>0 && <div className="mb-2"><div className="mb-1 text-[12px] font-bold text-zinc-700">Materials</div>{mats.map((l,i)=><div key={i} className="flex items-center gap-2 border-b border-zinc-50 py-1"><span className="min-w-0 flex-1 truncate">{l.itemCode?(l.itemCode+" · "):""}{l.item||"—"}{l.spec?(" · "+l.spec):""}{l.size?(" · "+l.size):""}{l.brand?(" · "+l.brand):""}</span><span className="shrink-0 text-zinc-400">{l.vendor}</span><span className="shrink-0 text-zinc-500">{l.qty}{l.unit?(" "+l.unit):""} × {money(Number(l.price||0))}</span><span className="mono shrink-0 font-semibold">{money(Number(l.qty||0)*Number(l.price||0))}</span></div>)}</div>}
+                                {cons.length>0 && <div className="mb-2"><div className="mb-1 text-[12px] font-bold text-zinc-700">Labour / Sub-contractor</div>{cons.map((l,i)=><div key={i} className="flex items-center gap-2 border-b border-zinc-50 py-1"><span className="rounded bg-zinc-100 px-1 text-[9px] uppercase text-zinc-500">{l.type==="labour"?"labour":l.type==="subcon"?"sub-con":"equip"}</span><span className="min-w-0 flex-1 truncate">{l.vendor}</span><span className="mono shrink-0 font-semibold">{money(Number(l.amount||0))}</span></div>)}</div>}
+                                <div className="mb-2 flex justify-end"><span className="text-zinc-500">Grand total: </span><span className="mono ml-1 font-bold">{money(gt)}</span></div>
+                                <div className="flex flex-wrap items-center gap-1">
+                                  {isAdmin && ["draft","submitted","accepted","declined","expired"].map(st=><button key={st} onClick={()=>setReqStatus(r,st)} className={"rounded border px-2 py-0.5 text-[10px] capitalize "+(r.status===st?"border-zinc-800 bg-zinc-800 text-white":"border-zinc-200 text-zinc-500 hover:bg-zinc-50")}>{st}</button>)}
+                                  <button onClick={()=>printRequisition(r)} className="ml-auto rounded border border-zinc-300 px-2 py-0.5 text-[10px] text-zinc-600 hover:bg-zinc-50">Print</button><button onClick={()=>setReqForm({...r,...(r.scope||{})})} className="text-[11px] text-zinc-400 hover:text-zinc-700">edit</button>
+                                  {isAdmin && <button onClick={()=>delReq(r.id)} className="text-[11px] text-zinc-400 hover:text-red-500">delete</button>}
+                                </div>
+                              </div>}
                             </div></div>
                           ); })}</div>
                         </div>
                       )); })()}
                   </div>
-                </>);  }catch(_e){ return <div className="p-4 text-[13px] text-red-600">Requisition tab error: {String((_e&&_e.stack)||(_e&&_e.message)||_e)}</div>; } })()}
+                </>); })()}
               {conTab==="handler" && (()=>{
                 const projName = pid => { const p=conProjects.find(x=>x.id===pid); return p?((p.code?p.code+" ":"")+(p.nickname||p.client||"Project")):""; };
                 const mName = id => { const m=members.find(x=>x.id===id); return m?m.name:""; };
