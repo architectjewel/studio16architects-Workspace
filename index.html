@@ -1151,7 +1151,7 @@ function printProposal(p){
             <div className="mx-auto max-w-[1100px] px-4 py-3 sm:px-8">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-3">
                 <div className="flex flex-wrap items-center gap-3">
-                  <img src={"data:image/svg+xml;base64,"+LOGO_B64} alt={profile?.companies?.name||"Studio 16 Architects"} className="h-6 w-auto sm:h-7" /><span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-400" title="App build version">dv26.08</span>
+                  <img src={"data:image/svg+xml;base64,"+LOGO_B64} alt={profile?.companies?.name||"Studio 16 Architects"} className="h-6 w-auto sm:h-7" /><span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-400" title="App build version">dv26.10</span>
                   <div className="flex flex-wrap gap-1">{[...areas, ...(isAdmin?[["admin","Admin"]]:[])].map(([k,l])=><button key={k} onClick={()=>setArea(k)} className={`rounded-md px-3 py-1.5 text-[12px] font-medium ${area===k?"bg-zinc-900 text-white":"text-zinc-500 hover:bg-zinc-100"}`}>{l}</button>)}</div>
                 </div>
                 <div className="flex items-center gap-2 text-[12px]">
@@ -2489,16 +2489,7 @@ function printProposal(p){
                   <h2 className="text-base font-semibold">Construction overview</h2>
                   <a href={CON_URL} target="_blank" rel="noopener" className="rounded-md bg-zinc-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-zinc-700">Open Construction workspace →</a>
                 </div>
-                {(()=>{ const bp=b=>Number(b.paidAmount||0)+((b.payments||[]).reduce((s,p)=>s+Number(p.amount||0),0)); const billed=bills.reduce((s,b)=>s+Number(b.amount||0),0); const paid=bills.reduce((s,b)=>s+bp(b),0); const payable=billed-paid; const cost=conCosts.reduce((s,x)=>s+Number(x.amount||0),0); const Tile=({l,v,tone})=>(<div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[10px] uppercase tracking-wide text-zinc-400">{l}</div><div className={"mono mt-0.5 text-[15px] font-semibold "+(tone==="red"?"text-red-600":tone==="emerald"?"text-emerald-600":"text-zinc-900")}>{v}</div></div>); return <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4"><Tile l="PO billed" v={money(billed)} /><Tile l="Paid" v={money(paid)} tone="emerald" /><Tile l="Payable" v={money(payable)} tone={payable>0.5?"red":"emerald"} /><Tile l="Project cost" v={money(cost)} /></div>; })()}
-                <div className="mb-4 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3"><div className="flex flex-wrap items-stretch gap-x-6 gap-y-2">
-                  <Stat n={siteProjs.length} l="Active site projects" />
-                  <Stat n={avgAll+"%"} l="Avg progress" />
-                  <Stat n={inProg} l="Stages in progress" />
-                  <Stat n={delayed} l="Delayed stages" tone={delayed>0?"red":undefined} />
-                  <Stat n={money(outstanding)} l="Owed to vendors" tone={outstanding>0?"amber":undefined} />
-                  <Stat n={money(overdue)} l="Overdue bills" tone={overdue>0?"red":undefined} />
-                  <Stat n={vendors.length} l="Vendors" />
-                </div></div>
+                <div className="mb-4 grid grid-cols-3 gap-2">{(()=>{const ps=p=>p.status||"live";const live=conProjects.filter(p=>ps(p)==="live").length;const active=conProjects.filter(p=>["live","hold","active"].includes(ps(p))).length;const T=({l,v,sub})=>(<div className="rounded-lg border border-zinc-200 bg-white p-3"><div className="text-[10px] uppercase tracking-wide text-zinc-400">{l}</div><div className="mono mt-0.5 text-[17px] font-semibold text-zinc-900">{v}</div>{sub&&<div className="text-[10px] text-zinc-400">{sub}</div>}</div>);return <><T l="Live projects" v={live} sub={conProjects.length+" total"} /><T l="Active projects" v={active} sub="live + on hold" /><T l="Avg progress" v={avgAll+"%"} /></>;})()}</div>
                 {projRows.length>0 ? (<div className="space-y-1.5">{projRows.map(r=>(
                   <div key={r.pid} className="rounded-lg border border-zinc-200 bg-white px-3 py-2.5">
                     <div className="flex items-center gap-2">{r.p&&<span className="mono text-[12px] font-bold">{r.p.code}</span>}<span className="min-w-0 flex-1 truncate text-[13px] font-medium">{r.p?(r.p.nickname||r.p.client||r.p.location||"Project"):"Unassigned"}</span><span className="mono text-[11px] text-zinc-500">{r.done}/{r.total} done</span><span className={`mono text-[12px] font-semibold ${r.del?"text-red-500":"text-zinc-700"}`}>{r.avg}%</span></div>
