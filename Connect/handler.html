@@ -2016,7 +2016,7 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
             <div className="mx-auto max-w-[1100px] px-4 py-3 sm:px-8">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-3">
                 <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-2"><img src={LOGO_URL} alt="Sync Land Limited" className="h-6 w-auto sm:h-7" /><span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-400" title="App build version">hv26.16</span></div>
+                  <div className="flex items-center gap-2"><img src={LOGO_URL} alt="Sync Land Limited" className="h-6 w-auto sm:h-7" /><span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-400" title="App build version">hv26.17</span></div>
                   <div className="flex gap-1 rounded-lg bg-zinc-100 p-1">{[["construction","Construction"],["design","Design"]].map(([k,l])=><button key={k} onClick={()=>{ setArea(k); setConTab(k==="design"?"dadvances":"cashadvance"); setNadv(f=>({...f,dest:(k==="design"?"office":"construction"),projectId:"",conProjId:"",conVendorId:"",conBillId:"",billId:"",invId:""})); }} className={"flex-1 rounded-md px-3 py-2 text-[13px] font-semibold "+(area===k?"bg-zinc-900 text-white shadow":"text-zinc-600")}>{l}</button>)}</div>
                 </div>
                 <div className="flex items-center gap-2 text-[12px]">
@@ -3157,7 +3157,7 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
                 const G = area==="design" ? [["dnav","Design"]] : [["hnav","Handler"]];
                 const T={hnav:[["cashadvance","Cash advance"],["purchase","Purchase"]],dnav:[["dadvances","Cash advance"]]};
                 const curG=(G.find(([g])=>T[g].some(t=>t[0]===conTab))||G[0])[0];
-                return (<>{G.length>1 && <div className="mb-3 flex flex-wrap gap-1.5">{G.map(([g,gl])=><button key={g} onClick={()=>{ if(!T[g].some(t=>t[0]===conTab)) setConTab(T[g][0][0]); }} className={"rounded-md px-3 py-1.5 text-[12px] font-semibold "+(g===curG?"bg-zinc-900 text-white":"bg-zinc-100 text-zinc-600")}>{gl}</button>)}</div>}{T[curG].length>1 && <div className="fixed bottom-0 left-0 right-0 z-40 mx-auto flex max-w-[600px] gap-1 border-t border-zinc-200 bg-white/95 px-2 py-1.5 backdrop-blur shadow-[0_-3px_12px_rgba(0,0,0,0.06)]">{T[curG].map(([k,l])=><button key={k} onClick={()=>setConTab(k)} className={"flex-1 rounded-lg px-2 py-2.5 text-[13px] font-semibold transition "+(conTab===k?"bg-zinc-900 text-white":"text-zinc-500 active:bg-zinc-100")}>{l}</button>)}</div>}</>);
+                return (<div className="mb-3">{G.length>1 && <div className="flex flex-wrap gap-1.5">{G.map(([g,gl])=><button key={g} onClick={()=>{ if(!T[g].some(t=>t[0]===conTab)) setConTab(T[g][0][0]); }} className={"rounded-md px-3 py-1.5 text-[12px] font-semibold "+(g===curG?"bg-zinc-900 text-white":"bg-zinc-100 text-zinc-600 hover:bg-zinc-200")}>{gl}</button>)}</div>}{T[curG].length>1 && <div className="mt-1.5 flex flex-wrap gap-1.5 border-t border-zinc-100 pt-1.5">{T[curG].map(([k,l])=><button key={k} onClick={()=>setConTab(k)} className={"rounded-md px-3 py-1.5 text-[12px] font-medium "+(conTab===k?"bg-zinc-700 text-white":"text-zinc-500 hover:bg-zinc-100")}>{l}</button>)}</div>}</div>);
               })()}
               {conTab==="conregistry" && (()=>{
                 const TYPES=[["building","Building"],["interior","Interior"],["landscape","Landscape"]];
@@ -5205,7 +5205,7 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
               </div>
             ); })()}
           </main>
-          <footer className="mx-auto max-w-[1100px] px-4 pb-24 pt-2 sm:px-8">
+          <footer className="mx-auto max-w-[1100px] px-4 pb-8 pt-2 sm:px-8">
             {showSeen && <div className="mb-3 rounded-lg border border-zinc-200 bg-white p-3"><div className="mb-1.5 mono text-[10px] uppercase tracking-wider text-zinc-400">Team — last seen</div><div className="space-y-0.5">{allProfiles.slice().sort((a,b)=>(b.last_seen?new Date(b.last_seen).getTime():0)-(a.last_seen?new Date(a.last_seen).getTime():0)).map(pr=>(<div key={pr.id} className="flex items-center gap-2 text-[11px]"><span className="min-w-0 flex-1 truncate text-zinc-600">{pr.name||pr.employee_id}{pr.id===profile?.id&&<span className="text-zinc-400"> (you)</span>}</span><span className="mono shrink-0 text-zinc-400">{pr.last_seen?relTime(pr.last_seen):"never"}</span></div>))}</div></div>}
             <div className="flex flex-wrap items-center justify-between gap-2 border-t border-zinc-200 pt-4 text-[11px] text-zinc-400">
               <span>{STUDIO.name} · {STUDIO.web} · <span className="text-zinc-300">{STUDIO.tagline}</span></span>
