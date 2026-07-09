@@ -250,6 +250,7 @@
       const areas = ALL_KEYS.filter(([k])=> k==="design" || has(AREA_KEY[k]||k));
 
       useEffect(()=>{ if(!profile) return; if(realAdmin && viewAs!=="member") return; const ok = ALL_KEYS.filter(([k])=> k==="design" || has(AREA_KEY[k]||k)).map(([k])=>k); if(!ok.includes(area)) setArea((ALL_KEYS.find(([k])=>k!=="design" && has(AREA_KEY[k]||k))||["design"])[0]); },[profile,viewAs,viewKeys,area,realAdmin]);
+      useEffect(()=>{ /* handler: keep conTab valid for the chosen area */ const DES=["dadvances"], CON=["cashadvance","purchase"]; if(area==="design"){ if(!DES.includes(conTab)) setConTab("dadvances"); } else { if(!CON.includes(conTab)) setConTab("cashadvance"); } },[area,conTab]);
 
       useEffect(()=>{ if(!db) return; db.auth.getSession().then(({data})=>setSession(data.session)); const {data:sub}=db.auth.onAuthStateChange((_e,s)=>setSession(s)); return ()=>sub.subscription.unsubscribe(); },[]);
       useEffect(()=>{ if(session) load(true); },[session]);
@@ -2013,7 +2014,7 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
             <div className="mx-auto max-w-[1100px] px-4 py-3 sm:px-8">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-3">
                 <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-2"><img src={LOGO_URL} alt="Sync Land Limited" className="h-6 w-auto sm:h-7" /><span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-400" title="App build version">hv26.08</span></div>
+                  <div className="flex items-center gap-2"><img src={LOGO_URL} alt="Sync Land Limited" className="h-6 w-auto sm:h-7" /><span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-400" title="App build version">hv26.10</span></div>
                   <div className="flex gap-1 rounded-lg bg-zinc-100 p-1">{[["construction","Construction"],["design","Design"]].map(([k,l])=><button key={k} onClick={()=>{ setArea(k); setConTab(k==="design"?"dadvances":"cashadvance"); }} className={"flex-1 rounded-md px-3 py-2 text-[13px] font-semibold "+(area===k?"bg-zinc-900 text-white shadow":"text-zinc-600")}>{l}</button>)}</div>
                 </div>
                 <div className="flex items-center gap-2 text-[12px]">
@@ -4431,7 +4432,7 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
                 const PROJ_CATS=["Printing & binding","Delivery","Liaison fee","Professional fee","Transport","Lunch & refreshment","Contract member payment","Other project cost"];
                 const METHODS=["Cash","Cheque","bKash","Nagad","Bank","Other"];
                 const TYPE_OPTS=[{value:"give",label:"Money received"},{value:"spend",label:"Paid out"},{value:"return",label:"Returned"}];
-                const subPills=(<div className="mb-3 flex flex-wrap gap-1">{[["expenditure","Expenses"],["monthlyrun","Monthly run"],["advances","Cash advances"]].map(([k,l])=>(<button key={k} onClick={()=>setFinTab(k)} className={"rounded-md px-2.5 py-1 text-[11px] font-medium "+(finTab===k?"bg-zinc-800 text-white":"text-zinc-500 hover:bg-zinc-100")}>{l}</button>))}</div>);
+                const subPills=null;
                 const emps=members.filter(m=>m.status==="active");
                 const dProjects=projects.filter(p=>p.status!=="archived");
                 const empName=id=>{ const m=members.find(x=>x.id===id); return m?m.name:"\u2014"; };
@@ -4587,7 +4588,7 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
                 const PROJ_CATS=["Printing & binding","Delivery","Contract member payment","Other project cost"];
                 const METHODS=["Cash","Cheque","bKash","Nagad","Bank","Other"];
                 const TYPE_OPTS=[{value:"give",label:"Money received"},{value:"spend",label:"Paid out"},{value:"return",label:"Returned"}];
-                const subPills=(<div className="mb-3 flex flex-wrap gap-1">{[["cexpenditure","Expenses"],["cmonthlyrun","Monthly run"],["cashadvance","Cash advances"]].map(([k,l])=>(<button key={k} onClick={()=>setConTab(k)} className={"rounded-md px-2.5 py-1 text-[11px] font-medium "+(conTab===k?"bg-zinc-800 text-white":"text-zinc-500 hover:bg-zinc-100")}>{l}</button>))}</div>);
+                const subPills=null;
                 const emps=members.filter(m=>m.status==="active");
                 const dProjects=projects.filter(p=>p.status!=="archived");
                 const empName=id=>{ const m=members.find(x=>x.id===id); return m?m.name:"\u2014"; };
