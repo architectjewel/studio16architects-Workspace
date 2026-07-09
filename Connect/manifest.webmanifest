@@ -1,7 +1,7 @@
 {
-  "name": "S16A Handler",
-  "short_name": "Handler",
-  "description": "Cash advance & purchase for the Studio 16 Architects field team",
+  "name": "S16A Connect",
+  "short_name": "Connect",
+  "description": "Cash advance & purchase for the Studio 16 Architects team",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
