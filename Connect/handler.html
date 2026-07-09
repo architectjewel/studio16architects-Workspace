@@ -251,6 +251,7 @@
 
       useEffect(()=>{ if(!profile) return; if(realAdmin && viewAs!=="member") return; const ok = ALL_KEYS.filter(([k])=> k==="design" || has(AREA_KEY[k]||k)).map(([k])=>k); if(!ok.includes(area)) setArea((ALL_KEYS.find(([k])=>k!=="design" && has(AREA_KEY[k]||k))||["design"])[0]); },[profile,viewAs,viewKeys,area,realAdmin]);
       useEffect(()=>{ /* handler: keep conTab valid for the chosen area */ const DES=["dadvances"], CON=["cashadvance","purchase"]; if(area==="design"){ if(!DES.includes(conTab)) setConTab("dadvances"); } else { if(!CON.includes(conTab)) setConTab("cashadvance"); } },[area,conTab]);
+      useEffect(()=>{ const CON_DESTS=["construction","siteexp","sitebill","sitesal","offexp","offbill","offsal","mgmtexp","mgmtbill"]; const DES_DESTS=["office","officebill","mgmt","mgmtbill","salary","project"]; setNadv(f=>{ if(area==="design" && CON_DESTS.includes(f.dest) && !DES_DESTS.includes(f.dest)) return {...f,dest:"office",conProjId:"",projectId:""}; if(area!=="design" && DES_DESTS.includes(f.dest) && !CON_DESTS.includes(f.dest)) return {...f,dest:"construction",projectId:"",conProjId:""}; return f; }); },[area]);
 
       useEffect(()=>{ if(!db) return; db.auth.getSession().then(({data})=>setSession(data.session)); const {data:sub}=db.auth.onAuthStateChange((_e,s)=>setSession(s)); return ()=>sub.subscription.unsubscribe(); },[]);
       useEffect(()=>{ if(session) load(true); },[session]);
@@ -2014,8 +2015,8 @@ function specDoc(p){ const d=p&&p.coreDocs; if(!d) return null; const ok=x=>x&&x
             <div className="mx-auto max-w-[1100px] px-4 py-3 sm:px-8">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-3">
                 <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-2"><img src={LOGO_URL} alt="Sync Land Limited" className="h-6 w-auto sm:h-7" /><span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-400" title="App build version">hv26.11</span></div>
-                  <div className="flex gap-1 rounded-lg bg-zinc-100 p-1">{[["construction","Construction"],["design","Design"]].map(([k,l])=><button key={k} onClick={()=>{ setArea(k); setConTab(k==="design"?"dadvances":"cashadvance"); }} className={"flex-1 rounded-md px-3 py-2 text-[13px] font-semibold "+(area===k?"bg-zinc-900 text-white shadow":"text-zinc-600")}>{l}</button>)}</div>
+                  <div className="flex items-center gap-2"><img src={LOGO_URL} alt="Sync Land Limited" className="h-6 w-auto sm:h-7" /><span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-medium text-zinc-400" title="App build version">hv26.12</span></div>
+                  <div className="flex gap-1 rounded-lg bg-zinc-100 p-1">{[["construction","Construction"],["design","Design"]].map(([k,l])=><button key={k} onClick={()=>{ setArea(k); setConTab(k==="design"?"dadvances":"cashadvance"); setNadv(f=>({...f,dest:(k==="design"?"office":"construction"),projectId:"",conProjId:"",conVendorId:"",conBillId:"",billId:"",invId:""})); }} className={"flex-1 rounded-md px-3 py-2 text-[13px] font-semibold "+(area===k?"bg-zinc-900 text-white shadow":"text-zinc-600")}>{l}</button>)}</div>
                 </div>
                 <div className="flex items-center gap-2 text-[12px]">
                   
