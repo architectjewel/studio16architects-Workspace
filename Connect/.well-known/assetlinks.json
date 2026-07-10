@@ -2,7 +2,7 @@
       "relation": ["delegate_permission/common.handle_all_urls"],
       "target": {
         "namespace": "android_app",
-        "package_name": "com.studio16architectsbd.connect.twa",
-        "sha256_cert_fingerprints": ["FF:5D:E5:75:36:E4:AF:6A:20:36:CB:E4:C4:D9:17:8B:4B:7B:78:5B:F6:42:8A:06:50:F2:CB:B0:5E:51:F8:41"]
+        "package_name": "com.studio16architectsbd.connect",
+        "sha256_cert_fingerprints": ["16:78:24:56:F4:F4:47:1D:07:98:8C:54:2F:36:79:00:39:57:C3:01:88:10:88:87:80:10:EC:C0:4F:85:9B:29"]
       }
     }]
