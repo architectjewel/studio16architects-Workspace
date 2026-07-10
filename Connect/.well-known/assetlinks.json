@@ -3,6 +3,6 @@
       "target": {
         "namespace": "android_app",
         "package_name": "com.studio16architectsbd.connect.twa",
-        "sha256_cert_fingerprints": ["E9:C5:E4:E7:05:7F:24:18:B1:87:4B:BF:1D:E7:C1:4A:70:84:1A:17:5C:42:96:D8:C6:1F:AD:13:A8:A5:01:06"]
+        "sha256_cert_fingerprints": ["FF:5D:E5:75:36:E4:AF:6A:20:36:CB:E4:C4:D9:17:8B:4B:7B:78:5B:F6:42:8A:06:50:F2:CB:B0:5E:51:F8:41"]
       }
     }]
